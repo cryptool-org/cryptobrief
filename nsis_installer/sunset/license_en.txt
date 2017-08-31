@@ -1,0 +1,9 @@
+Sunset is eine integrierte Entwicklungsumgebung für die Programmiersprache FFapl.
+
+Copyright (C) 2012 Alexander O. Ortner
+
+Durch die Verwendung dieser Software stimmen sie diesen Bedingungen zu. Sollten sie ihnen nicht zustimmen, verwenden Sie die Software nicht.
+
+Die Nutzung Sunset und FFapl ist nur im Rahmen der Lehrveranstaltungen der Forschungsgruppe Systemsicherheit der Universität Klagenfurt gestattet.
+
+Jegliche Weitergabe oder Nutzung der Software für andere Zwecke ist nur durch schriftliche Einwilligung des Leiters der Forschungsgruppe: O.Univ.-Prof. Dr. Patrick Horster gestattet.

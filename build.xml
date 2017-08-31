@@ -1,0 +1,81 @@
+<!-- Author: Alexander Ortner -->
+<!-- Date: 11.10.2010 -->
+
+	<project name = "finite_field_compiler" default = "compile-java" basedir = ".">
+	<description>
+		ANT build file for compiling the PARSER. 
+	</description>
+	
+	<!-- set global properties for this build -->
+	<property name="src" location="${basedir}/src/"/>
+	<property name="lib" location="${basedir}/lib/"/>
+	<property name="build" location="${basedir}/bin/"/>
+	<property name="javacc" location="C:/Program Files/javacc-5.0/"/>
+	<!--
+	<property name="scanner" location="ffapl.scanner"/>
+	-->
+	<property name="grammar" location="${src}/ffapl/ffaplParser.jj"/>
+	<!--<property name="predefinedProcedures" location="${lib}/predefined_procedures.ffapl"/ -->	
+	<!--durch das {src} plattformunabhÃ¤ngig-->
+	<property name="ffapl" location="Z:/testfiles/typecheck/test01.ffapl"/>
+    <property name="outfile" location="Z:/standard.java"/>
+
+			
+	<target name="init">
+		<!-- Create the time stamp -->
+		<tstamp/>
+		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${build}"/>
+	</target>
+	
+	<target name="compile-javacc" depends="init" description="compile the grammar file">
+		<javacc target="${grammar}" javacchome="${javacc}" static="true"/>
+	</target>
+	
+	<target name="compile-java" depends="init, compile-javacc" description="compile the source">
+		<!-- Compile the java code from ${src} into ${build} -->
+		<javac srcdir="${src}" destdir="${build}"/>
+	</target>
+	
+	
+
+	<target name="run" depends="compile-java" description="compiles if necessary and runs the the program">
+			<java classname="ffapl.java.mainApp">
+				<classpath>
+					<pathelement location="${build}" />
+					<pathelement path="${java.class.path}" />
+					<pathelement location="${lib}/jdom.jar" />
+				</classpath>
+				<arg value="${ffapl}" />
+				<arg value="${outfile}" />
+			</java>	
+	</target>
+	
+	<target name="run-test" depends="" description="runs the the program only for testing">
+					<java classname="ffapl.FFapl">
+						<classpath>
+							<pathelement location="${build}" />
+							<pathelement path="${java.class.path}" />
+						</classpath>
+						<arg value="${ffapl}" />
+						<arg value="${outfile}" />
+					</java>	
+	</target>
+	
+	
+	<target name="clean" description="clean up">
+		<!-- Delete the ${build}  and ${dist}  directory trees-->
+		<delete dir="${build}"/>
+		<delete>
+			<fileset dir="${src}/ffapl" >
+				<include name = "*.java" />
+				<exclude name = "ParseException.java" />
+				<exclude name = "TokenMgrError.java" />
+		   </fileset>
+		</delete>
+	</target>
+	
+	</project>
+	
+	
+	

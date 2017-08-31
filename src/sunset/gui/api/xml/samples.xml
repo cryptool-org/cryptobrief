@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ff:sampleCode xmlns:ff="ffapl/api"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="ffapl/api ../jaxb/api.xsd ">
+	<ff:functionList>
+		<ff:function>
+			<ff:name>faculty</ff:name>
+			<ff:description>SAMPLE_FUNC_FACULTY</ff:description>
+			<ff:regex>faculty</ff:regex>
+			<ff:parameterList>
+				<ff:parameter>
+					<ff:name>val</ff:name>
+					<ff:type>Integer</ff:type>
+				</ff:parameter>
+			</ff:parameterList>
+			<ff:body>
+	function faculty(val : Integer) : Integer{
+		f : Integer;
+		f := 1;
+		for i = 1 to val{
+			f:= f * i;
+		}
+		return f;
+	}</ff:body>
+			<ff:returnType>Integer</ff:returnType>
+		</ff:function>
+		<ff:function>
+			<ff:name>facultyRecursive</ff:name>
+			<ff:description>SAMPLE_FUNC_FACULTYRECURSIVE</ff:description>
+			<ff:regex>facultyRecursive</ff:regex>
+			<ff:parameterList>
+				<ff:parameter>
+					<ff:name>val</ff:name>
+					<ff:type>Integer</ff:type>
+				</ff:parameter>
+			</ff:parameterList>
+			<ff:body>
+	function facultyRecursion(val : Integer) : Integer{
+		f : Integer;
+		if(val == 1){
+		    f := 1;
+		}else{
+		    f := val * facultyRecursion(val - 1);
+		}
+		return f;
+	}</ff:body>
+			<ff:returnType>Integer</ff:returnType>
+		</ff:function>
+		<ff:function>
+			<ff:name>isIrreducibleQ</ff:name>
+			<ff:description>SAMPLE_FUNC_ISIRREDUCIBLEQ</ff:description>
+			<ff:regex>isIrreducibleQ</ff:regex>
+			<ff:parameterList>
+				<ff:parameter>
+					<ff:name>f</ff:name>
+					<ff:type>Polynomial</ff:type>
+				</ff:parameter>
+				<ff:parameter>
+					<ff:name>p</ff:name>
+					<ff:type>Prime</ff:type>
+				</ff:parameter>
+			</ff:parameterList>
+			<ff:body>
+	/** 
+	* Checks if polynomial is irreducible
+	* Alogrithm 4.69 in Handbook of Applied Cryptography 
+	*/
+	function isIrreducibleQ(f : Polynomial; p : Prime) : Boolean{
+		result : Boolean;
+		u, d, ff : Z(p)[x];
+    		lc: Z(p);
+		m: Integer;
+		ff := f;
+	
+		if(leadingCoefficient(ff) > 1){
+			//not monic
+    	    		lc := leadingCoefficient(ff);
+    	    		ff := ff * lc^-1;
+		}
+		
+		result := true;
+    		m := degree(ff);
+		u := [x]; // u(x) := x
+	   	if(m != 1){
+			for i = 1 to m/2 { // for i to m/2
+				u := u^p MOD ff;  // u(x) := u(x)^p mod f(x)
+				d := gcd(ff, u - [x]); //d(x) := gcd(f(x), u(x) - x)
+           		if(degree(d) > 0){ // if d(x) != 1 not irreducible
+					result := false; 
+					break;
+				}
+			}
+		}
+		return result;
+	}</ff:body>
+			<ff:returnType>Boolean</ff:returnType>
+		</ff:function>
+
+
+		<ff:function>
+			<ff:name>isPrimitiveQ</ff:name>
+			<ff:description>SAMPLE_FUNC_ISPRIMITIVEQ</ff:description>
+			<ff:regex>isPrimitiveQ</ff:regex>
+			<ff:parameterList>
+				<ff:parameter>
+					<ff:name>f</ff:name>
+					<ff:type>Polynomial</ff:type>
+				</ff:parameter>
+				<ff:parameter>
+					<ff:name>p</ff:name>
+					<ff:type>Prime</ff:type>
+				</ff:parameter>
+			</ff:parameterList>
+			<ff:body>
+	/** 
+	* Checks if polynomial is primitive
+	* Algorithm 4.77 from Handbook of Applied Cryptography 
+	*/
+	function isPrimitiveQ(f : Polynomial; p : Prime) : Boolean{
+		result : Boolean;
+		u, d, ff, lx : Z(p)[x];
+    		lc: Z(p);
+		m, pm, val: Integer;
+    		primeFactors : Integer[][];
+		ff := f;
+	
+		if(isIrreducibleQ(f, p)){
+			m:= degree(f);
+			pm := p^m - 1;
+			
+			if(leadingCoefficient(ff) > 1){
+				//nicht normiert
+        			lc := leadingCoefficient(ff);
+        			ff := ff * lc^-1;
+			}
+			
+			primeFactors := factorInteger(pm); //Primfaktoren von p^m - 1
+            		result := true;
+			for i = 0 to #primeFactors - 1{
+				val := primeFactors[i][0]; 
+				lx := [x]^(pm/val) MOD ff; //l(x) := x^((p^m - 1) / r_i) mod f(x)
+				if(lx == 1){ // nicht primitiv
+					result := false;
+					break;
+				}
+			}
+		}else{ // nicht irreduzibel daher auch nicht primtiv
+			result := false;
+		}
+  		return result;
+	}</ff:body>
+			<ff:returnType>Boolean</ff:returnType>
+		</ff:function>
+		
+		
+		
+		
+		<ff:function>
+			<ff:name>funcTemplate</ff:name>
+			<ff:description>SAMPLE_FUNC_TEMPLATE</ff:description>
+			<ff:regex>funcTemplate</ff:regex>
+			<ff:body>
+	function funcTemplate(/* insert parameters here */) : Integer{
+		//insert code here
+		return //insert return value here
+	}
+	</ff:body>
+			<ff:returnType>Integer</ff:returnType>
+		</ff:function>
+
+
+
+
+
+
+		<ff:function>
+			<ff:name>tateLichtenbaumPairing</ff:name>
+			<ff:description>SAMPLE_FUNC_TLPAIRING</ff:description>
+			<ff:regex>tateLichtenbaumPairing</ff:regex>
+			<ff:parameterList>
+				<ff:parameter>
+					<ff:name>A</ff:name>
+					<ff:type>EC</ff:type>
+				</ff:parameter>
+				<ff:parameter>
+					<ff:name>B</ff:name>
+					<ff:type>EC</ff:type>
+				</ff:parameter>
+			</ff:parameterList>
+			<ff:body>
+	/** 
+	* Calculates the logarithm of base 2
+	*/
+	function log2(a: Integer) : Integer
+	{
+		i,c:Integer;
+		c := 0;
+		i := 1;
+		while (i &lt;= a)
+		{
+			i := 2*i;
+			c := c+1;
+		}
+		return c;
+	}
+	
+	function testBit(a: Integer; b: Integer) : Integer{
+			ret: Integer;
+			ret := a;
+			ret := a/2^b;
+			return ret MOD 2;
+		}
+		
+	/** 
+	* Calculates TateLichtenbaumPairing
+	* Algorithm 16.12 from Handbook of Elliptic and Hyperelliptic Curve Cryptography 
+	*/
+	function tateLichtenbaumPairing(P: EC; Q: EC) :  GF{
+		T: SameAs(P);
+		l, ldigits: Integer;
+		f1,f2,x1,x2,x3, y1,y2, y3, lambda: BaseGF(Q);
+		a1, a2, a3, a4, a6: BaseGF(Q);
+		a1 := getECParameter(Q, "a1");
+		a2 := getECParameter(Q, "a2");
+		a3 := getECParameter(Q, "a3");
+		a4 := getECParameter(Q, "a4");
+		a6 := getECParameter(Q, "a6");
+		T:= P;
+		l:=getECPointOrder(P);
+		ldigits := log2(l);
+		f1 := [1];
+		f2 := [1];
+		&lt;&lt; x1, y1 &gt;&gt; := P;
+		&lt;&lt; x2, y2 &gt;&gt; := Q;
+		for i = ldigits-2 to 0 {
+			&lt;&lt; x3, y3 &gt;&gt; := T;
+			if (2*y3+a1*x3+a3 != 0)
+			{
+				lambda := (3*x3^2+2*a2*x3+a4-a1*y3)/(2*y3+a1*x3+a3);
+				f1 := f1^2* (y2- lambda*(x2-x3) -y3);
+				f2 := f2^2* (x2 + 2*x3 - lambda^2 - a1*lambda + a2);
+			}
+			else
+			{
+				f1 := f1^2* (x2-x3);
+				f2 := f2^2;
+			}
+			T := 2*T;
+			if ( testBit(l,i) == 1 )
+			{
+				&lt;&lt; x3, y3 &gt;&gt; := T;
+				if (x3 != x1)
+				{
+					lambda := (y3-y1)/(x3-x1);
+					f1 := f1 * (y2 - lambda*(x2-x3)-y3);
+					f2 := f2 * (x2+ x3+x1 - lambda^2 - a1*lambda + a2);
+				}
+				else
+				{
+					f1 := f1 * (x2 - x3);
+				}
+				T := T+P;	
+			}
+		}
+		return (f1/f2)^((getCharacteristic(f1)^degree(getIrreduciblePolynomial(f1))-1)/l);
+	}</ff:body>
+			<ff:returnType>GF</ff:returnType>
+		</ff:function>
+		
+    
+    <ff:function>
+			<ff:name>distortionMap1</ff:name>
+			<ff:description>SAMPLE_FUNC_DISTORTIONMAP1</ff:description>
+			<ff:regex>distortionMap1</ff:regex>
+      <ff:parameterList>
+      <ff:parameter>
+					<ff:name>e</ff:name>
+					<ff:type>EC</ff:type>
+				</ff:parameter>
+      </ff:parameterList>
+			<ff:body>
+      /* distortion map for elliptic curves y^2 = x^3 + a_4 x over the field Z(p) adjoint with an element i for which i^2 = -1 (mod p) */
+	     function distortion(e : EC) : EC {
+          x,y: BaseGF(e);
+          res: SameAs(e);
+          &lt;&lt; x3, y3 &gt;&gt; := e;
+          res := &lt;&lt; -x, [x]*y &gt;&gt;;
+          return res;
+      }
+	</ff:body>
+			<ff:returnType>EC</ff:returnType>
+		</ff:function>
+    
+    <ff:function>
+			<ff:name>distortionMap2</ff:name>
+			<ff:description>SAMPLE_FUNC_DISTORTIONMAP2</ff:description>
+			<ff:regex>distortionMap1</ff:regex>
+       <ff:parameterList>
+      <ff:parameter>
+					<ff:name>e</ff:name>
+					<ff:type>EC</ff:type>
+				</ff:parameter>
+      </ff:parameterList>
+			<ff:body>
+      /* distortion map for elliptic curves y^2 = x^3 + a_6 over the field Z(p) adjoint with an element j != 1 for which j^3 = 1, and where p is kongruent to 2 modulo 3 */
+	     function distortion(e : EC) : EC {
+          x,y: BaseGF(e);
+          res: SameAs(e);
+          &lt;&lt; x,y &gt;&gt; := e;
+          res := &lt;&lt; [x]*x, y &gt;&gt;;
+          return res;      }
+	</ff:body>
+			<ff:returnType>EC</ff:returnType>
+		</ff:function>
+
+
+
+
+
+
+	</ff:functionList>
+	<ff:procedureList>
+		<ff:procedure>
+			<ff:name>procTemplate</ff:name>
+			<ff:description>SAMPLE_PROC_TEMPLATE</ff:description>
+			<ff:regex>procTemplate</ff:regex>
+			<ff:body>
+	procedure procTemplate(/* insert parameters here */) {
+		//insert code here
+	}
+      </ff:body>
+		</ff:procedure>
+    <ff:procedure>
+			<ff:name>ecRandomPoints</ff:name>
+			<ff:description>SAMPLE_PROC_ECRANDOM</ff:description>
+			<ff:regex>ecRandomPoints</ff:regex>
+			<ff:body>
+      e1,e2: EC(GF(7,[x^7+2x^3+2]), a4 := [3], a6 := [5]);
+      /* generate a point on the elliptic curve over GF(7^7) */
+      e1 := &lt;&lt; RandomPoint &gt;&gt;;
+      /* generate a point on the curve over the subfield Z(7) */ 
+      e2 := &lt;&lt; RandomPointSubfield &gt;&gt;;
+      println(str(e1));
+      println(str(e2));
+      /* use the points in a pairing */
+      println(TLPairing(e2, e1)); 
+      </ff:body>
+		</ff:procedure>
+	</ff:procedureList>
+
+
+</ff:sampleCode>
+
+
