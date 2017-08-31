@@ -53,5 +53,4 @@ Contributions by the following people so far is thankfully acknowledged:
 * Volker Bugl: I/O support and IDE additions
 * Markus Wiltsche: API extensions
 
-For questions and other inquiries, feel free to send an email to the repository maintainer Stefan Rass [stefan.rass@aau.at](mailto: stefan.rass@aau.at?subject=Sunset-FFapl)
- 
+For questions and other inquiries, feel free to send an email to the repository maintainer [Stefan Rass](mailto:stefan.rass@aau.at?subject=Sunset-FFapl) 
