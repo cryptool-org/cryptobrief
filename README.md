@@ -48,10 +48,10 @@ Acknowledgement:
 The initial version was pushed on August 31st, 2017 with friendly permission of the Author Alexander O. Ortner (who created the system during his master thesis) and Prof.em. Dr. Patrick Horster (Universitaet Klagenfurt).
 
 Contributions by the following people so far is thankfully acknowledged:
-Alexander Oskar Ortner: initial implementation of IDE and FFapl interpreter
-Johannes Winkler: elliptic curve support (including pairings)
-Volker Bugl: I/O support and IDE additions
-Markus Wiltsche: API extensions
+* Alexander Oskar Ortner: initial implementation of IDE and FFapl interpreter
+* Johannes Winkler: elliptic curve support (including pairings)
+* Volker Bugl: I/O support and IDE additions
+* Markus Wiltsche: API extensions
 
-For questions and other inquiries, feel free to send an email to the repository maintainer Stefan Rass (stefan.rass@aau.at)
+For questions and other inquiries, feel free to send an email to the repository maintainer Stefan Rass [stefan.rass@aau.at](mailto: stefan.rass@aau.at?subject=Sunset-FFapl)
  
