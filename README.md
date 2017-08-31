@@ -44,4 +44,7 @@ Have fun with the tool, and if you like it, check out the list of features that
 could be added. We appreciate your contribution to our project of making
 cryptography more accessible in an easy way!
 
+Acknowledgement: 
+The initial version was pushed on August 31st, 2017 with friendly permission of the Author Alexander O. Ortner (who created the system during his master thesis) and Prof.em. Dr. Patrick Horster (Universitaet Klagenfurt).
+
  
