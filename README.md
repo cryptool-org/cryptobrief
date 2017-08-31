@@ -1,2 +1,47 @@
-# sunset-ffapl
-A crypto-programming language including an IDE
+# Sunset/FFapl
+**Sunset** is the name of the integrated development enviroment that embodies 
+the compiler for the **finite field application language (FFapl)**.
+
+Sunset/FFapl is an eLearning tool, following a simple philosophy: *implementing
+cryptographic protocols and algorithms should be easy!*
+
+To this end, FFapl supports algebraic structures commonly appearing in cryptographic
+schemes as *native data types*. For example, to work in the group of residuals 
+modulo some prime number p, one simply declares the prime as a constant and the 
+variables to work with in the group. 
+```Java
+const: p: Prime := 13;
+g: Z(p);  // this puts all computations on g into the finite field of size p
+```
+
+Likewise, more complex algebraic structures like polynomial rings, finite fields
+and even elliptic curves are supported by a simple syntax that attempts to resemble
+the way in which these objects appear in scientific papers on cryptography.
+
+The following structures are natively supported by now:
+1. Integers (signed but without numerical limits)
+1. Booleans
+1. Strings
+1. Residue class groups (requiring a positive modulus > 1, not necessarily prime)
+1. Polynomial rings over Z(p)
+1. Galois fields
+1. Elliptic curves (including pairings on them)
+1. Random number generators: those appear as simple data types, with a variable 
+of this type returning a fresh random value upon each read access to it.
+
+Another basic design paradigm is: *there are no libraries*
+Libraries typically require a user to go through potentially complicated installation 
+(even compilation) chains, followed by learning an API to access the library's functions.
+We created FFapl to support everything natively, so that there is never a question
+on which package, plugin or library to get where from or how to properly include
+it in some project.
+
+Sunset/FFapl is intensively being used in security courses at the Universitaet Klagenfurt
+(www.aau.at, www.syssec.at), to help students get the grips on cryptographic 
+protocols without needing to worry too much about the underlying complex mathematics.
+
+Have fun with the tool, and if you like it, check out the list of features that 
+could be added. We appreciate your contribution to our project of making
+cryptography more accessible in an easy way!
+
+ 
