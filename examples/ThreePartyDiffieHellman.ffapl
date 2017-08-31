@@ -1,0 +1,35 @@
+program calculate {
+  const G: EC(GF(127,[x^2+1]), a4 := [5]) := << [121] , [95] >>;
+
+  const g: Integer := 64; // order of G
+  // Distorsion Map
+  function distorsion(e : EC) : EC {
+    x,y: BaseGF(e);
+    res: SameAs(e);
+    << x,y >> := e;
+    res := << -x, [x]*y >>;
+    return res;
+  }
+  rng: RandomGenerator(1:g-1);
+  a,b,c: Integer;
+  va,vb,vc: SameAs(G);
+  ka,kb,kc: BaseGF(G);
+  
+  // generation of random numbers
+  a := rng;
+  b := rng;
+  c := rng;
+  
+  // partial keys
+  va := a*G;
+  vb := b*G;
+  vc := c*G;
+  
+  // final keys
+  ka := TLPairing(va,distorsion(vb))^c;
+  kb := TLPairing(vb,distorsion(vc))^a;
+  kc := TLPairing(va,distorsion(vc))^b;
+  
+  // output (for verification)
+  println(str(ka) + " == " + str(kb) + " == " + str(kc)); //Probe
+}

@@ -1,0 +1,18 @@
+program calculate{
+	P,Q,R: EC(Z(107), a4 := -1);
+	x,y,z: EC(Z(31), a4 := -1);
+	k: Integer;
+	P := <<44,90>>;	
+	Q := <<44,17>>;
+	x := <<8,15>>;
+	y := <<21,23>>;
+	z := x+y;
+	println(P);
+	println("x + y = " + z);
+	k := 1;
+	while(k != 0) {
+		k := readInt("enter multiplied (0 to abort)");
+		println("k * P = " + k + "*" + str(P) + " = " + (k*P));
+	}
+	
+}

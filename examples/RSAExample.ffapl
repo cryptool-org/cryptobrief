@@ -1,0 +1,16 @@
+program RSAExample{
+	const p: Prime := getNextPrime(10^9);	
+	const q: Prime := getNextPrime(p);
+	const n: Integer := p*q;	
+	const phi: Integer := (p-1)*(q-1);	
+	m,c: Z(n);
+	e,d: Z(phi);	
+	X: RandomGenerator(n);
+	m := 123456789;	// this is our message
+	e := 2*X+1;    // draw an odd random number	
+	d := 1/e;  // determine e such that e*d = 1 (mod n)	
+	c := m^e;  // encryption of the message m	
+	m := c^d;  // decryption of the ciphertext c
+	println("c = " + c);
+	println("m = " + m);
+}

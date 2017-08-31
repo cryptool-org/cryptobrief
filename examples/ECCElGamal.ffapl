@@ -1,0 +1,23 @@
+program ECCElGamal{
+	dr, kr: RandomGenerator(10^3:8831);	// random generators
+	s, k: Integer;
+	G, P, M, D, C1, C2: EC(Z(8831), a4 := 3, a6 := 45);
+
+	G := << 4 , 11 >>;
+	//Alice generates Keys
+	s := dr;	// random secret key
+	P := s * G;	// compute the public key
+		
+	//Bob encrypts a message
+	M := << 7168 , 3452 >>;
+	k := kr;
+	C1 := k * G;
+	C2 := M + k * P;
+		
+	println("Original Message: " + M);
+	println("Encrypted Message: (" + str(C1) + "," + str(C2) + ")");
+
+	//Alice decrypts
+	D := C2 - s * C1;
+	println("Decrypted Message: " + D);	
+}

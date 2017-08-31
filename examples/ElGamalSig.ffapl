@@ -1,0 +1,41 @@
+program ElGamalSignatur{
+	
+	const p: Prime := 2357;
+	alpha: Integer;
+	x: Integer;
+	y: Integer;
+	m: Integer;
+	r: Integer;
+	k: Integer;
+	s: Integer;
+	h1 : Z(p);
+	h2 : Z(p-1);
+	
+	RNG: RandomGenerator(1:(p-2));
+	
+	x := 1751;	// private key
+	alpha := 2;
+	// create public Key
+	h1 := alpha^x;
+	y := convertToInteger(h1);
+	println(y);
+	
+	// signing the message
+	m := 1463;	// message
+	k := 1529;	// random and coprime to p-1
+	
+	h1 := alpha^k;
+	r := convertToInteger(h1);
+	println(r + ", " + x);
+	// all computations done in Z(p-1)
+	h2 := k;
+	s := convertToInteger(h2^(-1) * (m - x * r));
+	println("(r,s) = (" + r + ", " + s + ")");
+	
+	// verification
+	// again, all computations done in Z(p)
+	h1 := alpha^m;
+	println("alpha^m = " + convertToInteger(h1));
+	h1 := y^r * r^s;
+	println("y^r * r^s = " + convertToInteger(h1));
+}

@@ -1,0 +1,48 @@
+program MillerRabin{
+	function MillerRabinTest(n: Integer; k: Integer) : Boolean {
+		s, r, a, j: Integer;
+		y: Z(n);
+		X: RandomGenerator(2:(n-2));
+		result: Boolean;
+		result := true;
+		r := n - 1;
+		s := 0;
+
+		while(r MOD 2 == 0) {
+			s := s + 1;
+			r := r / 2;
+		}
+		
+		for iter = 0 to k {
+			a := X;		// draw new random value
+			y := a^r;
+			if (y != 1 AND y != n-1) {
+				j := 1;
+				while(j <= (s-1) AND y != (n-1)) {
+					y := y^2;
+					if (y == 1) {
+						result := false;
+						break;
+					}
+					j := j + 1;
+				}
+				if (y != (n-1)) {
+					result := false;
+					break;
+				}
+			}
+		}
+		return result;
+	}
+	
+	n, k: Integer;
+//	n := 2^10*7+1;
+//	n := 9787;
+//	n := 1234567;
+	// a 1024 bit prime
+	n := 179769313486231590772930519078902473361797697894230657273430081157732675805500963132708477322407536021120113879871393357658789768814416622492847430639474124377767893424865485276302219601246094119453082952085005768838150682342462881473913110540827237163350510684586298239947245938479716304835356329624224137859;
+	k := 10;
+	println("Miller-Rabin Primality-Test for n = " + n + " returns " + MillerRabinTest(n,k));
+//	println(n + " = " + factorInteger(n));
+
+}

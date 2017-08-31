@@ -1,0 +1,12 @@
+program calculate{
+	x,a: Integer;
+	x:= 3;
+	a:= 4;
+	println([1 +  x + x^2]);
+	println([1 +  (x)]);
+	println([1 + (a + 1) x + x^2]);
+	println([1 + (x) x + x^2]);
+	println([x^x]);
+	println([(x)^x]);
+	
+}

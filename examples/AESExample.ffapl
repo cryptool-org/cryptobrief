@@ -1,0 +1,23 @@
+program calculate{
+	m,c,k: Integer;
+	X: RandomGenerator(0:2^600-1);	// enforce several blocks and padding
+	Y: RandomGenerator(0:100);	// only one (underfull) block
+	k := 2;
+	m := X;
+	c := AESEncrypt(m,k,999);
+	println("m = " + m);
+	println("c = " + c);
+	println("decrypted = " + AESDecrypt(c,k,999) + "\n");
+
+	m := Y;
+	c := AESRawEncrypt(m,k);
+	println("m = " + m);
+	println("c = " + c);
+	println("decrypted = " + AESRawDecrypt(c,k) + "\n");
+
+	println("verifying decryption after encryption = identity: 222 = " + AESDecrypt(AESEncrypt(222,3,999), 3,999));
+	println(AESRawDecrypt(222,3)); // this works
+	//println(AESDecrypt(222,3,999)); // this causes an exception, since the decryption block is incorrectly padded (as it is not padded at all)
+	
+	//m := X;	println(AESRawEncrypt(m,k));	// this also causes an exception (block too large for raw AES)	
+}

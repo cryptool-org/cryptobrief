@@ -1,0 +1,45 @@
+program ElGamalKeyGen{
+
+	function getSafePrime(bitLength: Integer) : Integer {
+		p, q: Integer;
+		q := getNextPrime(2^bitLength);	
+		p := 2*q+1;
+		while(!isPrime(p)) {
+			q := getNextPrime(q+1);
+			p := 2*q+1;
+		}
+		return p;
+	}
+	
+	function findGenerator(p: Prime) : Z() {
+		g: Z(p);
+		X: RandomGenerator(2:(p-1));
+		q: Prime;
+		q := (p-1)/2;	// here, we use that p=2q+1 is a safe prime
+		g := X;
+		while(g^2 == 1 OR g^q == 1) {
+			g := X;
+		}
+		return g;
+	}
+	
+	// get an element of prime order q, assuming that p = 2q+1 is prime
+	function findSubgroupGenerator(p: Prime) : Z() {
+		X: RandomGenerator(1:p-1);
+		g,h: Z(p);
+		g := 1;
+		while(g == 1) {
+			h := X;
+			g := h^2;	// nutze, dass (p-1)/q = 2 ist
+		}
+		return g;		
+	}
+	
+	p: Prime;
+	p := getSafePrime(10);
+	println("p = " + p);	
+	println("g = " + findGenerator(p));
+
+	// get a generating element for a subgroup
+	println("h = " + findSubgroupGenerator(p));
+}

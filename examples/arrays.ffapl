@@ -1,0 +1,11 @@
+program calculate{
+	a: Prime[][];
+	b: Z(3)[];
+	
+	a:= {{2,5,7},{3,11,13}};
+	b:= {1,2,3,4,5,6,7,8};
+	
+	println(a);
+	println(b);
+	
+}

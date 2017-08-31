@@ -1,0 +1,41 @@
+program calculate{
+  const P: EC(GF(13,[x^2-2]), a6 := [6]) := << [6],[1] >>; // system parameter
+  const p: Integer := 7; //Ordnung von P
+ 
+  function H1(str : String) : EC {
+    return (hash(str) MOD p)*P;
+  }
+  function H2(gf : GF) : Integer{
+    return hash(gf);
+  }
+  
+  rng : RandomGenerator(1 : p-1);
+  C1, Q,R,OS: SameAs(P);
+  c2,s,m,m1,r: Integer;
+  ID: String;
+  M: RandomGenerator(1:10000);
+
+  //KGC
+  s := 5; // secret key of the KGC
+  OS := s*P; // public key of the KGC
+  
+  // key generation for a user, based on its email-address
+  ID := "johannes.winkler@aau.at";
+  Q := H1(ID); // public
+  R := s*Q; // secret
+  
+  //encryption of a message m
+  m := M; //12345;
+  r := rng;
+  C1 := r*P;
+  c2 := m + H2(TLPairing(Q,OS)^r); // for simplicity, we replaced XOR by "+"
+  
+  // output of ciphertext (C1,c2) 
+  println("(" + str(C1) + "," + c2 + ")");
+  
+  // decryption
+  m1 := c2 - H2(TLPairing(R,C1)); // XOR replaced by "-" 
+  
+  // verification
+  println(m + " =?= " + m1);
+}
