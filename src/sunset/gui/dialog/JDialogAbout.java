@@ -163,10 +163,8 @@ public class JDialogAbout extends FFaplJDialog {
 		TranslateGUIElements.translateDialog(this);	
 		jEditorPane_info.setText(
 			"<h1>Sunset " + IProperties.APPVERSION + "</h1>" +
-		    "<div id='desc'>" + SunsetBundle.getInstance().getProperty("sunset_desc") + "<div><br/>" +
-		    "<div id='cr'>(c) Copyright 2012</div>" +
-		    "<div id='author'>Alexander O. Ortner</div>");
-		
+		    "<div id='desc'>" + SunsetBundle.getInstance().getProperty("sunset_desc") + "<div><br/>");// +
+
 	}
 
 }

@@ -4,17 +4,13 @@ public interface ILicense {
 
 		
 	public static String License_DE = 
-	    "<p><b>Sunset</b> is eine integrierte Entwicklungsumgebung für die Programmiersprache FFapl.</p>" +
-	    "<p>Copyright (C) 2012  Alexander O. Ortner</p>" +
-		"<p>Durch die Verwendung dieser Software stimmen sie diesen Bedingungen zu. Sollten sie ihnen nicht zustimmen, verwenden Sie die Software nicht.</p>" +
-		"<p>Die Nutzung von Sunset und FFapl ist nur im Rahmen der Lehrveranstaltungen der Forschungsgruppe Systemsicherheit der Universität Klagenfurt gestattet.</p>" +
-		"<p>Jegliche Weitergabe oder Nutzung der Software für andere Zwecke ist nur durch schriftliche Einwilligung des Leiters der Forschungsgruppe: <b>O.Univ.-Prof. Dr. Patrick Horster</b> gestattet.</p>";
+	    "<p><b>Sunset</b> is eine integrierte Entwicklungsumgebung für die Programmiersprache <b>FFapl</b>.</p>" +
+	    "<p>Konzeption und Implementierung: Alexander O. Ortner (2012)</p>" +
+		"<p>Die Software ist lizensiert unter <a href=\"https://www.gnu.org/licenses/gpl-3.0.txt\">GPL Version 3</a>.</p>";
 
 	public static String License_EN = 
-	    "<p><b>Sunset</b> is eine integrierte Entwicklungsumgebung für die Programmiersprache FFapl.</p>" +
-	    "<p>Copyright (C) 2012  Alexander O. Ortner</p>" +
-		"<p>Durch die Verwendung dieser Software stimmen sie diesen Bedingungen zu. Sollten sie ihnen nicht zustimmen, verwenden Sie die Software nicht.</p>" +
-		"<p>Die Nutzung von Sunset und FFapl ist nur im Rahmen der Lehrveranstaltungen der Forschungsgruppe Systemsicherheit der Universität Klagenfurt gestattet.</p>" +
-		"<p>Jegliche Weitergabe oder Nutzung der Software für andere Zwecke ist nur durch schriftliche Einwilligung des Leiters der Forschungsgruppe: <b>O.Univ.-Prof. Dr. Patrick Horster</b> gestattet.</p>";
+	    "<p><b>Sunset</b> is an integrated Development Environment for the <b>FFapl</b> programming language.</p>" +
+	    "<p>Concept and implementation: Alexander O. Ortner (2012)</p>" +
+		"<p>The Software is licensed under <a href=\"https://www.gnu.org/licenses/gpl-3.0.txt\">GPL Version 3</a>.</p>";
 
 }
