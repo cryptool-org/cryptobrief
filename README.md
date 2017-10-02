@@ -1,4 +1,4 @@
-# Sunset/FFapl
+# What is Sunset/FFapl?
 **Sunset** is the name of the integrated development enviroment that embodies 
 the compiler for the **finite field application language (FFapl)**.
 
@@ -54,3 +54,6 @@ Contributions by the following people so far is thankfully acknowledged:
 * Markus Wiltsche: API extensions
 
 For questions and other inquiries, feel free to send an email to the repository maintainer [Stefan Rass](mailto:stefan.rass@aau.at?subject=Sunset-FFapl) 
+
+# Installation Instructions
+The folder [nsis_installer](https://github.com/stefan-rass/sunset-ffapl/tree/master/nsis_installer) contains a Windows installer that can be downloaded and installed as it is. For all other platforms, feel free to copy the subfolder [nsis_installer/sunset](https://github.com/stefan-rass/sunset-ffapl/tree/master/nsis_installer/sunset) to any place on your computer and run the JAR-file in it.
