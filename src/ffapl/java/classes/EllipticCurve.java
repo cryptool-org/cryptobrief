@@ -1488,60 +1488,7 @@ public class EllipticCurve implements IJavaType, Comparable<EllipticCurve>{
 				
 				if (_gf.characteristic().equals(new BigInteger("2")))
 				{
-					
-					if (b.equals(BigInteger.ZERO)) // b = 0
-					{
-						this._y_gf = Algorithm.sqrt(c.negate()).value();
-					}
-					else //b != 0
-					{
-						
-						//convert to t^2 + t + h = 0
-						GaloisField h = c.clone();
-						foo = b.clone();
-						foo.pow(2);
-						
-						h.divide(foo); // h = c/b^2
-						
-						if (Algorithm.traceOfGaloisFieldElement(h) == 0) //Solution exists
-						{
-							BigInteger deg = this._gf.irrPolynomial().degree();
-							GaloisField sol = this._gf.clone();
-							GaloisField backup = h.clone();
-							
-							sol.setValue(new Polynomial(0, 0, _thread));
-	
-							if (deg.mod(new BigInteger("2")).equals(BigInteger.ZERO)) //F_{2^d} => deg even
-							{
-								for (int i = 0; i <= (deg.intValue()-3)/2; i++)
-								{
-									h = backup.clone();
-									h.pow(new BigInteger("2").pow(2*i+1));
-									sol.add(h);
-								}
-							}
-							else //deg odd
-							{
-								for (int i = 0; i <= deg.intValue()-1; i++)
-								{
-									for (int j = 0; j <= i; j++)
-									{
-										h = backup.clone();
-										h.pow(new BigInteger("2").pow(j));
-										sol.add(h);
-									}
-								}
-								
-							}
-							foo = sol.clone();
-							foo.multiply(b);
-							this._y_gf = foo.value();
-							
-							
-						}
-						else continue; //skip
-					}
-					
+					throw new FFaplAlgebraicException(null, IAlgebraicError.NOT_IMPLEMENTED);
 				}
 				else //Charakteristik != 2
 				{

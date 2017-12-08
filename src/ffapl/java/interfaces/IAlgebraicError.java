@@ -109,6 +109,7 @@ public interface IAlgebraicError {
 
     public static final int EC_GET_PARAMETER_ERROR = 1131;
 	
+    public static final int NOT_IMPLEMENTED = 9999;
 	/** 
 	 * Return the compiler error number.
 	 * @return error number
