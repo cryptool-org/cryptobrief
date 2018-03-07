@@ -176,7 +176,7 @@ public class PolynomialRCPrime extends PolynomialRC {
 					"' of polynomial [" + ply2 + "]", IAlgebraicError.CHARACTERISTIC_UNEQUAL);
 		}
 		
-		//Algorithm according Endliche Körper von Hans Kurzweil 2.5
+		//Algorithm according Endliche KÃ¶rper von Hans Kurzweil 2.5
 		c = ply1.characteristic();
 		r = (PolynomialRCPrime) ply1.clone();
 		p = new PolynomialRCPrime(c);
