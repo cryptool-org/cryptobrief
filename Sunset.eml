@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component inheritJdk="true">
+	<exclude-output/>
+	<contentEntry url="file://$MODULE_DIR$"/>
+	<lib name="xom-1.2.6.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/xom-1.2.6.jar!/"/>
+	</lib>
+	<lib name="patbinfree153.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/patbinfree153.jar!/"/>
+	</lib>
+	<lib name="commons-lang3-3.4.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/commons-lang3-3.4/commons-lang3-3.4.jar!/"/>
+	</lib>
+	<levels>
+		<level name="javax.xml.bind:jaxb-api:2.3.0" value="project"/>
+		<level name="com.sun.xml.bind:jaxb-core:2.3.0" value="project"/>
+		<level name="com.sun.xml.bind:jaxb-impl:2.3.0" value="project"/>
+		<level name="javax.activation:activation:1.1.1" value="project"/>
+	</levels>
+</component>

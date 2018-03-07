@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="javax.xml.bind:jaxb-api:2.3.0" type="repository">
+    <properties maven-id="javax.xml.bind:jaxb-api:2.3.0" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/jaxb-api-2.3.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

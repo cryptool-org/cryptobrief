@@ -5,5 +5,9 @@
 	<classpathentry kind="lib" path="lib/xom-1.2.6.jar"/>
 	<classpathentry kind="lib" path="lib/patbinfree153.jar"/>
 	<classpathentry kind="lib" path="lib/commons-lang3-3.4/commons-lang3-3.4.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/javax.xml.bind:jaxb-api:2.3.0"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/com.sun.xml.bind:jaxb-core:2.3.0"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/com.sun.xml.bind:jaxb-impl:2.3.0"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/javax.activation:activation:1.1.1"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
