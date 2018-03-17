@@ -14,6 +14,7 @@ import ffapl.FFaplInterpreter;
 import ffapl.exception.FFaplException;
 import ffapl.java.exception.FFaplAlgebraicException;
 import ffapl.java.interfaces.IAlgebraicError;
+import ffapl.java.interfaces.IAlgebraicOperations;
 import ffapl.java.interfaces.IJavaType;
 import ffapl.java.math.Algorithm;
 import ffapl.types.FFaplTypeCrossTable;
@@ -24,7 +25,7 @@ import java.util.Vector;
  * @version 1.0
  *
  */
-public class Polynomial implements IJavaType {
+public class Polynomial implements IJavaType, IAlgebraicOperations<Polynomial> {
 
 	protected TreeMap<BigInteger, BigInteger> _polynomialMap;
 	/** the thread within the Galois Field is created */
@@ -690,8 +691,31 @@ public class Polynomial implements IJavaType {
 		}
 	  }
 
-	
+	@Override
+	public Polynomial addR(Polynomial summand) {
+		Polynomial sum = this.clone();
+		sum.add(summand);
+		return sum;
+	}
 
-	 
+	@Override
+	public Polynomial subR(Polynomial subtrahend) {
+		Polynomial difference = this.clone();
+		difference.subtract(subtrahend);
+		return difference;
+	}
 
+	@Override
+	public Polynomial mulR(Polynomial factor) throws FFaplAlgebraicException {
+		Polynomial product = this.clone();
+		product.multiply(factor);
+		return product;
+	}
+
+	@Override
+	public Polynomial scalarMulR(BigInteger factor) throws FFaplAlgebraicException {
+		Polynomial product = this.clone();
+		product.multiply(factor, BigInteger.ZERO);
+		return product;
+	}
 }

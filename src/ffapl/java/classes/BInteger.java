@@ -9,6 +9,7 @@ import java.util.Random;
 import ffapl.FFaplInterpreter;
 import ffapl.java.exception.FFaplAlgebraicException;
 import ffapl.java.interfaces.IAlgebraicError;
+import ffapl.java.interfaces.IAlgebraicOperations;
 import ffapl.java.interfaces.IJavaType;
 import ffapl.java.math.Algorithm;
 import ffapl.types.FFaplTypeCrossTable;
@@ -19,7 +20,7 @@ import ffapl.types.FFaplTypeCrossTable;
  *
  */
 @SuppressWarnings("serial")
-public class BInteger extends BigInteger implements IJavaType{
+public class BInteger extends BigInteger implements IJavaType, IAlgebraicOperations<BInteger> {
 
 	/** the thread within the Galois Field is created */
 	protected Thread _thread;
@@ -223,4 +224,24 @@ public class BInteger extends BigInteger implements IJavaType{
 		return _thread;
 	}
 
+	@Override
+	public BInteger addR(BInteger summand) {
+		return (BInteger) this.add(summand);
+	}
+
+	@Override
+	public BInteger subR(BInteger subtrahend) {
+		return (BInteger) this.subtract(subtrahend);
+	}
+
+	@Override
+	public BInteger mulR(BInteger factor) {
+		return (BInteger) this.multiply(factor);
+	}
+
+	@Override
+	public BInteger scalarMulR(BigInteger factor) {
+		// in this case equal to mulR
+		return (BInteger) this.multiply(factor);
+	}
 }

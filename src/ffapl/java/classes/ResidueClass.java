@@ -8,6 +8,7 @@ import ffapl.FFaplInterpreter;
 import ffapl.exception.FFaplException;
 import ffapl.java.exception.FFaplAlgebraicException;
 import ffapl.java.interfaces.IAlgebraicError;
+import ffapl.java.interfaces.IAlgebraicOperations;
 import ffapl.java.interfaces.IJavaType;
 
 /**
@@ -15,7 +16,7 @@ import ffapl.java.interfaces.IJavaType;
  * @version 1.0
  *
  */
-public class ResidueClass implements IJavaType{
+public class ResidueClass implements IJavaType, IAlgebraicOperations<ResidueClass> {
 
 	protected BigInteger _modulus;
 	protected BigInteger _value;
@@ -403,4 +404,32 @@ public class ResidueClass implements IJavaType{
 			
 		}
 	  }
+
+	@Override
+	public ResidueClass addR(ResidueClass summand) throws FFaplAlgebraicException {
+		ResidueClass sum = this.clone();
+		sum.add(summand);
+		return sum;
+	}
+
+	@Override
+	public ResidueClass subR(ResidueClass subtrahend) throws FFaplAlgebraicException {
+		ResidueClass difference = this.clone();
+		difference.subtract(subtrahend);
+		return difference;
+	}
+
+	@Override
+	public ResidueClass mulR(ResidueClass factor) throws FFaplAlgebraicException {
+		ResidueClass product = this.clone();
+		product.multiply(factor);
+		return product;
+	}
+
+	@Override
+	public ResidueClass scalarMulR(BigInteger factor) {
+		ResidueClass product = this.clone();
+		product.multiply(factor);
+		return product;
+	}
 }

@@ -7,6 +7,7 @@ import java.math.BigInteger;
 
 import ffapl.java.exception.FFaplAlgebraicException;
 import ffapl.java.interfaces.IAlgebraicError;
+import ffapl.java.interfaces.IAlgebraicOperations;
 import ffapl.java.interfaces.IJavaType;
 import ffapl.java.math.Algorithm;
 
@@ -15,7 +16,7 @@ import ffapl.java.math.Algorithm;
  * @version 1.0
  *
  */
-public class GaloisField implements IJavaType, Comparable<GaloisField>{
+public class GaloisField implements IJavaType, Comparable<GaloisField>, IAlgebraicOperations<GaloisField>{
 
 	private Prime _p;
 	private PolynomialRC _irrply;
@@ -115,7 +116,7 @@ public class GaloisField implements IJavaType, Comparable<GaloisField>{
 		//_value = PolynomialRC.divide(_value, _irrply)[1];
 		_value.mod(_irrply);
 	}
-	
+
 	/**
 	 * Adds the ply
 	 * @param ply
@@ -555,12 +556,32 @@ public class GaloisField implements IJavaType, Comparable<GaloisField>{
 	public BigInteger calculate(BInteger val) throws FFaplAlgebraicException {
 		return _value.calculate(val);
 	}
-	
 
-	
+	@Override
+	public GaloisField addR(GaloisField summand) throws FFaplAlgebraicException {
+		GaloisField sum = this.clone();
+		sum.add(summand);
+		return sum;
+	}
 
-	
-	
-	
+	@Override
+	public GaloisField subR(GaloisField subtrahend) throws FFaplAlgebraicException {
+		GaloisField difference = this.clone();
+		difference.subtract(subtrahend);
+		return difference;
+	}
 
+	@Override
+	public GaloisField mulR(GaloisField factor) throws FFaplAlgebraicException {
+		GaloisField product = this.clone();
+		product.multiply(factor);
+		return product;
+	}
+
+	@Override
+	public GaloisField scalarMulR(BigInteger factor) throws FFaplAlgebraicException {
+		GaloisField product = this.clone();
+		product.multiply(factor);
+		return product;
+	}
 }
