@@ -27,6 +27,7 @@ public interface IJavaType extends Cloneable{
 	public static final byte RESIDUECLASS		= 12;
 	public static final byte STRING				= 13;
 	public static final byte ELLIPTICCURVE		= 14;
+    public static final byte MATRIX             = 15;
 	
 	public static final byte[] FFapl_Type_Compatibility = {
 		FFaplTypeCrossTable.FFAPLINTEGER,
