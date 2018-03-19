@@ -706,16 +706,33 @@ public class Polynomial implements IJavaType, IAlgebraicOperations<Polynomial> {
 	}
 
 	@Override
-	public Polynomial mulR(Polynomial factor) throws FFaplAlgebraicException {
+	public Polynomial multR(Polynomial factor) throws FFaplAlgebraicException {
 		Polynomial product = this.clone();
 		product.multiply(factor);
 		return product;
 	}
 
 	@Override
-	public Polynomial scalarMulR(BigInteger factor) throws FFaplAlgebraicException {
+	public Polynomial scalarMultR(BigInteger factor) throws FFaplAlgebraicException {
 		Polynomial product = this.clone();
 		product.multiply(factor, BigInteger.ZERO);
 		return product;
+	}
+
+	@Override
+	public Polynomial divR(Polynomial divisor) throws FFaplAlgebraicException {
+		Polynomial quotient = this.clone();
+		quotient.divide(divisor);
+		return quotient;
+	}
+
+	@Override
+	public Polynomial negateR() throws FFaplAlgebraicException {
+		return this.negate();
+	}
+
+	@Override
+	public Polynomial powR(BigInteger exponent) throws FFaplAlgebraicException {
+		return this.clone().pow(exponent);
 	}
 }

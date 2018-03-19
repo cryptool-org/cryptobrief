@@ -9,7 +9,7 @@ public interface IAlgebraicOperations<T> extends IJavaType {
     /**
      * Adds a summand
      *
-     * @param summand
+     * @param summand summand
      * @return sum
      * @throws FFaplAlgebraicException
      */
@@ -18,7 +18,7 @@ public interface IAlgebraicOperations<T> extends IJavaType {
     /**
      * Subtracts subtrahend
      *
-     * @param subtrahend
+     * @param subtrahend subtrahend
      * @return difference
      * @throws FFaplAlgebraicException
      */
@@ -27,19 +27,44 @@ public interface IAlgebraicOperations<T> extends IJavaType {
     /**
      * Multiplies with a factor
      *
-     * @param factor
+     * @param factor factor
      * @return product
      * @throws FFaplAlgebraicException
      */
-    T mulR(T factor) throws FFaplAlgebraicException;
+    T multR(T factor) throws FFaplAlgebraicException;
 
     /**
      * Multiplies with a scalar factor
      *
-     * @param factor
+     * @param factor factor
      * @return product
      * @throws FFaplAlgebraicException
      */
-    T scalarMulR(BigInteger factor) throws FFaplAlgebraicException;
+    T scalarMultR(BigInteger factor) throws FFaplAlgebraicException;
 
+    /**
+     * Divides by a dividend
+     *
+     * @param divisor divisor
+     * @return quotient
+     * @throws FFaplAlgebraicException
+     */
+    T divR(T divisor) throws FFaplAlgebraicException;
+
+    /**
+     * Negates the value
+     *
+     * @return negation
+     * @throws FFaplAlgebraicException
+     */
+    T negateR() throws FFaplAlgebraicException;
+
+    /**
+     * Raises by a power
+     *
+     * @param exponent exponent
+     * @return power
+     * @throws FFaplAlgebraicException
+     */
+    T powR(BigInteger exponent) throws FFaplAlgebraicException;
 }

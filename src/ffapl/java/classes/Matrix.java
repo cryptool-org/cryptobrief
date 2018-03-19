@@ -425,7 +425,7 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType, Ite
                     for (Map.Entry<Long, V> entry : row.entrySet()) {
                         k = entry.getKey();
                         // C[i][j] += A[i][k] * B[k][j]
-                        value = value.addR(row.get(k).mulR(B.get(k, j)));
+                        value = value.addR(row.get(k).multR(B.get(k, j)));
                     }
                     // and write to C
                     C.set(i, j, value);
@@ -448,19 +448,19 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType, Ite
      */
     public void scalarMultiply(BigInteger factor) throws FFaplAlgebraicException {
         for (MatrixEntry<V> e : this) {
-            this.set(e.i, e.j, e.value.scalarMulR(factor));
+            this.set(e.i, e.j, e.value.scalarMultR(factor));
         }
 
         /* more elegant variant using methods of TreeMap and Lambdas:
          * unfeasible because methods defined by IAlgebraicOperations
          * throw exceptions unhandled by TreeMap.forEach and TreeMap.replaceAll */
-        //matrix.forEach((Long i, TreeMap<Long, T> row) -> row.replaceAll((Long j, T entry) -> entry.scalarMulR(factor)));
+        //matrix.forEach((Long i, TreeMap<Long, T> row) -> row.replaceAll((Long j, T entry) -> entry.scalarMultR(factor)));
 
         // alternative:
         /*
         for (Map.Entry<Long, TreeMap<Long, V>> row : matrix.entrySet()) {
             for (Map.Entry<Long, V> entry : row.getValue().entrySet()) {
-                entry.setValue(entry.getValue().scalarMulR(factor));
+                entry.setValue(entry.getValue().scalarMultR(factor));
             }
         }
         */

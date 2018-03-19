@@ -557,31 +557,50 @@ public class GaloisField implements IJavaType, Comparable<GaloisField>, IAlgebra
 		return _value.calculate(val);
 	}
 
-	@Override
-	public GaloisField addR(GaloisField summand) throws FFaplAlgebraicException {
-		GaloisField sum = this.clone();
-		sum.add(summand);
-		return sum;
-	}
+    @Override
+    public GaloisField addR(GaloisField summand) throws FFaplAlgebraicException {
+        GaloisField sum = this.clone();
+        sum.add(summand);
+        return sum;
+    }
 
-	@Override
-	public GaloisField subR(GaloisField subtrahend) throws FFaplAlgebraicException {
-		GaloisField difference = this.clone();
-		difference.subtract(subtrahend);
-		return difference;
-	}
+    @Override
+    public GaloisField subR(GaloisField subtrahend) throws FFaplAlgebraicException {
+        GaloisField difference = this.clone();
+        difference.subtract(subtrahend);
+        return difference;
+    }
 
-	@Override
-	public GaloisField mulR(GaloisField factor) throws FFaplAlgebraicException {
-		GaloisField product = this.clone();
-		product.multiply(factor);
-		return product;
-	}
+    @Override
+    public GaloisField multR(GaloisField factor) throws FFaplAlgebraicException {
+        GaloisField product = this.clone();
+        product.multiply(factor);
+        return product;
+    }
 
-	@Override
-	public GaloisField scalarMulR(BigInteger factor) throws FFaplAlgebraicException {
-		GaloisField product = this.clone();
-		product.multiply(factor);
-		return product;
-	}
+    @Override
+    public GaloisField scalarMultR(BigInteger factor) throws FFaplAlgebraicException {
+        GaloisField product = this.clone();
+        product.multiply(factor);
+        return product;
+    }
+
+    @Override
+    public GaloisField divR(GaloisField divisor) throws FFaplAlgebraicException {
+        GaloisField quotient = this.clone();
+        quotient.divide(divisor);
+        return quotient;
+    }
+
+    @Override
+    public GaloisField negateR() throws FFaplAlgebraicException {
+        return this.negate();
+    }
+
+    @Override
+    public GaloisField powR(BigInteger exponent) throws FFaplAlgebraicException {
+        GaloisField power = this.clone();
+        power.pow(exponent);
+        return power;
+    }
 }

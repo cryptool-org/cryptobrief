@@ -420,16 +420,35 @@ public class ResidueClass implements IJavaType, IAlgebraicOperations<ResidueClas
 	}
 
 	@Override
-	public ResidueClass mulR(ResidueClass factor) throws FFaplAlgebraicException {
+	public ResidueClass multR(ResidueClass factor) throws FFaplAlgebraicException {
 		ResidueClass product = this.clone();
 		product.multiply(factor);
 		return product;
 	}
 
 	@Override
-	public ResidueClass scalarMulR(BigInteger factor) {
+	public ResidueClass scalarMultR(BigInteger factor) {
 		ResidueClass product = this.clone();
 		product.multiply(factor);
 		return product;
 	}
+
+    @Override
+    public ResidueClass divR(ResidueClass divisor) throws FFaplAlgebraicException {
+        ResidueClass quotient = this.clone();
+        quotient.divide(divisor);
+        return quotient;
+    }
+
+    @Override
+    public ResidueClass negateR() throws FFaplAlgebraicException {
+        return this.negate();
+    }
+
+    @Override
+    public ResidueClass powR(BigInteger exponent) throws FFaplAlgebraicException {
+        ResidueClass power = this.clone();
+        power.pow(exponent);
+        return power;
+    }
 }
