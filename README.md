@@ -61,3 +61,10 @@ For questions and other inquiries, feel free to send an email to the repository 
 
 # Installation Instructions
 The folder [nsis_installer](https://github.com/stefan-rass/sunset-ffapl/tree/master/nsis_installer) contains a Windows installer that can be downloaded and installed as it is. For all other platforms, feel free to copy the subfolder [nsis_installer/sunset](https://github.com/stefan-rass/sunset-ffapl/tree/master/nsis_installer/sunset) to any place on your computer and run the JAR-file in it.
+
+<span color="red">**Attention:**</span> Sunset/FFapl requires libraries that 
+will be deprecated as of Java 1.9. So, to run the system **either** use a JRE version 1.8, 
+**or** use the [portable version](https://github.com/stefan-rass/sunset-ffapl/tree/master/nsis_installer/PortableInstallation_for_Java9.zip) 
+in the [same folder as the nsis installer](https://github.com/stefan-rass/sunset-ffapl/tree/master/nsis_installer). To run the 
+program, simply extract the ZIP-file and run the JAR file in it on a **JRE version 1.9** (the jar 
+has the deprecated libraries packed into it, but will not run under Java 1.8).
