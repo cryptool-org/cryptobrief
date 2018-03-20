@@ -7,7 +7,7 @@ import ffapl.java.interfaces.IAlgebraicError;
 import ffapl.java.interfaces.IJavaType;
 import ffapl.java.math.Algorithm;
 
-public class EllipticCurve implements IJavaType, Comparable<EllipticCurve>{
+public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<EllipticCurve>{
 	
 	private Thread _thread;
 	private GaloisField _gf;

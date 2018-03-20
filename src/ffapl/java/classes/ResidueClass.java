@@ -16,7 +16,7 @@ import ffapl.java.interfaces.IJavaType;
  * @version 1.0
  *
  */
-public class ResidueClass implements IJavaType, IAlgebraicOperations<ResidueClass> {
+public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperations<ResidueClass> {
 
 	protected BigInteger _modulus;
 	protected BigInteger _value;

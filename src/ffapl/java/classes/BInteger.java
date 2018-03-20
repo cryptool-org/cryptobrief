@@ -20,7 +20,7 @@ import ffapl.types.FFaplTypeCrossTable;
  *
  */
 @SuppressWarnings("serial")
-public class BInteger extends BigInteger implements IJavaType, IAlgebraicOperations<BInteger> {
+public class BInteger extends BigInteger implements IJavaType<BInteger>, IAlgebraicOperations<BInteger> {
 
 	/** the thread within the Galois Field is created */
 	protected Thread _thread;

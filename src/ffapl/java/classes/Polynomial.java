@@ -25,7 +25,7 @@ import java.util.Vector;
  * @version 1.0
  *
  */
-public class Polynomial implements IJavaType, IAlgebraicOperations<Polynomial> {
+public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<Polynomial> {
 
 	protected TreeMap<BigInteger, BigInteger> _polynomialMap;
 	/** the thread within the Galois Field is created */

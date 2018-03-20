@@ -10,7 +10,7 @@ import ffapl.types.FFaplTypeCrossTable;
  * @version 1.0
  *
  */
-public interface IJavaType extends Cloneable{
+public interface IJavaType<T extends IJavaType> extends Cloneable{
 
 	public static final byte INTEGER			= 0;
 	public static final byte GALOISFIELD 		= 1;
@@ -64,7 +64,7 @@ public interface IJavaType extends Cloneable{
 	 * returns Clone of the Type
 	 * @return
 	 */
-	public IJavaType clone();
+	public T clone();
 	
 	/**
 	 * returns if two types are equal

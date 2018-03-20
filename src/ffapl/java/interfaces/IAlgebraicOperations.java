@@ -4,7 +4,7 @@ import ffapl.java.exception.FFaplAlgebraicException;
 
 import java.math.BigInteger;
 
-public interface IAlgebraicOperations<T> extends IJavaType {
+public interface IAlgebraicOperations<T extends IJavaType> extends IJavaType<T> {
 
     /**
      * Adds a summand

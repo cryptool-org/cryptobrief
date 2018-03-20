@@ -16,7 +16,7 @@ import java.util.function.Function;
  * @see TreeMap
  * @see MatrixIterator
  */
-public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType, Iterable<Matrix.MatrixEntry<V>> {
+public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matrix<V>>, Iterable<Matrix.MatrixEntry<V>> {
 
     // TODO method: importMatrix which copies a matrix (or parts of a matrix) to some place in this matrix
     // TODO method: transpose
@@ -64,8 +64,7 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType, Ite
     public Matrix(long m, long n, V defaultValue) {
         this.m = m;
         this.n = n;
-        this.defaultValue = (V) defaultValue.clone();
-        // TODO introduce generic into IJavaType to not have to cast after .clone() (cant use instanceof on generics so cast is always unsafe)
+        this.defaultValue = defaultValue.clone();
     }
 
     /**
@@ -76,7 +75,7 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType, Ite
     public Matrix(Matrix<V> matrix) {
         this.m = matrix.getM();
         this.n = matrix.getN();
-        this.defaultValue = (V) matrix.getDefaultValue().clone();
+        this.defaultValue = matrix.getDefaultValue().clone();
 
         for (MatrixEntry<V> entry : matrix) {
             this.set(entry.i, entry.j, entry.value);
@@ -96,7 +95,7 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType, Ite
 
         this.m = array.length;
         this.n = array[0].length;
-        this.defaultValue = (V) defaultValue.clone();
+        this.defaultValue = defaultValue.clone();
 
         V value;
         for (int i = 0; i < m; i++) {
@@ -124,7 +123,7 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType, Ite
 
         this.m = array.length();
         this.n = ((Array) array.getValue(0)).length();
-        this.defaultValue = (V) defaultValue.clone();
+        this.defaultValue = defaultValue.clone();
 
         V value;
         Vector<Integer> pos = new Vector<>();
@@ -158,7 +157,7 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType, Ite
     public Matrix(Map<Vector<Long>, V> map, long m, long n, V defaultValue) throws FFaplException {
         this.m = m;
         this.n = n;
-        this.defaultValue = (V) defaultValue.clone();
+        this.defaultValue = defaultValue.clone();
 
         if (map != null) {
             Vector<Long> pos;
@@ -208,7 +207,7 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType, Ite
      * @return default element value
      */
     public V getDefaultValue() {
-        return (V) this.defaultValue.clone();
+        return this.defaultValue.clone();
     }
 
     // matrix entry accessor methods
@@ -220,7 +219,7 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType, Ite
      * @param defaultValue default element value
      */
     public void setDefaultValue(V defaultValue) {
-        this.defaultValue = (V) defaultValue.clone();
+        this.defaultValue = defaultValue.clone();
     }
 
     /**
@@ -240,7 +239,7 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType, Ite
             if (validCoordinates(i, j)) {
                 // get row. if row does not exist (all zero values) insert and get new row.
                 TreeMap<Long, V> row = matrix.computeIfAbsent(i, k -> new TreeMap<>());
-                return row.put(j, (V) value.clone());
+                return row.put(j, value.clone());
             }
         }
 
@@ -289,7 +288,7 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType, Ite
             if (row == null)
                 return defaultValue;
             else
-                return (V) row.getOrDefault(j, defaultValue).clone();
+                return row.getOrDefault(j, defaultValue).clone();
         } else {
             return null;
         }
@@ -540,8 +539,10 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType, Ite
                 return false;
             else
                 return true;
+
+        } else {
+            return false;
         }
-        return false;
     }
 
     /**

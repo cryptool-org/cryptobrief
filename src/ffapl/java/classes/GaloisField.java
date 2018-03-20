@@ -16,7 +16,7 @@ import ffapl.java.math.Algorithm;
  * @version 1.0
  *
  */
-public class GaloisField implements IJavaType, Comparable<GaloisField>, IAlgebraicOperations<GaloisField>{
+public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisField>, IAlgebraicOperations<GaloisField>{
 
 	private Prime _p;
 	private PolynomialRC _irrply;
