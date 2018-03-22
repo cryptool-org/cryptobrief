@@ -1,7 +1,7 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="sunset:jar">
     <output-path>$PROJECT_DIR$/nsis_installer/sunset/</output-path>
-    <root id="archive" name="Sunset.jar">
+    <root id="archive" name="sunset.jar">
       <element id="module-output" name="Sunset" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/commons-lang3-3.4/commons-lang3-3.4.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/patbinfree153.jar" path-in-jar="/" />
