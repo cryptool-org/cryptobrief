@@ -26,7 +26,7 @@ BrandingText "Sunset - Install System V1.0"
 !define VERSION 2.0.0
 !define PRODUCT_VERSION 2.0.0.0
 !define COMPANY "Alpen-Adria Universität Klagenfurt"
-!define COPYRIGHT "Copyright 2013-2016, Alpen-Adria Universität Klagenfurt"
+!define COPYRIGHT "Copyright 2013-2018, Alpen-Adria Universität Klagenfurt"
 !define FILEDESCRIPTION "IDE für FFapl-Entwickler"
 
 
@@ -53,8 +53,8 @@ BrandingText "Sunset - Install System V1.0"
 !define MUI_LANGDLL_REGISTRY_KEY ${REGKEY}
 !define MUI_LANGDLL_REGISTRY_VALUENAME InstallerLanguage
 !define SUNSET_PROPERTIES "sunset.properties"
-!define REQ_JAVA_VERSION "16"
-!define STR_JAVA_VERSION "1.6"
+!define REQ_JAVA_VERSION "18"
+!define STR_JAVA_VERSION "1.8"
 
 # Included files
 !include MultiUser.nsh
@@ -120,7 +120,7 @@ LicenseLangString MUILicense ${LANG_GERMAN} sunset\license_de.txt
 !macroend
 
 # Installer attributes
-OutFile "Sunset_${VERSION}.exe"
+OutFile "Sunset_${VERSION}_for_JRE1.8.exe"
 InstallDir "$PROGRAMFILES\Sunset"
 CRCCheck on
 XPStyle on
@@ -145,7 +145,7 @@ Function controlJava
     StrCmp "" $JAVA_INSTALLATION_MSG Success OpenBrowserToGetJava
  
     Success:
-    StrCpy $JAVA_EXE "$\"$JAVA_HOME\bin\javaw.exe$\" -jar $\"$INSTDIR\sunset.jar$\" $\"%1$\""
+    StrCpy $JAVA_EXE "$\"$JAVA_HOME\bin\javaw.exe$\" -jar $\"$INSTDIR\sunset_jre8.jar$\" $\"%1$\""
     Goto Done
  
     OpenBrowserToGetJava:
@@ -165,13 +165,13 @@ Section -Main SEC0000
     #Call LocateJVM
     SetOutPath $INSTDIR
     SetOverwrite on
-    File sunset\sunset.jar
+    File sunset\sunset_jre8.jar
     File sunset\sunset.ico
     File sunset\ffapl.ico
     SetOutPath $SMPROGRAMS\$StartMenuGroup
     SetOutPath $INSTDIR
-    CreateShortCut "$DESKTOP\Sunset.lnk" "$INSTDIR\sunset.jar" " " "$INSTDIR\sunset.ico" 0
-    CreateShortcut "$SMPROGRAMS\$StartMenuGroup\Sunset.lnk" "$INSTDIR\sunset.jar" " " "$INSTDIR\sunset.ico" 0
+    CreateShortCut "$DESKTOP\Sunset.lnk" "$INSTDIR\sunset_jre8.jar" " " "$INSTDIR\sunset.ico" 0
+    CreateShortcut "$SMPROGRAMS\$StartMenuGroup\Sunset.lnk" "$INSTDIR\sunset_jre8.jar" " " "$INSTDIR\sunset.ico" 0
     WriteRegStr HKLM "${REGKEY}\Components" Main 1
     
     Call WriteFile
@@ -215,7 +215,7 @@ Section /o -un.Main UNSEC0000
     Delete /REBOOTOK $INSTDIR\ffapl.ico
     Delete /REBOOTOK $INSTDIR\${SUNSET_PROPERTIES}
     Delete /REBOOTOK $INSTDIR\sunset.ico
-    Delete /REBOOTOK $INSTDIR\sunset.jar
+    Delete /REBOOTOK $INSTDIR\sunset_jre8.jar
     DeleteRegValue HKLM "${REGKEY}\Components" Main
     !insertmacro APP_UNASSOCIATE "ffapl" "sunset.ffapl"
 SectionEnd
@@ -273,7 +273,7 @@ FileClose $9 ;Closes the filled file
 FunctionEnd
 
 Function runSunset
-#Exec "$\"$JAVA_HOME\bin\javaw.exe$\" -jar $\"$INSTDIR\sunset.jar$\""
+#Exec "$\"$JAVA_HOME\bin\javaw.exe$\" -jar $\"$INSTDIR\sunset_jre8.jar$\""
 ExecShell "Open" "$SMPROGRAMS\$StartMenuGroup\Sunset.lnk"
 FunctionEnd
 
