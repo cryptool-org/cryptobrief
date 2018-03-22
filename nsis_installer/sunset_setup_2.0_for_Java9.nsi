@@ -53,8 +53,8 @@ BrandingText "Sunset - Install System V1.0"
 !define MUI_LANGDLL_REGISTRY_KEY ${REGKEY}
 !define MUI_LANGDLL_REGISTRY_VALUENAME InstallerLanguage
 !define SUNSET_PROPERTIES "sunset.properties"
-!define REQ_JAVA_VERSION "19"
-!define STR_JAVA_VERSION "1.9"
+!define REQ_JAVA_VERSION "18"
+!define STR_JAVA_VERSION "1.8"
 
 # Included files
 !include MultiUser.nsh
