@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="org.glassfish.jaxb:jaxb-runtime:2.3.0" type="repository">
+    <properties maven-id="org.glassfish.jaxb:jaxb-runtime:2.3.0" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/jaxb-runtime-2.3.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jaxb-core-2.3.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jaxb-api-2.3.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/txw2-2.3.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/istack-commons-runtime-3.0.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/stax-ex-1.7.8.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/FastInfoset-1.2.13.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
