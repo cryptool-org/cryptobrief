@@ -3,7 +3,7 @@
  */
 package ffapl.java.logging;
 
-import java.util.Observable;
+import ffapl.utils.Observable;
 
 import ffapl.exception.FFaplWarning;
 import ffapl.java.interfaces.ILevel;

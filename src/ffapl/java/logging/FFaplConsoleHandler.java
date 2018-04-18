@@ -3,8 +3,8 @@
  */
 package ffapl.java.logging;
 
-import java.util.Observable;
-import java.util.Observer;
+import ffapl.utils.Observable;
+import ffapl.utils.Observer;
 
 import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
