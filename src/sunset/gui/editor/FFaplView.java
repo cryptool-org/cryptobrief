@@ -3,27 +3,15 @@
  */
 package sunset.gui.editor;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.Vector;
-
-import javax.swing.JTextPane;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.Element;
-import javax.swing.text.PlainView;
-import javax.swing.text.Segment;
-import javax.swing.text.Utilities;
-
+import ffapl.java.matcher.FFaplMatcher;
 import sunset.gui.enums.LineState;
 import sunset.gui.view.FFaplStatusLine;
 
-import ffapl.java.matcher.FFaplMatcher;
+import javax.swing.*;
+import javax.swing.text.*;
+import java.awt.*;
+import java.awt.geom.Path2D;
+import java.util.*;
 
 /**
  * View for the FFaplEditor
@@ -54,14 +42,14 @@ public class FFaplView extends PlainView {
 	}
 	
 	@Override
-	protected void drawLine(int lineIndex, Graphics g, int x, int y) {
+	protected void drawLine(int lineIndex, Graphics2D g, float x, float y) {
 		_currentLine = lineIndex;
 		super.drawLine(lineIndex, g, x, y);
 	}
 	
 	
 	@Override
-    protected int drawUnselectedText(Graphics graphics, int x, int y, int p0,
+    protected float drawUnselectedText(Graphics2D graphics, float x, float y, int p0,
             int p1) throws BadLocationException {
 
         Document doc = getDocument();
@@ -70,8 +58,8 @@ public class FFaplView extends PlainView {
        
         Segment segment = getLineBuffer();
         int i = p0;
-        int xStart = x;
-        
+        float xStart = x;
+
         try{
         // Colour the parts
         for (Map.Entry<Integer, Integer> entry : startMap.entrySet()) {
@@ -138,26 +126,26 @@ public class FFaplView extends PlainView {
 	 * @param y
 	 * @param sLine 
 	 */
-	private void drawErrorLine(Graphics graphics, int start, int end, int y, FFaplStatusLine sLine){
-		int y1, y2, tmp;
+	private void drawErrorLine(Graphics2D graphics, float start, float end, float y, FFaplStatusLine sLine){
 		if(LineState.ERROR.equals(sLine.getState())){
 			graphics.setColor(Color.red);
 		}else if(LineState.WARNING.equals(sLine.getState())){
 			graphics.setColor(new Color(255, 170, 0));
 		}
-		if(start/2 == 0){
-			y1 = y + 1;
-			y2 = y + 3;
-		}else{
-			y1 = y + 3;
-			y2 = y + 1;
+
+		boolean h = start%2 == 0;
+		float lower = y + 1;
+		float upper = y + 3;
+
+		Path2D path = new Path2D.Double();
+		path.moveTo(start, lower);
+
+		for (float x = start + 2; x < end; x = x + 2) {
+			path.lineTo(x, h ? lower : upper);
+			h = !h;
 		}
-		for (int i = start; i < end; i = i + 2){	    
-		        graphics.drawLine(i, y1, i+2, y2);
-		        tmp = y2;
-		        y2 = y1;
-		        y1 = tmp;
-		}
+
+		graphics.draw(path);
 	}
 	
 	public void updateSyntaxHighlighting(){
