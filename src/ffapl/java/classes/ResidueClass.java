@@ -1,15 +1,14 @@
 package ffapl.java.classes;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-
 import ffapl.FFaplInterpreter;
-import ffapl.exception.FFaplException;
 import ffapl.java.exception.FFaplAlgebraicException;
 import ffapl.java.interfaces.IAlgebraicError;
 import ffapl.java.interfaces.IAlgebraicOperations;
 import ffapl.java.interfaces.IJavaType;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Alexander Ortner
@@ -21,7 +20,7 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 	protected BigInteger _modulus;
 	protected BigInteger _value;
 	protected Thread _thread;
-	
+
 	/**
 	 * default constructor value = 0 modulo <Code> modulus </Code>;
 	 * @param modulus
@@ -36,7 +35,7 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
                         IAlgebraicError.RESIDUE_CLASS_CHARACTERISTIC_POSITIVE);
                 }
 	}
-	
+
 	/**
 	 * default constructor value = 0 modulo <Code> modulus </Code>;
 	 * @param modulus
@@ -44,7 +43,7 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 	public ResidueClass(long modulus) throws FFaplAlgebraicException{
 		this(BigInteger.valueOf(modulus));
 	}
-	
+
 	/**
 	 * Constructor
 	 * @param modulus
@@ -54,16 +53,16 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 		_modulus = modulus;
 		_value = value.mod(_modulus);
 	}
-	
+
 	/**
 	 * Constructor
 	 * @param value
 	 * @param modulus
 	 */
-	public ResidueClass(long value, long modulus){ 
+	public ResidueClass(long value, long modulus){
 		this(BigInteger.valueOf(value), BigInteger.valueOf(modulus));
 	}
-	
+
 	public ResidueClass() {
 		// TODO Auto-generated constructor stub
 	}
@@ -75,7 +74,7 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 	public BigInteger value(){
 		return new BInteger(_value, _thread);
 	}
-	
+
 	/**
 	 * Return the modulus value of the residue class
 	 * @return
@@ -83,7 +82,7 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 	public BigInteger modulus(){
 		return _modulus;
 	}
-	
+
 	/**
 	 * Sets the value of the residue class
 	 * @param value
@@ -91,7 +90,7 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 	public void setValue(BigInteger value){
 		_value = value.mod(_modulus);
 	}
-	
+
 	/**
 	 * Adds the BigInteger value to the Residue class
 	 * @param value
@@ -99,7 +98,7 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 	public void add(BigInteger value){
 		_value = _value.add(value).mod(_modulus);
 	}
-	
+
 	/**
 	 * Subtract the ResidueClass value from the Residue class
 	 * if compatible
@@ -109,12 +108,12 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 		if(this.isCompatibleTo(rc)){
 			this.add(rc.value().negate());
 		}else{
-			Object[] arguments ={this.modulus(), this.classInfo(), 
+			Object[] arguments ={this.modulus(), this.classInfo(),
 		            rc.modulus(), rc.classInfo()};
 			throw new FFaplAlgebraicException(arguments, IAlgebraicError.CHARACTERISTIC_UNEQUAL);
 		}
 	}
-	
+
 	/**
 	 * Subtract the BigInteger value from the Residue class
 	 * @param value
@@ -122,7 +121,7 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 	public void subtract(BigInteger value){
 		this.add(value.negate());
 	}
-	
+
 	/**
 	 * Adds the ResidueClass value to the Residue class
 	 * if compatible
@@ -132,12 +131,12 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 		if(this.isCompatibleTo(rc)){
 			_value = _value.add(rc.value()).mod(_modulus);
 		}else{
-			Object[] arguments ={this.modulus(), this.classInfo(), 
+			Object[] arguments ={this.modulus(), this.classInfo(),
 		            rc.modulus(), rc.classInfo()};
 			throw new FFaplAlgebraicException(arguments, IAlgebraicError.CHARACTERISTIC_UNEQUAL);
 		}
 	}
-	
+
 	/**
 	 * Multiplies the BigInteger value to the Residue class
 	 * @param value
@@ -145,7 +144,7 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 	public void multiply(BigInteger value){
 		_value = _value.multiply(value).mod(_modulus);
 	}
-	
+
 	/**
 	 * multiplies the ResidueClass value to the Residue class
 	 * if compatible
@@ -155,12 +154,12 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 		if(this.isCompatibleTo(rc)){
 			_value = _value.multiply(rc.value()).mod(_modulus);
 		}else{
-			Object[] arguments ={this.modulus(), this.classInfo(), 
+			Object[] arguments ={this.modulus(), this.classInfo(),
 		            rc.modulus(), rc.classInfo()};
 			throw new FFaplAlgebraicException(arguments, IAlgebraicError.CHARACTERISTIC_UNEQUAL);
 		}
 	}
-	
+
 	/**
 	 * Divides the ResidueClass by the specified BigInteger value
 	 * @param value
@@ -168,9 +167,9 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 	public void divide(BigInteger value) throws FFaplAlgebraicException{
 		ResidueClass rc = this.clone();
 		rc.setValue(value);
-		this.divide(rc);		
+		this.divide(rc);
 	}
-	
+
 	/**
 	 * Divides the ResidueClass by the specified Residue class
 	 * if compatible
@@ -181,23 +180,23 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 			//multiply the inverse
 			this.multiply(rc.inverse());
 		}else{
-			Object[] arguments ={this.modulus(), this.classInfo(), 
+			Object[] arguments ={this.modulus(), this.classInfo(),
 		            rc.modulus(), rc.classInfo()};
 			throw new FFaplAlgebraicException(arguments, IAlgebraicError.CHARACTERISTIC_UNEQUAL);
 		}
 	}
-	
+
 	/**
 	 * Exponentiate the ResidueClass by the specified BigInteger Value
 	 * @param value
-	 * @throws FFaplAlgebraicException 
+	 * @throws FFaplAlgebraicException
 	 */
 	public void pow(BigInteger value) throws FFaplAlgebraicException{
-		//Algorithm from Montgomery Powering Ladder 
+		//Algorithm from Montgomery Powering Ladder
 		List<Byte> v  = toByteList(value.abs());
      	BigInteger r0 = BigInteger.ONE;
 		BigInteger r1;
-		
+
 		if(value.compareTo(BigInteger.ZERO) <= 0){
 			 r1 = this.inverse().value();
 		}else{
@@ -214,21 +213,21 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 				r1 = r1.multiply(r1).mod(_modulus);
 			}
 		}
-        _value = r0;	
+        _value = r0;
 	}
-	
+
 	/**
 	 * Exponentiate the ResidueClass by the specified BigInteger Value
 	 * @param value
-	 * @throws FFaplAlgebraicException 
+	 * @throws FFaplAlgebraicException
 	 */
 	public void pow(long value) throws FFaplAlgebraicException{
 		this.pow(BigInteger.valueOf(value));
 	}
-	
+
 	/**
 	 * Converts BigInteger in Bit Vector; Bit representation
-	 * of BigInteger 
+	 * of BigInteger
 	 * @param value
 	 * @return
 	 */
@@ -239,7 +238,7 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Returns true if the actual residue class is compatible
 	 * to the specified class <Code> residue </Code>, i.e. module
@@ -250,12 +249,12 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 	public boolean isCompatibleTo(ResidueClass rc){
 		return _modulus.equals(rc.modulus());
 	}
-	
+
     /**
      * Returns true if value of Residue class is equal to the input
      * @param val
      * @return
-     * @throws FFaplAlgebraicException 
+     * @throws FFaplAlgebraicException
      */
 	public boolean equals(IJavaType val) throws FFaplAlgebraicException{
 		if(val instanceof BigInteger){
@@ -263,19 +262,33 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 		}else if(val instanceof ResidueClass){
 			if(this.isCompatibleTo((ResidueClass)val)){
 				return ((ResidueClass) val).modulus().equals(_modulus);
-				
+
 			}else{
-				Object[] arguments ={this.modulus(), this.classInfo(), 
+				Object[] arguments ={this.modulus(), this.classInfo(),
 			           ((ResidueClass) val).modulus(), val.classInfo()};
 				throw new FFaplAlgebraicException(arguments, IAlgebraicError.CHARACTERISTIC_UNEQUAL);
 			}
 		}else{
-			String[] arguments = {"residue class equals operation try to compare " + 
+			String[] arguments = {"residue class equals operation try to compare " +
 					this.classInfo() + " with " + val.classInfo()};
 			throw new FFaplAlgebraicException(arguments ,IAlgebraicError.INTERNAL);
-		}		
+		}
 	}
-	
+
+    @Override
+    public boolean equals(Object obj) {
+		// use compareTo instead of actual equals, as it's less problematic
+        if (obj instanceof ResidueClass) {
+            try {
+                return this.compareTo((ResidueClass) obj) == 0;
+            } catch (FFaplAlgebraicException e) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
 	@Override
 	public String toString(){
 		return _value.toString();// + " mod " + _modulus;
@@ -292,22 +305,22 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
             }
             return null;                    //same here
 	}
-	
+
 	@Override
 	public int typeID() {
 		return IJavaType.RESIDUECLASS;
 	}
-	
-	/** 
+
+	/**
 	 * Returns additive inverse of value
 	 * @return
 	 */
-	public ResidueClass negate()  throws FFaplAlgebraicException{
+	public ResidueClass negate() {
 		ResidueClass result = this.clone();
 		result.setValue(result.value().negate());
 		return result;
 	}
-	
+
 	@Override
 	public String classInfo() {
 		return "Z(" + this._modulus + ")";
@@ -343,18 +356,18 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 			}
 			this.setValue(this._value.mod(rc.value()));
 		}else{
-			Object[] arguments ={this.modulus(), this.classInfo(), 
+			Object[] arguments ={this.modulus(), this.classInfo(),
 		            rc.modulus(), rc.classInfo()};
 			throw new FFaplAlgebraicException(arguments, IAlgebraicError.CHARACTERISTIC_UNEQUAL);
 		}
-		
+
 	}
 
 	/**
-	 * Compares this BigInteger with the specified BigInteger. 
-	 * This method is provided in preference to individual methods 
-	 * for each of the six boolean comparison operators (<, ==, >, >=, !=, <=). 
-	 * The suggested idiom for performing these comparisons is: (x.compareTo(y) <op> 0), 
+	 * Compares this BigInteger with the specified BigInteger.
+	 * This method is provided in preference to individual methods
+	 * for each of the six boolean comparison operators (<, ==, >, >=, !=, <=).
+	 * The suggested idiom for performing these comparisons is: (x.compareTo(y) <op> 0),
 	 * where <op> is one of the six comparison operators.
 	 * @param val
 	 * @return -1, 0 or 1 as this BigInteger is numerically less than, equal to, or greater than val.
@@ -362,27 +375,27 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 	public int compareTo(BigInteger val) {
 		return _value.compareTo(val.mod(_modulus));
 	}
-	
+
 	/**
-	 * Compares this BigInteger with the specified BigInteger. 
-	 * This method is provided in preference to individual methods 
-	 * for each of the six boolean comparison operators (<, ==, >, >=, !=, <=). 
-	 * The suggested idiom for performing these comparisons is: (x.compareTo(y) <op> 0), 
+	 * Compares this BigInteger with the specified BigInteger.
+	 * This method is provided in preference to individual methods
+	 * for each of the six boolean comparison operators (<, ==, >, >=, !=, <=).
+	 * The suggested idiom for performing these comparisons is: (x.compareTo(y) <op> 0),
 	 * where <op> is one of the six comparison operators.
 	 * @param rc
 	 * @return -1, 0 or 1 as this BigInteger is numerically less than, equal to, or greater than val.
-	 * @throws FFaplAlgebraicException 
+	 * @throws FFaplAlgebraicException
 	 */
 	public int compareTo(ResidueClass rc) throws FFaplAlgebraicException {
 		if(this.isCompatibleTo(rc)){
 			return _value.compareTo(rc.value());
 		}else{
-			Object[] arguments ={this.modulus(), this.classInfo(), 
+			Object[] arguments ={this.modulus(), this.classInfo(),
 		            rc.modulus(), rc.classInfo()};
 			throw new FFaplAlgebraicException(arguments, IAlgebraicError.CHARACTERISTIC_UNEQUAL);
 		}
 	}
-	
+
 	@Override
 	public boolean equalType(Object obj){
 		if(obj instanceof ResidueClass){
@@ -390,10 +403,10 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 		}
 		return false;
 	}
-	
+
 	 /**
 	  * throws an interrupt exception if not running
-	  * @throws FFaplException
+	  * @throws FFaplAlgebraicException
 	  */
 	  protected void isRunning() throws FFaplAlgebraicException
 	  {
@@ -401,7 +414,7 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 			if(_thread.isInterrupted()){
 				throw new FFaplAlgebraicException(null, IAlgebraicError.INTERRUPT);
 			}
-			
+
 		}
 	  }
 

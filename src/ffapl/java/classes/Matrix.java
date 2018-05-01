@@ -10,17 +10,28 @@ import java.util.*;
 import java.util.function.Function;
 
 /**
- * Sparse matrix implementation using a double-nested TreeMap in row-major order.
+ * Sparse matrix implementation using a double-nested TreeMap structured
+ * in row-major order.
+ * <p>
+ * This class uses one-based indexing for its entries, meaning the
+ * first entry (upper left) of a matrix A mxn can be accessed with
+ * {@code A.get(1,1)} and the last entry (lower right) with
+ * {@code A.get(m,n)}. Therefore, standard matrix item descriptions
+ * like a<subInPlace>{@code ij}</subInPlace> translate directly
+ * to {@code A.get(i,j)}.
  *
  * @param <V> type of values in the matrix
  * @see TreeMap
  * @see MatrixIterator
  */
-public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matrix<V>>, Iterable<Matrix.MatrixEntry<V>> {
+public class Matrix<V extends IAlgebraicOperations<V>>
+        implements IJavaType<Matrix<V>>, Iterable<Matrix.MatrixEntry<V>> {
+
+    private final int typeID = 15;
 
     // TODO method: importMatrix which copies a matrix (or parts of a matrix) to some place in this matrix
-    // TODO method: transpose
     // TODO method: determinant
+    // TODO method: inverse
 
     /**
      * the "zero" value that fills the empty values of the sparse matrix
@@ -40,9 +51,6 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
      */
     private long n;
 
-    // TODO implement decomposition
-    private Matrix<V>[] LuDecomposition = null;
-
     /**
      * A double nested TreeMap that stores the elements of the matrix.
      * The outer TreeMap is indexed by row number and stores TreeMaps
@@ -50,6 +58,18 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
      * is indexed by column number. If an element is not present (no
      * entry in the inner TreeMap or the whole row is missing) it is
      * assumed to have the default value.
+     * <p>
+     * TreeMap has no default iterator (which makes sense), but can,
+     * through use of {@link Map#entrySet}, comfortably be iterated
+     * over (providing desirable properties for a sparse implementation):
+     * <pre>{@code
+     * for (Map.Entry<Long, TreeMap<Long, V>> row : matrix.entrySet()) {
+     *     for (Map.Entry<Long, V> entry : row.getValue().entrySet()) {
+     *         System.out.println("row: " + row.getKey() + ", col: "
+     *              + entry.getKey() + ", value: " + entry.getValue());
+     *     }
+     * }
+     * }</pre>
      */
     private TreeMap<Long, TreeMap<Long, V>> matrix = new TreeMap<>();
 
@@ -97,13 +117,12 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
         this.n = array[0].length;
         this.defaultValue = defaultValue.clone();
 
-        V value;
         for (int i = 0; i < m; i++) {
             if (array[i].length != n)
                 throw new FFaplException();
 
             for (int j = 0; j < n; j++) {
-                value = array[i][j];
+                V value = array[i][j];
                 this.set(i + 1, j + 1, value);
             }
         }
@@ -114,10 +133,11 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
      *
      * @param array        matrix stored as {@link Array}
      * @param defaultValue default value of the sparse matrix
-     * @throws FFaplException when array is null, not two-dimensional or not rectangular
+     * @throws FFaplException when array is null, not two-dimensional
+     *                        or not rectangular
      * @see Array
      */
-    public Matrix(Array array, V defaultValue) throws FFaplException {
+    public Matrix(Array array, V defaultValue) throws FFaplException, ClassCastException {
         if (array == null || array.dim() != 2)
             throw new FFaplException();
 
@@ -125,7 +145,6 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
         this.n = ((Array) array.getValue(0)).length();
         this.defaultValue = defaultValue.clone();
 
-        V value;
         Vector<Integer> pos = new Vector<>();
         pos.add(0);
         pos.add(0);
@@ -137,7 +156,9 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
 
             for (int j = 0; j < n; j++) {
                 pos.set(1, j);
-                value = (V) array.getValue(pos);
+                // unsafe cast as unavoidable consequence of the nested Object[]
+                // data structure used in ffapl.java.classes.Array
+                V value = (V) array.getValue(pos);
                 this.set(i + 1, j + 1, value);
             }
         }
@@ -145,8 +166,9 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
 
     /**
      * Creates a sparse matrix from a (coordinates -> value) map.
-     * The map shall be indexed by Vector containing two Long values,
-     * a row and a column number, in that order.
+     * The map shall be indexed by vectors (or rather, {@link List}s,
+     * for compatibility) containing two Long values,
+     * (a row and a column number, in that order).
      *
      * @param map          map of elements
      * @param m            number of rows
@@ -154,14 +176,14 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
      * @param defaultValue default value of the matrix
      * @throws FFaplException when coordinates are not two-dimensional
      */
-    public Matrix(Map<Vector<Long>, V> map, long m, long n, V defaultValue) throws FFaplException {
+    public Matrix(Map<List<Long>, V> map, long m, long n, V defaultValue) throws FFaplException {
         this.m = m;
         this.n = n;
         this.defaultValue = defaultValue.clone();
 
         if (map != null) {
-            Vector<Long> pos;
-            for (Map.Entry<Vector<Long>, V> entry : map.entrySet()) {
+            List<Long> pos;
+            for (Map.Entry<List<Long>, V> entry : map.entrySet()) {
                 pos = entry.getKey();
 
                 if (pos.size() != 2)
@@ -170,6 +192,172 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
                 this.set(pos.get(0), pos.get(1), entry.getValue());
             }
         }
+    }
+
+    /**
+     * Swaps two items in a map.
+     *
+     * @param map  the map
+     * @param key1 key of first item
+     * @param key2 key of second item
+     * @param <K>  map key type
+     * @param <V>  map value type
+     */
+    public static <K, V> void swapMapItems(Map<K, V> map, K key1, K key2) {
+        swapMapItems(map, key1, key2, null, null, false);
+    }
+
+    /**
+     * Swaps two items in a map.
+     *
+     * @param map       the map
+     * @param key1      key of first item
+     * @param key2      key of second item
+     * @param default1  value to assume for first item if not set
+     * @param default2  value to assume for second item if not set
+     * @param writeNull whether to put null values in the map
+     * @param <K>       map key type
+     * @param <V>       map value type
+     */
+    public static <K, V> void swapMapItems(Map<K, V> map, K key1, K key2, V default1, V default2, boolean writeNull) {
+        // swap map values of key1 and key2 using variables value1 and value2
+        // (dear reader, forgive me for using TWO swap vars,
+        // but it is necessary to avoid unreadable code. trust me, ive tried)
+
+        if (map != null) {
+            // do not swap if keys are equal. keys are considered equal iff:
+            // their references match OR a call to their equals method returns true
+            if (key1 != key2 && (key1 == null || !key1.equals(key2))) {
+
+                V value1 = map.getOrDefault(key1, default1);
+                V value2 = map.getOrDefault(key2, default2);
+
+                map.remove(key1);
+                map.remove(key2);
+
+                if (value2 != null || writeNull)
+                    map.put(key1, value2);
+
+                if (value1 != null || writeNull)
+                    map.put(key2, value1);
+            }
+        }
+    }
+
+    /**
+     * Multiplies two matrices {@code A mxn} and {@code B nxp}.
+     * For matrix-vector multiplications ({@code p = 1})
+     * consider using {@link #multiplyVector(NavigableMap)} instead.
+     *
+     * @param A factor
+     * @param B factor
+     * @return product ({@code C mxp})
+     * @throws FFaplAlgebraicException if addition or multiplication
+     *                                 of values fails
+     * @see #isCompatibleMult(Matrix)
+     */
+    public static <T extends IAlgebraicOperations<T>> Matrix<T> multiply(Matrix<T> A, Matrix<T> B)
+            throws FFaplAlgebraicException {
+
+        if (A.isCompatibleMult(B)) {
+            // matrices: A mxn, B nxp, C mxp
+            Matrix<T> C = new Matrix<>(A.getM(), B.getN(), A.getDefaultValue());
+
+            long i; // row of A and C (0..m)
+            long j; // column of B and C (0..p)
+            long k; // column of A and row of B (0..n)
+
+            // fun begins here
+            // normally would have to iterate over rows (m) and columns (p)
+            // of C and then do (n) multiplications to find the value but in
+            // this sparse matrix, it's trivial too see that when row (i)
+            // of matrix A is completely filled with zeroes, the same row in C
+            // will be too. so only iterate over non zero rows of A
+            for (Map.Entry<Long, TreeMap<Long, T>> rowEntry : A.matrix.entrySet()) {
+                i = rowEntry.getKey();
+                TreeMap<Long, T> row = rowEntry.getValue();
+
+                // because sparse matrix is in row major order (collection
+                // of rows which in turn are a collection of elements)
+                // have to iterate over all columns of B/C
+                for (j = 1; j <= B.getN(); j++) {
+                    // for each element of target matrix C:
+                    // start with zero
+                    T value = C.getDefaultValue();
+                    // then iterate over the row of A to avoid unnecessary
+                    // multiplications with zero
+                    for (Map.Entry<Long, T> entry : row.entrySet()) {
+                        k = entry.getKey();
+                        // C[i][j] += A[i][k] * B[k][j]
+                        value = value.addR(row.get(k).multR(B.get(k, j)));
+                    }
+                    // and write to C
+                    C.set(i, j, value);
+                }
+            }
+            return C;
+
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Adds two matrices and returns the result.
+     * <p>
+     * If one of the matrices is no longer needed after this operation,
+     * consider using {@link #addInPlace(Matrix)}.
+     *
+     * @param A   summand
+     * @param B   summand
+     * @param <T> type of values in the matrices
+     * @return C sum
+     * @throws FFaplAlgebraicException when operations on underlying objects fail
+     * @see #addInPlace(Matrix)
+     */
+    public static <T extends IAlgebraicOperations<T>> Matrix<T> add(Matrix<T> A, Matrix<T> B)
+            throws FFaplAlgebraicException {
+
+        Matrix<T> C = A.clone();
+        C.addInPlace(B);
+        return C;
+    }
+
+    /**
+     * Subtracts a matrix from another and returns the result.
+     * <p>
+     * If one of the matrices is no longer needed after this operation,
+     * consider using {@link #subInPlace(Matrix)}.
+     *
+     * @param A   minuend
+     * @param B   subtrahend
+     * @param <T> type of values in the matrices
+     * @return C difference
+     * @throws FFaplAlgebraicException when operations on underlying objects fail
+     * @see #subInPlace(Matrix)
+     */
+    public static <T extends IAlgebraicOperations<T>> Matrix<T> sub(Matrix<T> A, Matrix<T> B)
+            throws FFaplAlgebraicException {
+
+        Matrix<T> C = A.clone();
+        C.subInPlace(B);
+        return C;
+    }
+
+    /**
+     * Multiplies this matrix (A mxn) with another matrix (B nxp).
+     * For matrix-vector multiplications ({@code p = 1})
+     * consider using {@link #multiplyVector(NavigableMap)} instead.
+     *
+     * @param B factor
+     * @return product ({@code C mxp})
+     * @throws FFaplAlgebraicException if addition or multiplication
+     *                                 of values fails
+     * @see #isCompatibleMult(Matrix)
+     */
+    public Matrix<V> multiply(Matrix<V> B)
+            throws FFaplAlgebraicException {
+        return multiply(this, B);
     }
 
     /**
@@ -210,8 +398,6 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
         return this.defaultValue.clone();
     }
 
-    // matrix entry accessor methods
-
     /**
      * Set the default value for elements of this sparse matrix,
      * i.e. the value that fills empty entries.
@@ -222,9 +408,38 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
         this.defaultValue = defaultValue.clone();
     }
 
+    public Long getNextRow(long i, boolean orEqual) {
+        return orEqual ? matrix.ceilingKey(i) : matrix.higherKey(i);
+    }
+
+    public Long getPrevRow(long i, boolean orEqual) {
+        return orEqual ? matrix.floorKey(i) : matrix.lowerKey(i);
+    }
+
+    public Long getNextValue(long i, long j, boolean orEqual) {
+        TreeMap<Long, V> row = matrix.get(i);
+        return row == null ? null : (orEqual ? row.ceilingKey(j) : row.higherKey(j));
+    }
+
+    public Long getPrevValue(long i, long j, boolean orEqual) {
+        TreeMap<Long, V> row = matrix.get(i);
+        return row == null ? null : (orEqual ? row.floorKey(j) : row.lowerKey(j));
+    }
+
     /**
-     * Set the value in row {@code i} and column {@code j} to {@code value}.
-     * Will remove entry if value is null or equal to the default value of the matrix.
+     * Swaps two rows in this matrix.
+     *
+     * @param i1 number of first row
+     * @param i2 number of second row
+     */
+    public void swapRows(long i1, long i2) {
+        swapMapItems(this.matrix, i1, i2);
+    }
+
+    /**
+     * Set the value in row {@code i} and column {@code j} to
+     * {@code value}. Will remove entry if value is null or equal
+     * to the default value of the matrix.
      *
      * @param i     row
      * @param j     column
@@ -274,7 +489,7 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
     }
 
     /**
-     * Get the value in row {@code i} and column {@code j} or the
+     * Get the value in row {@code i} and column {@code j}, or the
      * default value of the matrix if no entry is present.
      *
      * @param i row
@@ -295,25 +510,37 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
     }
 
     /**
-     * Checks whether element is non zero
+     * Checks whether the value in row {@code i} and column
+     * {@code j} is non-zero
      * (i.e. there is an entry for the given coordinates).
      *
      * @param i row
      * @param j column
-     * @return true if value at coordinates is non zero
+     * @return true iff value at coordinates is non zero
      */
-    public boolean isValuePresent(long i, long j) {
+    public boolean hasNonZeroEntryAt(long i, long j) {
         if (validCoordinates(i, j)) {
             TreeMap<Long, V> row = matrix.get(i);
 
             if (row != null) {
                 V value = row.get(j);
-                if (value != null && !defaultValue.equals(value))
+                if (!defaultValue.equals(value))
                     return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * Checks whether row is non zero
+     * (i.e. there is at least one non-zero entry in the given row)
+     *
+     * @param i row
+     * @return true iff row has non-zero entries
+     */
+    public boolean hasNonZeroRowAt(long i) {
+        return validCoordinates(i, 1L) && matrix.get(i) != null;
     }
 
     /**
@@ -325,12 +552,10 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
      * @param j column
      * @return true if coordinates are valid
      */
-    public boolean validCoordinates(long i, long j) {
-        return i > 0 && i <= this.getM()
-                && j > 0 && j <= this.getN();
+    public boolean validCoordinates(Long i, Long j) {
+        return i != null && i > 0 && i <= this.getM() &&
+                j != null && j > 0 && j <= this.getN();
     }
-
-    // compatibility checkers
 
     /**
      * Checks whether this matrix is compatible to the matrix {@code B}
@@ -345,21 +570,21 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
     }
 
     /**
-     * Checks whether this matrix is compatible to matrix {@code B}
+     * Checks whether this matrix ({@code A}) is compatible to matrix {@code B}
      * with respect to matrix multiplication
      * (i.e. if this matrix has as much columns as the other has rows).
      * <p>
-     * Note: matrix multiplication is not commutative. Thus, if {@code A} is compatible
-     * to {@code B} this does not imply that {@code B} is compatible to {@code A}
+     * Note: matrix multiplication is not commutative. Thus, if {@code A}
+     * is compatible to {@code B} this does not imply that {@code B}
+     * is compatible to {@code A}.
      *
      * @param B other matrix
      * @return true if the matrices are compatible
+     * @see #multiply(Matrix, Matrix)
      */
     public boolean isCompatibleMult(Matrix B) {
         return this.equalType(B) && this.getN() == B.getM();
     }
-
-    // arithmetic methods
 
     /**
      * Adds another matrix (B mxn) to this matrix (A mxn).
@@ -367,7 +592,7 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
      * @param B summand
      * @throws FFaplAlgebraicException if addition of values fails
      */
-    public void add(Matrix<V> B) throws FFaplAlgebraicException {
+    public void addInPlace(Matrix<V> B) throws FFaplAlgebraicException {
         for (MatrixEntry<V> e : B) {
             this.set(e.i, e.j, this.get(e.i, e.j).addR(e.value));
         }
@@ -379,62 +604,50 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
      * @param B subtrahend
      * @throws FFaplAlgebraicException if addition of values fails
      */
-    public void sub(Matrix<V> B) throws FFaplAlgebraicException {
+    public void subInPlace(Matrix<V> B) throws FFaplAlgebraicException {
         for (MatrixEntry<V> e : B) {
             this.set(e.i, e.j, this.get(e.i, e.j).subR(e.value));
         }
     }
 
     /**
-     * Multiplies this matrix (A mxn) with another matrix (B nxp).
+     * Multiplies with a vector. Uses sparsity of matrix and vector
+     * and tries to do as few multiplications as possible.
      *
-     * @param B factor
-     * @return product (C mxp)
-     * @throws FFaplAlgebraicException if addition or multiplication of values fails
+     * @param factor factor (vector)
+     * @return product
+     * @throws FFaplAlgebraicException if addition or multiplication
+     *                                 of values fails
      */
-    public Matrix<V> multiply(Matrix<V> B) throws FFaplAlgebraicException {
-        if (this.isCompatibleMult(B)) {
-            // matrices: A mxn, B nxp, C mxp
-            Matrix<V> C = new Matrix<>(this.getM(), B.getN(), this.getDefaultValue());
+    public TreeMap<Long, V> multiplyVector(NavigableMap<Long, V> factor) throws FFaplAlgebraicException {
+        TreeMap<Long, V> product = new TreeMap<>();
 
-            long i; // row of A and C (0..m)
-            long j; // column of B and C (0..p)
-            long k; // column of A and row of B (0..n)
-            V value;
-            TreeMap<Long, V> row;
-            // fun begins here
-            // normally would have to iterate over rows (m) and columns (p) of C
-            // and then do (n) multiplications to find the value
-            // but in this sparse matrix, it's trivial too see that when row (i)
-            // of matrix A is completely filled with zeroes, the same row in C
-            // will be too. so only iterate over non zero rows of A
-            for (Map.Entry<Long, TreeMap<Long, V>> rowEntry : matrix.entrySet()) {
-                i = rowEntry.getKey();
-                row = rowEntry.getValue();
+        for (Map.Entry<Long, TreeMap<Long, V>> rowEntry : matrix.entrySet()) {
 
-                // because sparse matrix is in row major order (collection of rows
-                // which in turn are a collection of elements) have to iterate over
-                // all colums of B/C
-                for (j = 1; j <= B.getN(); j++) {
-                    // for each element of target matrix C:
-                    // start with zero
-                    value = C.getDefaultValue();
-                    // then iterate over the row of A to avoid unnecessary
-                    // multiplications with zero
-                    for (Map.Entry<Long, V> entry : row.entrySet()) {
-                        k = entry.getKey();
-                        // C[i][j] += A[i][k] * B[k][j]
-                        value = value.addR(row.get(k).multR(B.get(k, j)));
-                    }
-                    // and write to C
-                    C.set(i, j, value);
-                }
+            // iterate over the vector (row or factor) that has less entries,
+            // using sparsity. to avoid duplicating code, rename variables
+            // into v1 (less entries => iterate over this one) and v2
+            NavigableMap<Long, V> v1, v2;
+            if (factor.size() <= rowEntry.getValue().size()) {
+                v1 = factor;
+                v2 = rowEntry.getValue();
+            } else {
+                v1 = rowEntry.getValue();
+                v2 = factor;
             }
-            return C;
 
-        } else {
-            return null;
+            V tmp = this.defaultValue;
+            for (Map.Entry<Long, V> entry : v1.entrySet()) {
+                V item = v2.get(entry.getKey());
+
+                if (item != null)
+                    tmp = tmp.addR(entry.getValue().multR(item));
+            }
+
+            product.put(rowEntry.getKey(), tmp);
         }
+
+        return product;
     }
 
     /**
@@ -445,7 +658,7 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
      * @throws FFaplAlgebraicException when multiplication of values fails
      * @see BigInteger
      */
-    public void scalarMultiply(BigInteger factor) throws FFaplAlgebraicException {
+    public void scalarMultiplyInPlace(BigInteger factor) throws FFaplAlgebraicException {
         for (MatrixEntry<V> e : this) {
             this.set(e.i, e.j, e.value.scalarMultR(factor));
         }
@@ -453,23 +666,172 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
         /* more elegant variant using methods of TreeMap and Lambdas:
          * unfeasible because methods defined by IAlgebraicOperations
          * throw exceptions unhandled by TreeMap.forEach and TreeMap.replaceAll */
-        //matrix.forEach((Long i, TreeMap<Long, T> row) -> row.replaceAll((Long j, T entry) -> entry.scalarMultR(factor)));
-
-        // alternative:
-        /*
-        for (Map.Entry<Long, TreeMap<Long, V>> row : matrix.entrySet()) {
-            for (Map.Entry<Long, V> entry : row.getValue().entrySet()) {
-                entry.setValue(entry.getValue().scalarMultR(factor));
-            }
-        }
-        */
+        //matrix.forEach((Long i, TreeMap<Long, V> row) -> row.replaceAll((Long j, V entry) -> entry.scalarMultR(factor)));
     }
 
-    // methods from IJavaType
+    /**
+     * Transposes this matrix (A<sup>{@code T}</sup>).
+     *
+     * @return transposition
+     */
+    public Matrix<V> transpose() {
+        Matrix<V> transposition = new Matrix<>(this.m, this.n, this.defaultValue);
+
+        for (MatrixEntry<V> entry : this) {
+            transposition.set(entry.j, entry.i, entry.value);
+        }
+
+        return transposition;
+    }
+
+    /**
+     * Solve equation system given by this matrix and vector {@code b}
+     * as {@code Ax = b} for {@code x}.
+     * Assume lower triangular matrix.
+     *
+     * @param b constant term vector
+     * @return x - solution
+     */
+    public TreeMap<Long, V> solveLowerTriangular(Map<Long, V> b) throws FFaplAlgebraicException {
+        TreeMap<Long, V> x = new TreeMap<>();
+
+        Long i, j;
+
+        // use iterator, as it's probably more efficient and bug free
+        for (Map.Entry<Long, TreeMap<Long, V>> rowEntry : matrix.entrySet()) {
+            i = rowEntry.getKey();
+
+            if (this.hasNonZeroRowAt(i)) {
+                V tmp = this.defaultValue;
+
+                for (j = getNextValue(i, 1L, true); j != null && j < i; j = getNextValue(i, j, false)) {
+                    V a_ij = get(i, j);
+                    V x_j = x.get(j);
+
+                    if (a_ij != null && x_j != null) {
+                        tmp = tmp.addR(a_ij.multR(x_j));
+                    }
+                }
+
+                // x_i = ( b_i - sum_j=1..i-1(a_ij * x_j) ) / a_ii
+                x.put(i, b.get(i).subR(tmp).divR(get(i, i)));
+            }
+        }
+
+        return x;
+    }
+
+    /**
+     * Solve equation system given by this matrix and vector {@code b}
+     * as {@code Ax = b} for {@code x}.
+     * Assume upper triangular matrix.
+     *
+     * @param b constant term vector
+     * @return x - solution
+     */
+    public TreeMap<Long, V> solveUpperTriangular(Map<Long, V> b) throws FFaplAlgebraicException {
+        TreeMap<Long, V> x = new TreeMap<>();
+
+        Long i, j;
+
+        // iterate over rows, starting at the bottom (no reverse-iterator here)
+        for (i = getPrevRow(m, true); i != null; i = getPrevRow(i, false)) {
+            if (this.hasNonZeroEntryAt(i, i)) {
+                V tmp = getDefaultValue();
+
+                for (j = getNextValue(i, i, false); j != null; j = getNextValue(i, j, false)) {
+                    V a_ij = get(i, j);
+                    V x_j = x.get(j);
+
+                    if (a_ij != null && x_j != null) {
+                        tmp = tmp.addR(a_ij.multR(x_j));
+                    }
+                }
+
+                // x_i = ( b_i - sum_j=i+1..n(a_ij * x_j) ) / a_ii
+                x.put(i, b.get(i).subR(tmp).divR(get(i, i)));
+            }
+        }
+
+        return x;
+    }
+
+    /**
+     * Performs Gaussian Elimination and reduces this matrix to upper triangular form.
+     * <p>
+     * Algorithm is applied in place, it is required to clone this matrix in order to
+     * use its normal form afterwards.
+     *
+     * @param b          vector of constant terms
+     * @param trackSwaps whether to return a permutation index
+     * @return permutation map
+     * @throws FFaplAlgebraicException when operations on underlying objects fail
+     */
+    public TreeMap<Long, Long> rowReduceInPlace(NavigableMap<Long, V> b, boolean trackSwaps) throws FFaplAlgebraicException {
+        // TODO param: numerically stable (use max pivot, requires compareTo in interface)
+        // TODO param: division free (multiply both rows by each others pivots)
+        long h = 1; // pivot row
+        long k = 1; // pivot column
+
+        // init permutation
+        TreeMap<Long, Long> permutation = null;
+        if (trackSwaps)
+            permutation = new TreeMap<>();
+
+        // iterate over rows, adjust pivot column in each iteration as well
+        for (; h <= m && k <= n; h++, k++) {
+
+            // find pivot
+            Long pivot = this.getNextRow(h, true);
+            while (pivot != null && !this.hasNonZeroEntryAt(pivot, k)) {
+                pivot = this.getNextRow(pivot, false);
+            }
+
+            if (pivot != null) {
+                // swap rows/entries in matrix, vector and (if needed) the permutation
+                this.swapRows(h, pivot);
+                swapMapItems(b, h, pivot);
+
+                if (trackSwaps)
+                    swapMapItems(permutation, h, pivot, h, pivot, false);
+
+                for (long i = h + 1; i <= m; i++) {
+                    // only adjust row if pivot entry is non zero
+                    if (this.hasNonZeroEntryAt(i, k)) {
+                        //factor =   A[i, k]  /     A[h, k]
+                        V factor = get(i, k).divR(get(h, k));
+
+                        // set pivot value of row to zero
+                        this.set(i, k, this.getDefaultValue());
+
+                        // adjust other values in row
+                        for (long j = k + 1; j <= n; j++) {
+                            //A[i, j] = A[i, j]   -    A[h, j]   *   factor
+                            set(i, j, get(i, j).subR(get(h, j).multR(factor)));
+                        }
+
+                        // adjust value in vector
+                        V b_h = b.get(h);
+                        if (b_h != null) {
+                            V b_i = b.getOrDefault(i, this.getDefaultValue());
+                            //  b[i]=b[i] -   b[h]  *   factor
+                            b.put(i, b_i.subR(b_h.multR(factor)));
+                        }
+                    }
+                }
+            }
+            // else: no pivot in this column, continue with the next
+        }
+
+        if (trackSwaps)
+            return permutation;
+        else
+            return null;
+    }
 
     @Override
     public int typeID() {
-        return 15;
+        return typeID;
     }
 
     @Override
@@ -481,6 +843,7 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
 
     @Override
     public Matrix<V> clone() {
+        // TODO (maybe) rewrite to follow convention of calling super.clone() which is hardcoded for efficiency then swap mutable object references with clones
         return new Matrix<>(this);
     }
 
@@ -499,13 +862,11 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
                 && this.defaultValue.equalType(((Matrix) type).getDefaultValue()); // has values of equal types
     }
 
-    // utility methods
-
     /**
      * Checks whether two matrices are equal with respect to their elements.
-     * Two matrices (A mxn, B mxn) are considered equal if they are the same size and for
-     * each coordinate in the matrices (i,j) the following evaluates to true:
-     * <p>
+     * Two matrices (A mxn, B mxn) are considered equal if they are the same
+     * size and for each coordinate in the matrices {@code (i,j)}
+     * the following evaluates to true:
      * <center>{@code A.get(i, j).equals(B.get(i, j))}</center>
      *
      * @param B other matrix
@@ -521,12 +882,12 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
             // would be wrong for A = {{1,0},{0,1}} and B = {{1,1},{0,1}}
             // instead implement "parallel foreach" over two iterators
 
-            Iterator<MatrixEntry<V>> iterA = this.iterator(), iterB = B.iterator();
-            MatrixEntry<V> itemA, itemB;
+            Iterator<MatrixEntry<V>> iterA = this.iterator();
+            Iterator<MatrixEntry<V>> iterB = B.iterator();
 
             while (iterA.hasNext() && iterB.hasNext()) {
-                itemA = iterA.next();
-                itemB = iterB.next();
+                MatrixEntry<V> itemA = iterA.next();
+                MatrixEntry<V> itemB = iterB.next();
 
                 if (itemA == null || !itemA.equals(itemB))
                     return false;
@@ -559,7 +920,7 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
      */
     @Override
     public String toString() {
-        // stringbuilder used for better efficiency
+        // StringBuilder used for better efficiency
         // when concatenating strings in loops
         StringBuilder sb = new StringBuilder();
         sb.append('{');
@@ -567,7 +928,8 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
         for (int i = 1; i <= this.getM(); i++) {
             sb.append('{');
             for (int j = 1; j <= this.getN(); j++) {
-                sb.append(this.get(i, j).toString()).append(',');
+                V item = this.get(i, j);
+                sb.append((item != null ? item : getDefaultValue()).toString()).append(',');
             }
 
             // insert closing parenthesis before comma
@@ -614,8 +976,6 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
         matrix.forEach((Long i, TreeMap<Long, V> row) -> row.replaceAll((Long j, V entry) -> function.apply(entry)));
     }
 
-    // iterator stuff
-
     /**
      * Returns an iterator over the elements in this matrix in row-major order.
      * Elements are given as {@link MatrixEntry} objects that contain
@@ -641,7 +1001,7 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
      * @see Matrix
      * @see MatrixEntry
      */
-    static final class MatrixIterator<U> implements Iterator<MatrixEntry<U>> {
+    static class MatrixIterator<U> implements Iterator<MatrixEntry<U>> {
 
         private TreeMap<Long, U> row;
         private Long i;
@@ -650,10 +1010,10 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
 
         private MatrixIterator(TreeMap<Long, TreeMap<Long, U>> matrix) {
             this.matrix = matrix;
-            i = matrix.ceilingKey(0L);
+            i = matrix.ceilingKey(1L);
             if (i != null) {
                 row = matrix.get(i);
-                j = row.ceilingKey(0L);
+                j = row.ceilingKey(1L);
             } else {
                 j = null;
             }
@@ -676,7 +1036,7 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
                     i = matrix.higherKey(i);
                     if (i != null) {
                         row = matrix.get(i);
-                        j = row.ceilingKey(0L);
+                        j = row.ceilingKey(1L);
                     }
                 }
                 return entry;
@@ -692,15 +1052,24 @@ public class Matrix<V extends IAlgebraicOperations<V>> implements IJavaType<Matr
      * Contains row number, column number and value
      * of one item in the matrix.
      *
-     * @param <T> type of values in the matrix
+     * @param <U> type of values in the matrix
      * @see Matrix
      * @see MatrixIterator
      */
-    public static final class MatrixEntry<T> {
-        long i, j;
-        T value;
+    public static class MatrixEntry<U> {
+        /**
+         * row number
+         */
+        public long i;
 
-        MatrixEntry(long i, long j, T value) {
+        /**
+         * column number
+         */
+        public long j;
+
+        public U value;
+
+        MatrixEntry(long i, long j, U value) {
             this.i = i;
             this.j = j;
             this.value = value;
