@@ -524,7 +524,7 @@ public class Matrix<V extends IAlgebraicOperations<V>>
 
             if (row != null) {
                 V value = row.get(j);
-                if (!defaultValue.equals(value))
+                if (value != null && !defaultValue.equals(value))
                     return true;
             }
         }
@@ -748,8 +748,10 @@ public class Matrix<V extends IAlgebraicOperations<V>>
                     }
                 }
 
+                V b_i = b.getOrDefault(i, defaultValue);
+
                 // x_i = ( b_i - sum_j=i+1..n(a_ij * x_j) ) / a_ii
-                x.put(i, b.get(i).subR(tmp).divR(get(i, i)));
+                x.put(i, b_i.subR(tmp).divR(get(i, i)));
             }
         }
 
@@ -827,6 +829,14 @@ public class Matrix<V extends IAlgebraicOperations<V>>
             return permutation;
         else
             return null;
+    }
+
+    public TreeMap<Long, V> solve(NavigableMap<Long, V> b, boolean inPlace) throws FFaplAlgebraicException {
+        Matrix<V> A = inPlace ? this : this.clone();
+        b = inPlace ? b : new TreeMap<>(b);
+
+        A.rowReduceInPlace(b, false);
+        return A.solveUpperTriangular(b);
     }
 
     @Override

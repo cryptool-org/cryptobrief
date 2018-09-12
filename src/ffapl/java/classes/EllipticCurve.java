@@ -1,11 +1,13 @@
 package ffapl.java.classes;
 
-import java.math.BigInteger;
-
 import ffapl.java.exception.FFaplAlgebraicException;
 import ffapl.java.interfaces.IAlgebraicError;
 import ffapl.java.interfaces.IJavaType;
 import ffapl.java.math.Algorithm;
+
+import java.math.BigInteger;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<EllipticCurve>{
 	
@@ -1486,8 +1488,51 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 				
 				
 				
-				if (_gf.characteristic().equals(new BigInteger("2")))
+				if (_gf.characteristic().equals(BigInteger.TWO))
 				{
+				    if (_gf.irrPolynomial().isOne()) {
+				        // todo check the four trivial cases
+                    }
+
+					GaloisField b_ = c.divR(b.multR(b)); // b variable used in the thesis
+					GaloisField alpha; // generator
+
+					alpha = _gf.findPrimitiveElement();
+
+					// create galois field element with value one, needed for matching later
+					GaloisField one = new GaloisField(BigInteger.TWO, _gf.irrPolynomial(), _thread);
+					one.setValue(new Polynomial(1, 0, _thread));
+
+					// create base as matrix of base vectors (vertical)
+					Matrix<ResidueClass> base = new Matrix<>(degree.longValue(), degree.longValue(), new ResidueClass(0,2));
+
+					for (long j = 0; j > degree.longValue(); j++) {
+
+						TreeMap<BigInteger, BigInteger> tmp = alpha.value()._polynomialMap;
+
+						for (Map.Entry<BigInteger, BigInteger> entry: tmp.entrySet()) {
+							base.set(entry.getKey().longValue(), j, new ResidueClass(entry.getValue().intValue(),2));
+						}
+
+						alpha = alpha.multR(alpha);
+						if (alpha.equalGF(one)) {
+							// throw new FFaplException("alpha is no generator");
+						}
+					}
+
+					TreeMap<Long, ResidueClass> bVector = new TreeMap<>();
+					for (Map.Entry<BigInteger, BigInteger> entry : b_.value()._polynomialMap.entrySet())
+						bVector.put(entry.getKey().longValue(), new ResidueClass(entry.getValue().intValue(),2));
+
+					TreeMap<BigInteger, BigInteger> t = new TreeMap<>();
+
+					for (Map.Entry<Long, ResidueClass> entry: base.solve(bVector, true).entrySet())
+						t.put(BigInteger.valueOf(entry.getKey()), entry.getValue().value());
+
+					this._y_gf = new PolynomialRCPrime(t, alpha.characteristic(), _thread);
+
+
+
 					throw new FFaplAlgebraicException(null, IAlgebraicError.NOT_IMPLEMENTED);
 				}
 				else //Charakteristik != 2
