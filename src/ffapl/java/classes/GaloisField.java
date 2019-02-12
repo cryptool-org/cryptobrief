@@ -3,6 +3,7 @@
  */
 package ffapl.java.classes;
 
+import ffapl.exception.FFaplException;
 import ffapl.java.exception.FFaplAlgebraicException;
 import ffapl.java.interfaces.IAlgebraicError;
 import ffapl.java.interfaces.IAlgebraicOperations;
@@ -12,6 +13,8 @@ import ffapl.java.math.Algorithm;
 import java.math.BigInteger;
 import java.util.Map;
 import java.util.TreeMap;
+
+import static java.math.BigInteger.*;
 
 /**
  * @author Alexander Ortner
@@ -623,7 +626,7 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 
         // Step 0
         // r := ( p^n - 1 ) / ( p - 1 )
-        BigInteger r = p.pow(n.intValue()).divide(p.subtract(one));
+        BigInteger r = p.pow(n.intValue()).subtract(ONE).divide(p.subtract(ONE));
         // factorize r
         TreeMap<BigInteger, BigInteger> factorsOfR = Algorithm.FactorInteger(new BInteger(r,_thread));
 
@@ -632,14 +635,14 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 
         // Step 1
         // iterate over possible polynomials (monic, of order n)
-        Polynomial f_x = new Polynomial(one, n, _thread); // start with just x^n
+        PolynomialRC f_x = new PolynomialRC(ONE, n, p, _thread); // start with just x^n
         boolean allPossiblePolynomialsIterated = false;
 
         while (!allPossiblePolynomialsIterated) {
 
         	// [Step 2 - 7]
-            if (isPrimitivePolynomial(f_x, factorsOfR, factorsOfPMinus1, _thread)) {
-            	// Step 8
+            if (isPrimitivePolynomial(f_x, p, factorsOfR, factorsOfPMinus1, _thread)) {
+            	// [Step 8]
             	return f_x;
 			}
 
@@ -674,18 +677,70 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
         return null;
     }
 
-	public static boolean isPrimitivePolynomial(Polynomial f, Map<BigInteger, BigInteger> p_i, Map<BigInteger, BigInteger> factorsOfPMinusOne, Thread _thread)
-			throws FFaplAlgebraicException {
-		BigInteger p = f.degree();
+	/**
+	 *
+	 * @param f the polynomial
+	 * @param p characteristic
+	 * @param factorsOfR precomputed factorization of r := (p^n - 1)/(p - 1)
+	 * @param factorsOfPMinusOne precomputed factorization of (p - 1)
+	 * @return
+	 * @throws FFaplAlgebraicException
+	 */
+	public static boolean isPrimitivePolynomial(PolynomialRC f, BigInteger p, Map<BigInteger, BigInteger> factorsOfR, Map<BigInteger, BigInteger> factorsOfPMinusOne, Thread _thread)
+            throws FFaplException {
 
-		// Step 2
-		BigInteger a0 = f.coefficientAt(BigInteger.ZERO);
-		if (!isPrimitiveRoot(a0, p, factorsOfPMinusOne, _thread))
+		BigInteger n = f.degree();
+		BigInteger pMinusOne = p.subtract(ONE);
+        BigInteger r = p.pow(n.intValue()).subtract(ONE).divide(pMinusOne);
+
+
+		// [Step 2]
+		BigInteger a0 = f.coefficientAt(ZERO);
+		// a_0 * (-1)^n
+		BigInteger a0TimesMinusOneToTheN = (n.mod(TWO).compareTo(ZERO)==0) ? a0 : a0.negate();
+		// assert that a_0 * (-1)^n is a primitive root of p
+		if (!isPrimitiveRoot(a0TimesMinusOneToTheN, p, factorsOfPMinusOne, _thread))
 			return false;
 
+		// [Step 3]
+		// assert that f has no linear factors (as linear factors imply reducibility)
+		if (f.hasLinearFactors())
+			return false;
 
-		// TODO implement steps 2-7 from http://www.seanerikoconnor.freeservers.com/Mathematics/AbstractAlgebra/PrimitivePolynomials/theory.html#AlgoforFinding
+		// [Step 4]
+		// apply berlekamp polynomial factorization to check for reducibility
+		// assert that the Q-matrix of f has a nullity less than 2 (nullity of two or greater implies reducibility)
+		if (f.findQMatrix(p, n, _thread).nullity(2) == 2)
+			return false;
 
+		// [Step 5]
+		// assert that x^r is an integer (a) without any other coefficients
+		GaloisField x = new GaloisField(p, f, _thread);
+		// x = 1 * x^1
+		TreeMap<BigInteger, BigInteger> polyMap = new TreeMap<>();
+		polyMap.put(ONE, ONE);
+		x.setValue(new Polynomial(polyMap, _thread));
+		// x^r
+		GaloisField xToTheR = x.powR(r);
+		// assert that x^r === a, where a is an integer
+		if (xToTheR.value().leadingCoefficient().compareTo(ZERO) != 0)
+			return false;
+
+		// [Step 6]
+        BigInteger a = xToTheR.value().coefficientAt(ZERO);
+        // assert that a === (-1)^n * a0 mod f, p
+        if (!a.equals(a0TimesMinusOneToTheN))
+            return false;
+
+        // [Step 7]
+		for (BigInteger factor : factorsOfR.keySet())
+			// skip test if p_i | (p-1) (divides)
+			if (!factor.mod(pMinusOne).equals(ZERO))
+				// otherwise, assert that x^(r/p_i) is not an integer
+				if (x.powR(r.divide(factor)).value().leadingCoefficient().compareTo(ZERO) == 0)
+					return false;
+
+		// [Step 8]
 		return true;
 	}
 

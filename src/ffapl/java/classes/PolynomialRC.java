@@ -3,17 +3,20 @@
  */
 package ffapl.java.classes;
 
+import ffapl.FFaplInterpreter;
+import ffapl.exception.FFaplException;
+import ffapl.java.exception.FFaplAlgebraicException;
+import ffapl.java.interfaces.IAlgebraicError;
+import ffapl.java.interfaces.IJavaType;
+import ffapl.java.math.Algorithm;
+
 import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import ffapl.FFaplInterpreter;
-import ffapl.java.exception.FFaplAlgebraicException;
-import ffapl.java.interfaces.IAlgebraicError;
-import ffapl.java.interfaces.IJavaType;
-import ffapl.java.math.Algorithm;
+import static java.math.BigInteger.*;
 
 /**
  * @author Alexander Ortner
@@ -487,7 +490,65 @@ public class PolynomialRC extends Polynomial {
 		}
 		return false;
 	}
-	
-	
 
+	/**
+	 * Check for linear factors by searching for roots of the polynomial.
+	 *
+	 * @return true if the polynomial has linear factors
+	 */
+	public boolean hasLinearFactors() throws FFaplAlgebraicException {
+		BInteger current = new BInteger(ZERO, _thread);
+		BInteger one = new BInteger(ONE, _thread);
+
+		// for every a in [1,p-1] (p being the characteristic)
+		while (current.compareTo(this._characteristic) <= 0) {
+			// check if f(a) = 0 (mod p)
+			// i.e. if the polynomial has a root caused by a linear factor
+			if (this.calculate(current).compareTo(ZERO) == 0)
+				return true;
+			current = current.addR(one);
+		}
+
+		return false;
+	}
+
+	public Matrix<BInteger> findQMatrix(BigInteger characteristic, BigInteger degree, Thread _thread) throws FFaplException {
+
+		if(characteristic.compareTo(TWO) < 0 || degree.compareTo(TWO) < 0)
+			throw new FFaplException("Cannot generate Q-Matrix with degree or characteristic less than 2");
+
+		Matrix<BInteger> Q = new Matrix<>(degree.longValue(), degree.longValue(), new BInteger(ZERO, _thread));
+		BInteger one = new BInteger(ONE, _thread);
+
+		// first row is zero
+		// (entry at 1,1 would be 1 but result will have identity matrix subtracted)
+
+		PolynomialRC x = new PolynomialRC(ONE, ONE, characteristic, _thread);
+		PolynomialRC xp = (PolynomialRC) x.clone().pow(characteristic);
+		xp.mod(this);
+		PolynomialRC q = (PolynomialRC) xp.clone();
+
+		// second row are the coefficients of x^p
+		xp._polynomialMap.forEach((BigInteger e, BigInteger c)
+				-> Q.set(2, e.add(one).longValue(), new BInteger(c, _thread)));
+		// subtract identity matrix
+		Q.set(1, 1, Q.get(1, 1).subR(one));
+
+		// k-th row are the coefficients of x^(k-1)p
+		// (matrix indices start at 1)
+		for (long k = 3; k < degree.longValue(); k++) {
+			q = (PolynomialRC) q.multR(xp);
+			q.mod(this);
+
+			// variables in lambda function should be effectively final
+			long finalK = k;
+			q._polynomialMap.forEach((BigInteger e, BigInteger c)
+					-> Q.set(finalK, e.add(one).longValue(), new BInteger(c, _thread)));
+
+			// subtract identity matrix
+			Q.set(k, k, Q.get(k, k).subR(one));
+		}
+
+		return Q;
+	}
 }

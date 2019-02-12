@@ -825,10 +825,7 @@ public class Matrix<V extends IAlgebraicOperations<V>>
             // else: no pivot in this column, continue with the next
         }
 
-        if (trackSwaps)
-            return permutation;
-        else
-            return null;
+        return permutation;
     }
 
     public TreeMap<Long, V> solve(NavigableMap<Long, V> b, boolean inPlace) throws FFaplAlgebraicException {
@@ -837,6 +834,76 @@ public class Matrix<V extends IAlgebraicOperations<V>>
 
         A.rowReduceInPlace(b, false);
         return A.solveUpperTriangular(b);
+    }
+
+    /**
+     * Computes the nullity of this matrix,
+     * i.e. the number of columns that are not linear independent,
+     * == the number of columns minus the rank of this matrix
+     * <p>
+     * From Sean E. O'Connor: COMPUTING PRIMITIVE POLYNOMIALS - THEORY AND ALGORITHM
+     *
+     * @param earlyOut break if nullity is shown to be greater than this
+     * @return the nullity of this matrix
+     * @throws FFaplAlgebraicException
+     */
+    public long nullity(long earlyOut) throws FFaplAlgebraicException {
+        TreeSet<Long> pivotInCol = new TreeSet<>(); // Is included in the set if the column has a pivotal element.
+        long nullity = 0;
+        long pivotCol = -1; // No pivots yet.
+
+        // Sweep through each row.
+        for (long row = 1; row <= this.getN(); row++) {
+            // Search for a pivot in this row:  a non-zero element
+            // in a column which had no previous pivot.
+            boolean found = false;
+            if (this.hasNonZeroRowAt(row)) {
+                for (long col = 1; !found && col <= this.getN(); ++col) {
+                    if (this.hasNonZeroEntryAt(row, col) && !pivotInCol.contains(col)) {
+                        found = true;
+                        pivotCol = col;
+                    }
+                }
+            }
+
+            // No pivot;  increase nullity by 1.
+            if (!found) {
+                nullity++;
+
+                // Early out.
+                if (earlyOut > 0 && nullity >= earlyOut)
+                    return nullity;
+            }
+
+            // Found a pivot, q.
+            else {
+                V q = this.get(row, pivotCol);
+
+                // Normalize the pivotal column.
+                for (long r = 1; r <= this.getN(); ++r) {
+                    this.set(r, pivotCol, this.get(r, pivotCol).divR(q));
+                }
+
+                // Do column reduction:  Add C times the pivotal column to the other
+                // columns where C = element in the other column at current row.
+                for (long col = 1; col <= this.getN(); ++col) {
+                    if (col != pivotCol) {
+                        V s = this.get(row, col);
+
+                        Long r = 1L;
+                        while (r <= this.getN() && (r = this.getNextRow(r, false)) != null) {
+                            V t = s.multR(this.get(r, pivotCol));
+                            this.set(r, col, t.addR(this.get(r, col)));
+                        }
+                    }
+                }
+
+                // Record the presence of a pivot in this column.
+                pivotInCol.add(pivotCol);
+
+            } // found a pivot
+        }
+        return nullity;
     }
 
     @Override
