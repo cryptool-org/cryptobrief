@@ -1,18 +1,10 @@
 package ffapl.java.math;
 
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.security.AlgorithmParameters;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.AlgorithmParameterSpec;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.Iterator;
-import java.util.Stack;
-import java.util.Vector;
+import ffapl.exception.FFaplException;
+import ffapl.java.classes.*;
+import ffapl.java.exception.FFaplAlgebraicException;
+import ffapl.java.interfaces.IAlgebraicError;
+import ffapl.java.interfaces.IRandomGenerator;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -20,16 +12,16 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 
-import org.apache.commons.lang3.ArrayUtils;
-
-import ffapl.exception.FFaplException;
-import ffapl.exception.FFaplWarning;
-import ffapl.java.classes.*;
-import ffapl.java.exception.FFaplAlgebraicException;
-import ffapl.java.interfaces.IAlgebraicError;
-import ffapl.java.interfaces.IRandomGenerator;
-import ffapl.java.predefined.function.RandomPolynomial;
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.ZERO;
 
 /**
  * Algorithms needed for Algebraic calculations
@@ -225,7 +217,7 @@ public class Algorithm {
 		BInteger r;
 		Thread thread = g.getThread();
 				
-		while(! h.equals(BigInteger.ZERO)){
+		while(! h.equals(ZERO)){
 			isRunning(thread);
 			r = (BInteger) g.mod(h);
 			g = h;
@@ -258,13 +250,13 @@ public class Algorithm {
 		
 		if(h.isZero()){
 			d = (PolynomialRC) g.clone();
-			s = new PolynomialRC(BigInteger.ONE, BigInteger.ZERO, g.characteristic(), thread);
-			t = new PolynomialRC(BigInteger.ZERO, BigInteger.ZERO, g.characteristic(), thread);
+			s = new PolynomialRC(ONE, ZERO, g.characteristic(), thread);
+			t = new PolynomialRC(ZERO, ZERO, g.characteristic(), thread);
 			
 		}else{
 			try{
-				s2 = new PolynomialRC(BigInteger.ONE, BigInteger.ZERO, g.characteristic(), thread);
-				s1 = new PolynomialRC(BigInteger.ZERO, BigInteger.ZERO, g.characteristic(), thread);
+				s2 = new PolynomialRC(ONE, ZERO, g.characteristic(), thread);
+				s1 = new PolynomialRC(ZERO, ZERO, g.characteristic(), thread);
 				t2 = (PolynomialRC) s1.clone();
 				t1 = (PolynomialRC) s2.clone();
 				while(!h.isZero()){
@@ -294,12 +286,12 @@ public class Algorithm {
 		//minimize
 		if(! d.isOne()){
 			//d <> 1
-			if(d.degree().compareTo(BigInteger.ZERO) == 0){
+			if(d.degree().compareTo(ZERO) == 0){
 				try{
-					dinverse = new BInteger(d.polynomial().get(BigInteger.ZERO).modInverse(d.characteristic()), ht.getThread());
-					d.multiply(dinverse, BigInteger.ZERO);
-					s.multiply(dinverse, BigInteger.ZERO);
-					t.multiply(dinverse, BigInteger.ZERO);
+					dinverse = new BInteger(d.polynomial().get(ZERO).modInverse(d.characteristic()), ht.getThread());
+					d.multiply(dinverse, ZERO);
+					s.multiply(dinverse, ZERO);
+					t.multiply(dinverse, ZERO);
 				}catch(ArithmeticException e){
 					//do nothing 
 				}
@@ -324,17 +316,17 @@ public class Algorithm {
 		BInteger x1, x2, y1, y2, q, r;
 		BInteger[] result = new BInteger[3];
 		
-		if(b.equals(BigInteger.ZERO)){
+		if(b.equals(ZERO)){
 			d = a;
-			x = new BInteger(BigInteger.ONE, a.getThread());
-			y = new BInteger(BigInteger.ZERO, a.getThread());
+			x = new BInteger(ONE, a.getThread());
+			y = new BInteger(ZERO, a.getThread());
 		}else{
-			x2 = new BInteger(BigInteger.ONE, a.getThread());
-			x1 = new BInteger(BigInteger.ZERO, a.getThread());
-			y2 = new BInteger(BigInteger.ZERO, a.getThread());
-			y1 = new BInteger(BigInteger.ONE, a.getThread());
+			x2 = new BInteger(ONE, a.getThread());
+			x1 = new BInteger(ZERO, a.getThread());
+			y2 = new BInteger(ZERO, a.getThread());
+			y1 = new BInteger(ONE, a.getThread());
 			
-			while (b.compareTo(BigInteger.ZERO) > 0){
+			while (b.compareTo(ZERO) > 0){
 				q = (BInteger) a.divide(b);
 				r = (BInteger) a.subtract(q.multiply(b));
 				x = (BInteger) x2.subtract(q.multiply(x1));
@@ -390,9 +382,9 @@ public class Algorithm {
 			throw new FFaplAlgebraicException(messages, IAlgebraicError.CHARACTERISTIC_UNEQUAL);
 		}
 		//s=1
-		s = new PolynomialRC(BigInteger.ONE, BigInteger.ZERO, g.characteristic(), thread);
+		s = new PolynomialRC(ONE, ZERO, g.characteristic(), thread);
 		//If k = 0 then return (s)
-		if(k.equals(BigInteger.ZERO)){
+		if(k.equals(ZERO)){
 			return s;
 		}
 		//G <- g
@@ -434,10 +426,10 @@ public class Algorithm {
 		Thread thread = g.getThread();
 		//s=1
 		s = g.clone();
-		s.setPolynomial((new Polynomial(BigInteger.ONE, BigInteger.ZERO, thread)).polynomial());
+		s.setPolynomial((new Polynomial(ONE, ZERO, thread)).polynomial());
 		
 		//If k = 0 then return (s)
-		if(k.equals(BigInteger.ZERO)){
+		if(k.equals(ZERO)){
 			return s;
 		}
 		//G <- g
@@ -469,17 +461,17 @@ public class Algorithm {
 	/**
 	 * Legendre Symbol for BigInteger
 	 * @param a
-	 * @param b
+	 * @param p
 	 * @return
 	 * 
 	 */
 	public static BigInteger legendreSymbol(BigInteger a, BigInteger p)
 	{
-		a = a.modPow((p.subtract(BigInteger.ONE)).divide(new BigInteger("2")), p);
+		a = a.modPow((p.subtract(ONE)).divide(new BigInteger("2")), p);
 		
-		if (a.mod(p).equals(BigInteger.ONE)) return BigInteger.ONE;
-		if (a.mod(p).equals(p.subtract(BigInteger.ONE))) return BigInteger.ONE.negate();
-		return BigInteger.ZERO;
+		if (a.mod(p).equals(ONE)) return ONE;
+		if (a.mod(p).equals(p.subtract(ONE))) return ONE.negate();
+		return ZERO;
 	}
 	
 
@@ -505,7 +497,7 @@ public class Algorithm {
 		
 		if (Algorithm.gcd(f, g).degree().intValue() > 0) //int value range problem
 		{
-			return BigInteger.ZERO;
+			return ZERO;
 		}
 		
 		p = new Prime(g.characteristic(), null);
@@ -519,7 +511,7 @@ public class Algorithm {
 		{
 			f.divide(alpha);
 			result = legendreSymbol(alpha, p).pow(g.degree().intValue()).multiply(legendreSymbol(g, f));//int value range problem
-			if ((p.subtract(BigInteger.ONE).divide(new BigInteger("2")).mod(new BigInteger("2")).equals(BigInteger.ONE)) && f.degree().mod(new BigInteger("2")).equals(BigInteger.ONE) && g.degree().mod(new BigInteger("2")).equals(BigInteger.ONE))
+			if ((p.subtract(ONE).divide(new BigInteger("2")).mod(new BigInteger("2")).equals(ONE)) && f.degree().mod(new BigInteger("2")).equals(ONE) && g.degree().mod(new BigInteger("2")).equals(ONE))
 			{
 				result = result.negate();
 			}
@@ -548,33 +540,33 @@ public class Algorithm {
 		aux1 = new PolynomialRC(a.characteristic(),null);
 		aux2 = new PolynomialRC(a.characteristic(),null);
 		
-		b.setValue(new Polynomial(BigInteger.ONE,BigInteger.ZERO,null));
+		b.setValue(new Polynomial(ONE, ZERO,null));
 		p = a.characteristic();
 		if (p.equals(new BigInteger("2")))
 		{
-			a.pow(new BigInteger("2").pow(a.irrPolynomial().degree().subtract(BigInteger.ONE).intValue()));
+			a.pow(new BigInteger("2").pow(a.irrPolynomial().degree().subtract(ONE).intValue()));
 			return a;
 		}
 		else
 		{
 			q = p.pow(a.irrPolynomial().degree().intValue()); //int value range problem
-			aux1 = Algorithm.getRandomPolynomial(new BInteger(a.irrPolynomial().degree().subtract(BigInteger.ONE),null), new BInteger(p,null));
+			aux1 = Algorithm.getRandomPolynomial(new BInteger(a.irrPolynomial().degree().subtract(ONE),null), new BInteger(p,null));
 			aux2 = a.irrPolynomial();
 			
-			while (legendreSymbol(aux1,aux2).equals(BigInteger.ONE))
+			while (legendreSymbol(aux1,aux2).equals(ONE))
 			{
-				aux1 = Algorithm.getRandomPolynomial(new BInteger(a.irrPolynomial().degree().subtract(BigInteger.ONE),null), new BInteger(p,null));
+				aux1 = Algorithm.getRandomPolynomial(new BInteger(a.irrPolynomial().degree().subtract(ONE),null), new BInteger(p,null));
 			}
 			g.setValue(aux1);
-			t = q.subtract(BigInteger.ONE);
-			s = BigInteger.ZERO;
-			while (t.mod(new BigInteger("2")).equals(BigInteger.ZERO))
+			t = q.subtract(ONE);
+			s = ZERO;
+			while (t.mod(new BigInteger("2")).equals(ZERO))
 			{
-				s = s.add(BigInteger.ONE);
+				s = s.add(ONE);
 				t = t.divide(new BigInteger("2"));
 			}
 			
-			e = BigInteger.ZERO;
+			e = ZERO;
 			for (int i = 2; i <= s.intValue(); i++) //int value range problem
 			{
 				aux3 = a.clone();
@@ -582,7 +574,7 @@ public class Algorithm {
 				aux4.pow(e.negate());
 				
 				aux3.multiply(aux4);
-				aux3.pow(q.subtract(BigInteger.ONE).divide(new BigInteger("2").pow(i)));
+				aux3.pow(q.subtract(ONE).divide(new BigInteger("2").pow(i)));
 				
 				aux4.setValue(new Polynomial(1,0,null));
 				
@@ -596,7 +588,7 @@ public class Algorithm {
 			aux4 = g.clone();
 			aux4.pow(e.negate());
 			aux3.multiply(aux4); //h
-			aux3.pow(t.add(BigInteger.ONE).divide(new BigInteger("2"))); //h^((t+1)/2)
+			aux3.pow(t.add(ONE).divide(new BigInteger("2"))); //h^((t+1)/2)
 			
 			aux4 = g.clone();
 			aux4.pow(e.divide(new BigInteger("2"))); // g^(e/2)
@@ -622,15 +614,15 @@ public class Algorithm {
 	
 	public static BigInteger sqrtMod(BigInteger a, BigInteger modulus, boolean checkForError) throws FFaplAlgebraicException
 	{
-		if (a.equals(BigInteger.ZERO))
+		if (a.equals(ZERO))
 		{
-			return BigInteger.ZERO;
+			return ZERO;
 		}
 		
 		BigInteger b;
 		PolynomialRC f = new PolynomialRC(modulus,null);
 		PolynomialRC r = new PolynomialRC(modulus,null);
-		RNG_Placebo X = new RNG_Placebo(BigInteger.ZERO,modulus.subtract(BigInteger.ONE), null);
+		RNG_Placebo X = new RNG_Placebo(ZERO,modulus.subtract(ONE), null);
 		
   		b = X.next();
 		
@@ -640,21 +632,21 @@ public class Algorithm {
 		}
 		
 		TreeMap<BigInteger, BigInteger> fmap = new TreeMap<BigInteger,BigInteger>();
-		fmap.put(new BigInteger("2"), BigInteger.ONE);
-		fmap.put(BigInteger.ONE, b.negate());
-		fmap.put(BigInteger.ZERO, a);
+		fmap.put(new BigInteger("2"), ONE);
+		fmap.put(ONE, b.negate());
+		fmap.put(ZERO, a);
 		
 		f.setPolynomial(fmap);
 
 		TreeMap<BigInteger,BigInteger> rmap = new TreeMap<BigInteger,BigInteger>();
-		rmap.put(BigInteger.ONE, BigInteger.ONE);
+		rmap.put(ONE, ONE);
 		
 		r.setPolynomial(rmap);
-		r.pow(modulus.add(BigInteger.ONE).divide(new BigInteger("2")));
+		r.pow(modulus.add(ONE).divide(new BigInteger("2")));
 		r.mod(f);
 		
 		
-		BigInteger result = r.coefficientAt(BigInteger.ZERO);
+		BigInteger result = r.coefficientAt(ZERO);
 		
 		if (checkForError && !result.modPow(new BigInteger("2"), modulus).equals(a))
 		{
@@ -677,7 +669,7 @@ public class Algorithm {
 		
 		for (Map.Entry<BigInteger, BigInteger> entry : ply.entrySet())
 		{
-			if (entry.getValue().equals(BigInteger.ONE)) oneCount++;
+			if (entry.getValue().equals(ONE)) oneCount++;
 		}
 		
 		return oneCount%2;
@@ -701,7 +693,7 @@ public class Algorithm {
 		s.setPAI(true); //s = 1
 		
 		//If k = 0 then return (s)
-		if(k.equals(BigInteger.ZERO)){
+		if(k.equals(ZERO)){
 			return s;
 		}
 		//G <- g
@@ -747,10 +739,10 @@ public class Algorithm {
 		BigInteger s, G;
 		//Thread thread = g.getThread();
 		//s=1
-		s = new BInteger(BigInteger.ONE, thread);
+		s = new BInteger(ONE, thread);
 		
 		//If k = 0 then return (s)
-		if(k.equals(BigInteger.ZERO)){
+		if(k.equals(ZERO)){
 			return s;
 		}
 		//G <- g
@@ -792,7 +784,7 @@ public class Algorithm {
 		} else{
 			p = new Prime(f.characteristic(), thread);
 		}
-		if(f.degree().compareTo(BigInteger.ONE) < 0){
+		if(f.degree().compareTo(ONE) < 0){
 			//degree must be >= 1
 			return false;
 		}
@@ -800,7 +792,7 @@ public class Algorithm {
 		m = f.degree();
 		
 		
-		x = new PolynomialRC(BigInteger.ONE, BigInteger.ONE, p, thread);
+		x = new PolynomialRC(ONE, ONE, p, thread);
 		//System.out.println("f = " + f);
 		//System.out.println("x = " + x);
 		u = (PolynomialRC) x.clone();
@@ -815,8 +807,8 @@ public class Algorithm {
 			d = gcd(f, g);
 			//System.out.println("d = " + d);
 			//System.out.println("--");
-			if(! (!d.isZero() && d.degree().equals(BigInteger.ZERO))){ 
-				//Grad von Polynom is 0 d.h. einheit im K�rper
+			if(! (!d.isZero() && d.degree().equals(ZERO))){
+				//Grad von Polynom is 0 d.h. einheit im Körper
 				return false;
 			}			
 		}		
@@ -836,7 +828,7 @@ public class Algorithm {
 		GaloisField l;
 		Thread thread = f.getThread();
 		//TODO check irreducible
-		if(f.degree().compareTo(BigInteger.ONE) < 0 && !f.isMonic() && !isIrreducible(f)){
+		if(f.degree().compareTo(ONE) < 0 && !f.isMonic() && !isIrreducible(f)){
 			//degree must be >= 1
 			return false;
 		}
@@ -852,7 +844,7 @@ public class Algorithm {
 		//	throw new FFaplAlgebraicException(arguments, IAlgebraicError.PRIMITIVE);
 		//}
 		//System.out.println(p + "," + m);
-		if(p.compareTo(BigInteger.valueOf(2)) == 0 && m.compareTo(BigInteger.ONE) == 0){
+		if(p.compareTo(BigInteger.valueOf(2)) == 0 && m.compareTo(ONE) == 0){
 			//spezialfall GF(2) und x+1 oder x
 			return true;
 		}
@@ -861,8 +853,8 @@ public class Algorithm {
 		
 		for(Iterator<BigInteger> itr = primeFactors.iterator(); itr.hasNext();){
 			isRunning(thread);
-			e = p.pow(m.intValue()).subtract(BigInteger.ONE).divide(itr.next());
-			x = new PolynomialRC(BigInteger.ONE, e, p, thread);
+			e = p.pow(m.intValue()).subtract(ONE).divide(itr.next());
+			x = new PolynomialRC(ONE, e, p, thread);
 			//System.out.println("x = " + x);
 			//x.pow(e);
 			l.setValue(x.getPolynomial());
@@ -888,8 +880,8 @@ public class Algorithm {
 		PolynomialRC plyInit;
 		Thread thread = p.getThread();
 		if (n.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) <= 0){
-			plyInit = new PolynomialRC(BigInteger.ONE, n, p, thread);
-			return irreduciblePolynomial(plyInit, BigInteger.ZERO, new Prime(p, thread), n);
+			plyInit = new PolynomialRC(ONE, n, p, thread);
+			return irreduciblePolynomial(plyInit, ZERO, new Prime(p, thread), n);
 		}else{
 			Object[] messages = {n};
 			throw new FFaplAlgebraicException(messages,
@@ -906,7 +898,7 @@ public class Algorithm {
 	public static PolynomialRC getRandomPolynomial(BInteger n, BInteger p) throws FFaplAlgebraicException {
 		PolynomialRC ply;
 		Thread thread = p.getThread();
-		RNG_Placebo rnd1 = new RNG_Placebo(BigInteger.ONE, p, thread);
+		RNG_Placebo rnd1 = new RNG_Placebo(ONE, p, thread);
 		RNG_Placebo rnd2 = new RNG_Placebo(p, thread);
 		
 		if (n.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) <= 0){
@@ -944,7 +936,7 @@ public class Algorithm {
 		TreeMap<BigInteger, BigInteger> primeFact;
 		
 		
-		if(n.compareTo(BigInteger.ONE) == 0){
+		if(n.compareTo(ONE) == 0){
 			addPrimeFactor(result, n);
 		}else if(n.isProbablePrime(100)){
 			addPrimeFactor(result, n);
@@ -970,7 +962,7 @@ public class Algorithm {
 					if(fact2.isProbablePrime(100)){
 						addPrimeFactor(result, fact2);
 						break;//finished
-					}else if(fact2.compareTo(BigInteger.ONE) == 0){
+					}else if(fact2.compareTo(ONE) == 0){
 						break;//finished
 					}
 				}else{
@@ -993,12 +985,12 @@ public class Algorithm {
 					fact2 = (BInteger) val.divide(fact1);
 					if(!(val.compareTo(fact1) != 0)){
 						addPrimeFactor(result, fact1);
-					}else if(fact1.compareTo(BigInteger.ONE) > 0){
+					}else if(fact1.compareTo(ONE) > 0){
 						factors.push(fact1);
 					}
 					if(fact2.isProbablePrime(100)){
 						addPrimeFactor(result, fact2);
-					}else if(fact2.compareTo(BigInteger.ONE) > 0){
+					}else if(fact2.compareTo(ONE) > 0){
 						factors.push(fact2);
 					}
 				}else{
@@ -1014,12 +1006,12 @@ public class Algorithm {
 						fact2 = (BInteger) val.divide(fact1);
 						if(!(val.compareTo(fact1) != 0)){
 							addPrimeFactor(result, fact1);
-						}else if(fact1.compareTo(BigInteger.ONE) > 0){
+						}else if(fact1.compareTo(ONE) > 0){
 							factors.push(fact1);
 						}
 						if(fact2.isProbablePrime(100)){
 							addPrimeFactor(result, fact2);
-						}else if(fact2.compareTo(BigInteger.ONE) > 0){
+						}else if(fact2.compareTo(ONE) > 0){
 							factors.push(fact2);
 						}
 					}else{
@@ -1037,7 +1029,7 @@ public class Algorithm {
 							
 							if(fact2.isProbablePrime(100)){
 								addPrimeFactor(result, fact2);
-							}else if(fact2.compareTo(BigInteger.ONE) > 0){
+							}else if(fact2.compareTo(ONE) > 0){
 								factors.push(fact2);
 							}
 						}else{
@@ -1064,18 +1056,18 @@ public class Algorithm {
 		
 		p = new BInteger(BigInteger.valueOf(2), thread);
 		if(n.isProbablePrime(100)){
-			result.put(n, new BInteger(BigInteger.ONE, thread));
+			result.put(n, new BInteger(ONE, thread));
 		}else{
-			while(n.compareTo(BigInteger.ONE) > 0 && p.compareTo(n) <= 0){
+			while(n.compareTo(ONE) > 0 && p.compareTo(n) <= 0){
 				isRunning(thread);
 				d = gcd(p, (BInteger)n);
-				if(d.compareTo(BigInteger.ONE) == 0){
+				if(d.compareTo(ONE) == 0){
 					p = (BInteger) p.nextProbablePrime();
 				}else{
 					if(result.containsKey(p)){
-						result.put(p, result.get(p).add(BigInteger.ONE));
+						result.put(p, result.get(p).add(ONE));
 					}else{
-						result.put(p, new BInteger(BigInteger.ONE, thread));
+						result.put(p, new BInteger(ONE, thread));
 					}
 					n = n.divide(p);
 				}
@@ -1105,15 +1097,15 @@ public class Algorithm {
 		//control if Monic
 		if(!f.value().isMonic()){
 			tmp = f.clone();
-			tmp.setValue(new Polynomial(f.value().leadingCoefficient(), BigInteger.ZERO, thread));
+			tmp.setValue(new Polynomial(f.value().leadingCoefficient(), ZERO, thread));
 			
-			factor.put(tmp, BigInteger.ONE);			
+			factor.put(tmp, ONE);
 			f.setValue(f.value().getMonic());
 		}
 		
 		
 		
-		i = new BInteger(BigInteger.ONE, thread);
+		i = new BInteger(ONE, thread);
 		//F = f.clone();
 		fderivate = f.clone();
 		//F.setValue(new Polynomial(BigInteger.ONE, BigInteger.ZERO, thread));
@@ -1132,7 +1124,7 @@ public class Algorithm {
 			h = f.clone();
 			h.divide(g);
 			//System.out.println("h:" + h + " g:" + g);
-			while(!h.value().isOne()&& h.value().degree().compareTo(BigInteger.ZERO) > 0){
+			while(!h.value().isOne()&& h.value().degree().compareTo(ZERO) > 0){
 				isRunning(thread);
 				hcap = f.clone();
 				hcap.setValue(gcd(h.value(), g.value()));
@@ -1146,7 +1138,7 @@ public class Algorithm {
 					if(l.value().isMonic()){
 						factor.put(tmp, i);
 					}else{
-						tmp.setValue(new Polynomial(l.value().leadingCoefficient(), BigInteger.ZERO, thread));
+						tmp.setValue(new Polynomial(l.value().leadingCoefficient(), ZERO, thread));
 						tmp1 = tmp.clone();
 						tmp1.pow(i);
 						if(!tmp1.value().isOne()){
@@ -1160,12 +1152,12 @@ public class Algorithm {
 				//l.pow(i);
 				//F.multiply(l);
 				//System.out.println("F" + F);
-				i = (BInteger) i.add(BigInteger.ONE);
+				i = (BInteger) i.add(ONE);
 				h = hcap;
 				g.divide(hcap);				
 			}
 			//System.out.println("g:" + g);
-			if(!g.value().isOne() && g.value().degree().compareTo(BigInteger.ZERO) > 0){
+			if(!g.value().isOne() && g.value().degree().compareTo(ZERO) > 0){
 				g = PRoot(g);
 				//System.out.println("("+ g + ")^" + p + " ");
 				factorTmp = SquareFree(g);
@@ -1179,7 +1171,7 @@ public class Algorithm {
 		for(Iterator<GaloisField> itr = factor.keySet().iterator(); itr.hasNext(); ){
 			tmp = itr.next();
 			tmp1 = tmp.clone();
-			if(tmp1.value().degree().compareTo(BigInteger.ZERO) == 0){
+			if(tmp1.value().degree().compareTo(ZERO) == 0){
 				tmp1.pow(factor.get(tmp));
 				if(tmp1.value().isOne()){
 					toDelete.add(tmp);
@@ -1221,11 +1213,11 @@ public class Algorithm {
 			}
 		}
 		unit = f.clone();
-		unit.setValue(new Polynomial(BigInteger.ONE, BigInteger.ZERO, f.getThread()));
+		unit.setValue(new Polynomial(ONE, ZERO, f.getThread()));
 		for(Iterator<GaloisField> itr = factor.keySet().iterator(); itr.hasNext(); ){
 			key = itr.next();
 			//System.out.println(key);
-			if(key.value().degree().equals(BigInteger.ZERO)){
+			if(key.value().degree().equals(ZERO)){
 				e = factor.get(key);
 				tmp = key.clone();
 				tmp.pow(e.intValue());
@@ -1237,7 +1229,7 @@ public class Algorithm {
 			factor.remove(itr.next());
 		}
 		if(!unit.value().isOne()){
-			factor.put(unit, BigInteger.ONE);
+			factor.put(unit, ONE);
 		}
 		//System.out.println(factor);
 		return factor;
@@ -1285,13 +1277,13 @@ public class Algorithm {
 		GaloisField w, a0, ai, wx, tmp;
 		BigInteger p;
 		BigInteger degree;
-		BigInteger i = new BInteger(BigInteger.ONE, thread);
+		BigInteger i = new BInteger(ONE, thread);
 		//q = f.characteristic().pow(f.irrPolynomial().degree().intValue());
 		p = f.characteristic();
 		w = f.clone();
 		a0 = f.clone();
-		w.setValue(new Polynomial(BigInteger.ONE, BigInteger.ONE, thread)); //x
-		a0.setValue(new Polynomial(BigInteger.ONE, BigInteger.ZERO, thread)); //1
+		w.setValue(new Polynomial(ONE, ONE, thread)); //x
+		a0.setValue(new Polynomial(ONE, ZERO, thread)); //1
 		degree = f.value().degree();
 		
 		while(i.compareTo(degree) <= 0){
@@ -1300,7 +1292,7 @@ public class Algorithm {
 			w.mod(f);
 			//System.out.println("fa:" + f + " w:" + w);
 			wx = w.clone();
-			wx.subtract(new Polynomial(BigInteger.ONE, BigInteger.ONE, thread));
+			wx.subtract(new Polynomial(ONE, ONE, thread));
 			ai = f.clone();
 			ai.setValue(gcd(f.value(), wx.value()));
 			
@@ -1319,7 +1311,7 @@ public class Algorithm {
 				w.mod(f);
 				
 			}
-			i = i.add(BigInteger.ONE);
+			i = i.add(ONE);
 		}
 		
 		if(f.value().isMonic()){
@@ -1329,7 +1321,7 @@ public class Algorithm {
 			//non Monic Polynomial
 			//unit
 			tmp = f.clone();
-			tmp.setValue(new Polynomial(f.value().leadingCoefficient(), BigInteger.ZERO, thread));
+			tmp.setValue(new Polynomial(f.value().leadingCoefficient(), ZERO, thread));
 			//tmp = GaloisField.inverse(tmp);
 			//System.out.print(tmp + " -> ");
 			result.add(tmp);
@@ -1357,7 +1349,7 @@ public class Algorithm {
 		BigInteger p = ply.characteristic();
 		PolynomialRC plyRes = new PolynomialRC(p, f.getThread());
 		ResidueClass val = new ResidueClass(p);
-		BigInteger m1 = f.irrPolynomial().degree().subtract(BigInteger.ONE);//m-1
+		BigInteger m1 = f.irrPolynomial().degree().subtract(ONE);//m-1
 		BigInteger pm1 = p.pow(m1.intValue());//p^m-1
 		BigInteger e,c;
 		TreeMap<BigInteger, BigInteger> plyView = ply.polynomial();
@@ -1393,9 +1385,9 @@ public class Algorithm {
 	 */
 	private static void addPrimeFactor(TreeMap<BigInteger, BigInteger> table, BInteger p){
 		if(table.containsKey(p)){
-			table.put(p, table.get(p).add(BigInteger.ONE));
+			table.put(p, table.get(p).add(ONE));
 		}else{
-			table.put(p, new BInteger(BigInteger.ONE, p.getThread()));
+			table.put(p, new BInteger(ONE, p.getThread()));
 		}
 	}
 	
@@ -1423,7 +1415,7 @@ public class Algorithm {
 	 */
 	private static BInteger primeFactorValue(TreeMap<BigInteger, BigInteger> table, Thread thread){
 		BigInteger key;
-		BInteger result = new BInteger(BigInteger.ONE, thread);
+		BInteger result = new BInteger(ONE, thread);
 		for(Iterator<BigInteger>  itr = table.keySet().iterator(); itr.hasNext(); ){
 			key = itr.next();
 			result = (BInteger) result.multiply(key.pow(table.get(key).intValue()));
@@ -1438,7 +1430,7 @@ public class Algorithm {
 	 */
 	private static BInteger primeFactor(TreeMap<BigInteger, BigInteger> table, Thread thread){
 		BInteger key;
-		BInteger result = new BInteger(BigInteger.ONE, thread);
+		BInteger result = new BInteger(ONE, thread);
 		for(Iterator<BigInteger>  itr = table.keySet().iterator(); itr.hasNext(); ){
 			key = new BInteger(itr.next(), thread);
 			return key;
@@ -1472,11 +1464,11 @@ public class Algorithm {
 		if(n.isProbablePrime(100)){
 			return n;
 		}		
-		rand = new RNG_Placebo(BigInteger.valueOf(2), n.subtract(BigInteger.ONE), n.getThread());
+		rand = new RNG_Placebo(BigInteger.valueOf(2), n.subtract(ONE), n.getThread());
 		a = new ResidueClass(rand.next(), n);
 		d = gcd((BInteger)a.value(), n);
 		q = BInteger.valueOf(2, n.getThread());
-		if(d.compareTo(BigInteger.ONE) <= 0){
+		if(d.compareTo(ONE) <= 0){
 			while(q.compareTo(B) <= 0){
 				isRunning(thread);
 				l = (BInteger) BInteger.valueOf((long)Math.ceil((Math.log10(n.longValue())/Math.log10(q.longValue()))), n.getThread());
@@ -1484,8 +1476,8 @@ public class Algorithm {
 				a.pow(l);
 				q = q.nextProbablePrime();
 			}
-			d = gcd((BInteger)a.value().subtract(BigInteger.ONE), n);
-			if(d.compareTo(BigInteger.ONE) == 0 || 
+			d = gcd((BInteger)a.value().subtract(ONE), n);
+			if(d.compareTo(ONE) == 0 ||
 					d.compareTo(n) == 0){
 				return null;//failure
 			}
@@ -1505,15 +1497,15 @@ public class Algorithm {
 		ResidueClass x, y, q;
 		int i;
 		
-		d = new BInteger(BigInteger.ONE, thread);
+		d = new BInteger(ONE, thread);
 		
 		a = BInteger.valueOf(2, thread);
 		
 		IRandomGenerator fx;
-		fx = new RNG_Placebo(BigInteger.ONE, n, thread);
+		fx = new RNG_Placebo(ONE, n, thread);
 		x = new ResidueClass(fx.next(), n);
 		y = x.clone();
-		q = new ResidueClass(BigInteger.ONE, n);
+		q = new ResidueClass(ONE, n);
 		i = 0;
 		while(i < 20000){
 			isRunning(thread);
@@ -1527,7 +1519,7 @@ public class Algorithm {
 			
 			if(i % 20 == 0){
 				d = gcd(new BInteger(q.value(), thread), (BInteger)n);
-				if(d.compareTo(BigInteger.ONE) > 0){
+				if(d.compareTo(ONE) > 0){
 					//System.out.println("i " + d);
 					return new BInteger(d, thread);
 				}
@@ -1585,7 +1577,7 @@ public class Algorithm {
 		Thread thread = n.getThread();
 		TreeMap<BigInteger, BigInteger> result = new TreeMap<BigInteger, BigInteger>();
 		if(n.isProbablePrime(100)){
-			result.put(n, BigInteger.ONE);
+			result.put(n, ONE);
 			return result;
 		}
 		if(min.isProbablePrime(100)){
@@ -1593,13 +1585,13 @@ public class Algorithm {
 		}else{
 			p = new BInteger(min.nextProbablePrime(), thread);
 		}		
-		while(n.compareTo(BigInteger.ONE) > 0 && p.compareTo(n) <= 0){
+		while(n.compareTo(ONE) > 0 && p.compareTo(n) <= 0){
 				isRunning(thread);
 				d = gcd(p, (BInteger)n);
-				if(d.compareTo(BigInteger.ONE) == 0){
+				if(d.compareTo(ONE) == 0){
 					p = (BInteger) p.nextProbablePrime();
 				}else{
-					while(d.compareTo(BigInteger.ONE) > 0){
+					while(d.compareTo(ONE) > 0){
 						addPrimeFactor(result, p);
 						n = (BInteger) n.divide(p);
 						d = gcd(p, (BInteger)n);
@@ -1624,7 +1616,7 @@ public class Algorithm {
 		Thread thread = n.getThread();
 		TreeMap<BigInteger, BigInteger> result = new TreeMap<BigInteger, BigInteger>();
 		if(n.isProbablePrime(100)){
-			result.put(n, BigInteger.ONE);
+			result.put(n, ONE);
 			return result;
 		}
 		if(min.isProbablePrime(100)){
@@ -1633,13 +1625,13 @@ public class Algorithm {
 			p = new BInteger(min.nextProbablePrime(), thread);
 		}
 				
-		while(n.compareTo(BigInteger.ONE) > 0 && p.compareTo(n) <= 0 && p.compareTo(max) <= 0){
+		while(n.compareTo(ONE) > 0 && p.compareTo(n) <= 0 && p.compareTo(max) <= 0){
 				isRunning(thread);
 				d = gcd(p, (BInteger)n);
-				if(d.compareTo(BigInteger.ONE) == 0){
+				if(d.compareTo(ONE) == 0){
 					p = (BInteger) p.nextProbablePrime();
 				}else{
-					while(d.compareTo(BigInteger.ONE) > 0){
+					while(d.compareTo(ONE) > 0){
 						addPrimeFactor(result, p);
 						n = (BInteger) n.divide(p);
 						d = gcd(p, (BInteger)n);
@@ -1666,7 +1658,7 @@ public class Algorithm {
 		int start;
 		    isRunning(p.getThread());
 		    
-			if(index.compareTo(BigInteger.ZERO) == 0){
+			if(index.compareTo(ZERO) == 0){
 				//first index must not be zero
 				start = 1;
 			}else{
@@ -1685,7 +1677,7 @@ public class Algorithm {
 					ply2 = (PolynomialRC) ply.clone();
 					ply2.add(BigInteger.valueOf(i), index);
 					//System.out.println(ply2);
-					ply2 = irreduciblePolynomial(ply2, index.add(BigInteger.ONE), p, n);
+					ply2 = irreduciblePolynomial(ply2, index.add(ONE), p, n);
 					if (ply2 != null){
 						return ply2;
 					}
@@ -1741,12 +1733,12 @@ public class Algorithm {
 	  public static BigInteger log2(BigInteger a)
 	  {
 		  BigInteger x = new BigInteger("-1");
-		  BigInteger k = BigInteger.ONE;
+		  BigInteger k = ONE;
 		  
 		  while (a.compareTo(k) >= 0)
 		  {
 			  k = k.multiply(new BigInteger("2"));
-			  x = x.add(BigInteger.ONE);
+			  x = x.add(ONE);
 		  }
 		  
 		  return x;
@@ -1955,7 +1947,7 @@ public class Algorithm {
 
 		  BigInteger exp = P.getGF().characteristic();
 		  exp = exp.pow(Q.getGF().irrPolynomial().degree().intValue());//q^k
-		  exp = exp.subtract(BigInteger.ONE);
+		  exp = exp.subtract(ONE);
 		  exp = exp.divide(order);
 		  
 		  f1.divide(f2);

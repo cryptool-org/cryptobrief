@@ -82,16 +82,10 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 	 * @throws FFaplAlgebraicException
 	 */
 	public void setValue(Polynomial ply) throws FFaplAlgebraicException{
-		if(ply instanceof PolynomialRC ){
-			if(! _p.equals(((PolynomialRC) ply).characteristic())){
-				Object[] arguments ={this.characteristic(), this.classInfo(),
-						            ((PolynomialRC) ply).characteristic(), ply.classInfo()};
-			    throw new FFaplAlgebraicException(arguments, IAlgebraicError.CHARACTERISTIC_UNEQUAL);
-			}
-			//throw new FFaplAlgebraicException("Error in GF multiply", IAlgebraicError.INTERNAL);
-		}
+		if (!characteristicMatches(ply))
+			return;
+
 		_value.setPolynomial(ply.polynomial());
-		//_value = PolynomialRC.divide(_value, _irrply)[1];
 		_value.mod(_irrply);
 	}
 
@@ -118,7 +112,6 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 		}
 
 		_value.add(gf.value());
-		//_value = PolynomialRC.divide(_value, _irrply)[1];
 		_value.mod(_irrply);
 	}
 
@@ -128,15 +121,10 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 	 * @throws FFaplAlgebraicException
 	 */
 	public void add(Polynomial ply) throws FFaplAlgebraicException{
-		if(ply instanceof PolynomialRC ){
-			if(! _p.equals(((PolynomialRC) ply).characteristic())){
-				Object[] arguments ={this.characteristic(), this.classInfo(),
-			            ((PolynomialRC) ply).characteristic(), ply.classInfo()};
-				throw new FFaplAlgebraicException(arguments, IAlgebraicError.CHARACTERISTIC_UNEQUAL);
-			}
-		}
+		if (!characteristicMatches(ply))
+			return;
+
 		_value.add(ply);
-		//_value = PolynomialRC.divide(_value, _irrply)[1];
 		_value.mod(_irrply);
 	}
 
@@ -146,8 +134,7 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 	 * @throws FFaplAlgebraicException
 	 */
 	public void add(BigInteger summand) throws FFaplAlgebraicException{
-		_value.add(summand, BigInteger.ZERO);
-		//_value = PolynomialRC.divide(_value, _irrply)[1];
+		_value.add(summand, ZERO);
 		_value.mod(_irrply);
 	}
 
@@ -178,7 +165,6 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 		}
 
 		_value.subtract(gf.value());
-		//_value = PolynomialRC.divide(_value, _irrply)[1];
 		_value.mod(_irrply);
 	}
 
@@ -189,16 +175,10 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 	 * @throws FFaplAlgebraicException
 	 */
 	public void subtract(Polynomial ply) throws FFaplAlgebraicException{
-		if(ply instanceof PolynomialRC ){
-			if(! _p.equals(((PolynomialRC) ply).characteristic())){
-				Object[] arguments ={this.characteristic(), this.classInfo(),
-			            ((PolynomialRC) ply).characteristic(), ply.classInfo()};
-				throw new FFaplAlgebraicException(arguments, IAlgebraicError.CHARACTERISTIC_UNEQUAL);
-			}
-		}
+		if (!characteristicMatches(ply))
+			return;
 
 		_value.subtract(ply);
-		//_value = PolynomialRC.divide(_value, _irrply)[1];
 		_value.mod(_irrply);
 	}
 
@@ -208,8 +188,7 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 	 * @throws FFaplAlgebraicException
 	 */
 	public void subtract(BigInteger subtrahend) throws FFaplAlgebraicException{
-		_value.subtract(subtrahend, BigInteger.ZERO);
-		//_value = PolynomialRC.divide(_value, _irrply)[1];
+		_value.subtract(subtrahend, ZERO);
 		_value.mod(_irrply);
 	}
 
@@ -242,7 +221,6 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 		}
 
 		_value.multiply(gf.value());
-		//_value = PolynomialRC.divide(_value, _irrply)[1];
 		_value.mod(_irrply);
 	}
 
@@ -252,16 +230,10 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 	 * @throws FFaplAlgebraicException
 	 */
 	public void multiply(Polynomial ply) throws FFaplAlgebraicException{
-		if(ply instanceof PolynomialRC ){
-			if(! _p.equals(((PolynomialRC) ply).characteristic())){
-				Object[] arguments ={this.characteristic(), this.classInfo(),
-			            ((PolynomialRC) ply).characteristic(), ply.classInfo()};
-				throw new FFaplAlgebraicException(arguments, IAlgebraicError.CHARACTERISTIC_UNEQUAL);
-			}
-			//throw new FFaplAlgebraicException("Error in GF multiply", IAlgebraicError.INTERNAL);
-		}
+		if (!characteristicMatches(ply))
+			return;
+
 		_value.multiply(ply);
-		//_value = PolynomialRC.divide(_value, _irrply)[1];
 		_value.mod(_irrply);
 	}
 
@@ -271,8 +243,7 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 	 * @throws FFaplAlgebraicException
 	 */
 	public void multiply(BigInteger factor) throws FFaplAlgebraicException{
-		_value.multiply(factor, BigInteger.ZERO);
-		//_value = PolynomialRC.divide(_value, _irrply)[1];
+		_value.multiply(factor, ZERO);
 		_value.mod(_irrply);
 	}
 
@@ -329,7 +300,7 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
      * @throws FFaplAlgebraicException
      */
     public void divide(BigInteger divisor) throws FFaplAlgebraicException{
-    	divide(new Polynomial(divisor, BigInteger.ZERO, _thread));
+    	divide(new Polynomial(divisor, ZERO, _thread));
     }
 
     /**
@@ -361,7 +332,7 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 		}*/
 
 		this.setValue(Algorithm.squareAndMultiply(this._value, exp, this._irrply));
-		if(exponent.compareTo(BigInteger.ZERO) < 0){
+		if(exponent.compareTo(ZERO) < 0){
 			this.setValue(GaloisField.inverse(this).value());
 		}
 	}
@@ -400,7 +371,7 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 			}
 		}else if(val instanceof BigInteger){
 			gf = this.clone();
-			gf.setValue(new Polynomial((BigInteger) val, BigInteger.ZERO, _thread));
+			gf.setValue(new Polynomial((BigInteger) val, ZERO, _thread));
 		}else if(val instanceof PolynomialRC){
 
 			if(! this.characteristic().equals(((PolynomialRC)val).characteristic())){
@@ -421,7 +392,7 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 				throw new FFaplAlgebraicException(arguments, IAlgebraicError.CHARACTERISTIC_UNEQUAL);
 			}
 			gf = this.clone();
-			gf.setValue(new Polynomial(((ResidueClass) val).value(), BigInteger.ZERO, _thread));
+			gf.setValue(new Polynomial(((ResidueClass) val).value(), ZERO, _thread));
 		}else{
 			String[] arguments = {"GaloisField equals operation try to compare " +
 					this.classInfo() + " with " + val.classInfo()};
@@ -467,7 +438,7 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 		//tmp = [d, s, t] .... d = s*g + t*h
 		if(! tmp[0].isOne()){
 			//d <> 1
-			if(tmp[0].degree().compareTo(BigInteger.ZERO) > 0){
+			if(tmp[0].degree().compareTo(ZERO) > 0){
 				Object[] arguments ={"Error in GF inverse - EEA"};
 				throw new FFaplAlgebraicException(arguments, IAlgebraicError.INTERNAL);
 			}
@@ -501,7 +472,7 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 	 */
 	public GaloisField negate() throws FFaplAlgebraicException {
 		GaloisField gf = this.clone();
-		gf.multiply(BigInteger.ONE.negate());
+		gf.multiply(ONE.negate());
 		return gf;
 	}
 
@@ -553,6 +524,7 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 	}
 
 	/**
+	 * Evaluates this element's polynomial at the point x = val.
 	 *
 	 * @param val
 	 * @return the result of the polynomial if x = val
@@ -560,6 +532,23 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 	 */
 	public BigInteger calculate(BInteger val) throws FFaplAlgebraicException {
 		return _value.calculate(val);
+	}
+
+	/**
+	 * Checks if a given polynomial's characteristic matches this element's one.
+	 * Note that this will return true if the polynomial has no characteristic attached.
+	 *
+	 * @param ply the polynomial to check
+	 * @return true if the characteristics match
+	 * @throws FFaplAlgebraicException if a mismatch occurs
+	 */
+	public boolean characteristicMatches(Polynomial ply) throws FFaplAlgebraicException {
+		if (ply instanceof PolynomialRC && !_p.equals(((PolynomialRC) ply).characteristic())) {
+			Object[] arguments = {this.characteristic(), this.classInfo(),
+					((PolynomialRC) ply).characteristic(), ply.classInfo()};
+			throw new FFaplAlgebraicException(arguments, IAlgebraicError.CHARACTERISTIC_UNEQUAL);
+		}
+		return true;
 	}
 
     @Override
@@ -620,9 +609,7 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 	 * @param n degree
 	 * @return primitive polynomial
 	 */
-    public static Polynomial findPrimitivePolynomial(BigInteger p, BigInteger n, Thread _thread) throws FFaplAlgebraicException {
-        BInteger one = new BInteger(BigInteger.ONE, _thread);
-        BInteger zero = new BInteger(BigInteger.ZERO, _thread);
+    public static Polynomial findPrimitivePolynomial(BigInteger p, BigInteger n, Thread _thread) throws FFaplException {
 
         // Step 0
         // r := ( p^n - 1 ) / ( p - 1 )
@@ -631,7 +618,7 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
         TreeMap<BigInteger, BigInteger> factorsOfR = Algorithm.FactorInteger(new BInteger(r,_thread));
 
         // factorize p-1
-		TreeMap<BigInteger, BigInteger> factorsOfPMinus1 = Algorithm.FactorInteger(new BInteger(p.subtract(one),_thread));
+		TreeMap<BigInteger, BigInteger> factorsOfPMinus1 = Algorithm.FactorInteger(new BInteger(p.subtract(ONE),_thread));
 
         // Step 1
         // iterate over possible polynomials (monic, of order n)
@@ -648,25 +635,25 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 
             // [Step 1] find next polynomial by counting through coefficients
             boolean nextPolynomialFound = false;
-            BigInteger current = zero;
+            BigInteger current = ZERO;
             // iterate until done or no more coefficients left
             while (!nextPolynomialFound && current.compareTo(n) < 0) {
                 // add one to current, check if it is modulo reducible
 				// if it is, reduce, then go to next coefficient
-                BigInteger currentItem = f_x.coefficientAt(current).add(one);
+                BigInteger currentItem = f_x.coefficientAt(current).add(ONE);
                 if (currentItem.compareTo(p) == 0) {
-					if (current.compareTo(zero) == 0)
+					if (current.compareTo(ZERO) == 0)
 						// polynomials with constant term a_0 = 0 are reducible (divisible by x)
 						// therefore not primitive and will be skipped
-						currentItem = one;
+						currentItem = ONE;
 					else
-						currentItem = zero;
+						currentItem = ZERO;
 				} else {
 					nextPolynomialFound = true;
 				}
 
                 f_x.polynomial().put(current, currentItem);
-                current = current.add(one);
+                current = current.add(ONE);
             }
 
             if (!nextPolynomialFound) {
@@ -755,16 +742,16 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 										  Map<BigInteger, BigInteger> factorsOfPMinusOne,
 										  Thread _thread) throws FFaplAlgebraicException {
 		// zero values cant be primitive roots. negative values are invalid.
-		if (a.compareTo(BigInteger.ZERO) <= 0)
+		if (a.compareTo(ZERO) <= 0)
 			return false;
 
 		a = a.mod(p);
 
 		// (modulo reduced) zero values cant be primitive roots
-		if (a.compareTo(BigInteger.ZERO) == 0)
+		if (a.compareTo(ZERO) == 0)
 			return false;
 
-		BigInteger pMinusOne = p.subtract(BigInteger.ONE);
+		BigInteger pMinusOne = p.subtract(ONE);
 
 		// factor p-1 (if not already supplied by callee)
 		if (factorsOfPMinusOne == null)
@@ -773,7 +760,7 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 		// for each distinct prime factor q...
 		for (Map.Entry<BigInteger, BigInteger> distinctPrime : factorsOfPMinusOne.entrySet()) {
 			// ... check if a^((p-1)/q) != 1
-			if (a.modPow(pMinusOne.divide(distinctPrime.getKey()), p).compareTo(BigInteger.ONE) == 0) {
+			if (a.modPow(pMinusOne.divide(distinctPrime.getKey()), p).compareTo(ONE) == 0) {
 				return false;
 			}
 		}

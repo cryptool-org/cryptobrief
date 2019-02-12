@@ -10,15 +10,16 @@ import java.util.*;
 import java.util.function.Function;
 
 /**
- * Sparse matrix implementation using a double-nested TreeMap structured
- * in row-major order.
+ * Sparse matrix implementation using a double-nested TreeMap
+ * structured in row-major order.
  * <p>
  * This class uses one-based indexing for its entries, meaning the
- * first entry (upper left) of a matrix A mxn can be accessed with
- * {@code A.get(1,1)} and the last entry (lower right) with
- * {@code A.get(m,n)}. Therefore, standard matrix item descriptions
- * like a<subInPlace>{@code ij}</subInPlace> translate directly
- * to {@code A.get(i,j)}.
+ * first entry (upper left) of a matrix A mxn (m rows, n columns)
+ * can be accessed with {@code A.get(1,1)}
+ * and the last entry (lower right) with {@code A.get(m,n)}.
+ * Therefore, standard matrix item descriptions like
+ * a<subInPlace>{@code ij}</subInPlace> translate directly to
+ * {@code A.get(i,j)}.
  *
  * @param <V> type of values in the matrix
  * @see TreeMap
@@ -408,19 +409,67 @@ public class Matrix<V extends IAlgebraicOperations<V>>
         this.defaultValue = defaultValue.clone();
     }
 
+    /**
+     * Finds the next row that is non-zer
+     * (i.e., has at least one non-zero entry),
+     * starting at the starting row i and counting up the row number.
+     * <p>
+     * If orEqual is set to true, this can also return
+     * the starting row i itself, if it is non-zero.
+     *
+     * @param i       the starting row
+     * @param orEqual if true, will return i, if row i is non-zero
+     * @return the row number of the next non-zero row
+     */
     public Long getNextRow(long i, boolean orEqual) {
         return orEqual ? matrix.ceilingKey(i) : matrix.higherKey(i);
     }
 
+    /**
+     * Finds the first preceding row that is non-zero
+     * (i.e., has at least one non-zero entry),
+     * starting at the starting row i and counting down the row number.
+     * <p>
+     * If orEqual is set to true, this can also return
+     * the starting row i itself, if it is non-zero.
+     *
+     * @param i       the starting row
+     * @param orEqual if true, will return i, if row i is non-zero
+     * @return the row number of the first preceding non-zero row
+     */
     public Long getPrevRow(long i, boolean orEqual) {
         return orEqual ? matrix.floorKey(i) : matrix.lowerKey(i);
     }
 
+    /**
+     * Finds the next value in the row i that is non-zero,
+     * starting at the starting column j and counting up the column number.
+     * <p>
+     * If orEqual is set to true, this can also return
+     * the starting column j itself, if A[i,j] is non-zero.
+     *
+     * @param i       the starting row
+     * @param j       the starting column
+     * @param orEqual if true, will return j, if item A[i,j] is non-zero
+     * @return the column number of the next non-zero entry
+     */
     public Long getNextValue(long i, long j, boolean orEqual) {
         TreeMap<Long, V> row = matrix.get(i);
         return row == null ? null : (orEqual ? row.ceilingKey(j) : row.higherKey(j));
     }
 
+    /**
+     * Finds the first preceding value in the row i that is non-zero,
+     * starting at the starting column j and counting down the column number.
+     * <p>
+     * If orEqual is set to true, this can also return
+     * the starting column j itself, if A[i,j] is non-zero.
+     *
+     * @param i       the starting row
+     * @param j       the starting column
+     * @param orEqual if true, will return j, if item A[i,j] is non-zero
+     * @return the column number of the first preceding non-zero entry
+     */
     public Long getPrevValue(long i, long j, boolean orEqual) {
         TreeMap<Long, V> row = matrix.get(i);
         return row == null ? null : (orEqual ? row.floorKey(j) : row.lowerKey(j));
@@ -456,6 +505,26 @@ public class Matrix<V extends IAlgebraicOperations<V>>
                 TreeMap<Long, V> row = matrix.computeIfAbsent(i, k -> new TreeMap<>());
                 return row.put(j, value.clone());
             }
+        }
+
+        return null;
+    }
+
+    /**
+     * Sets the contents of row {@code i} to the values given in the map {@code row}.
+     * Note that if there are entries in the given map that would lie outside of this
+     * matrix, the changes will be discarded.
+     *
+     * @param i   the number of the row to replace
+     * @param row a map of column numbers to values
+     * @return the row that was replaced by this action
+     */
+    public Map<Long, V> setRow(long i, NavigableMap<Long, V> row) {
+        if (validCoordinates(i, 1L) &&
+                // entries of row should be within the matrix
+                row.lowerKey(1L) == null && row.higherKey(this.n) == null) {
+
+            return matrix.put(i, new TreeMap(row));
         }
 
         return null;
@@ -828,6 +897,19 @@ public class Matrix<V extends IAlgebraicOperations<V>>
         return permutation;
     }
 
+    /**
+     * Solves a system of linear equations given in form of a matrix {@code A} (this matrix)
+     * and a vector {@code b} of constant terms, by reducing the Matrix to upper triangular form.
+     *
+     * Note that if the original matrix (this matrix) or the vector {@code b}
+     * are needed after this operation, the inPlace switch should be set to false
+     *
+     * @param b
+     * @param inPlace if set to true, all operations on this matrix and vector {@code b}
+     *                will be done in place
+     * @return
+     * @throws FFaplAlgebraicException
+     */
     public TreeMap<Long, V> solve(NavigableMap<Long, V> b, boolean inPlace) throws FFaplAlgebraicException {
         Matrix<V> A = inPlace ? this : this.clone();
         b = inPlace ? b : new TreeMap<>(b);
@@ -920,7 +1002,6 @@ public class Matrix<V extends IAlgebraicOperations<V>>
 
     @Override
     public Matrix<V> clone() {
-        // TODO (maybe) rewrite to follow convention of calling super.clone() which is hardcoded for efficiency then swap mutable object references with clones
         return new Matrix<>(this);
     }
 

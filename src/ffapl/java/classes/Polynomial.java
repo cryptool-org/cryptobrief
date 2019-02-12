@@ -3,13 +3,6 @@
  */
 package ffapl.java.classes;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeMap;
-
 import ffapl.FFaplInterpreter;
 import ffapl.exception.FFaplException;
 import ffapl.java.exception.FFaplAlgebraicException;
@@ -18,7 +11,9 @@ import ffapl.java.interfaces.IAlgebraicOperations;
 import ffapl.java.interfaces.IJavaType;
 import ffapl.java.math.Algorithm;
 import ffapl.types.FFaplTypeCrossTable;
-import java.util.Vector;
+
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * @author Alexander Ortner
@@ -425,7 +420,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	
 	 /**
 	   * Returns the coefficient of x^e
-	   * @param index
+	   * @param e
 	   * @return the coefficient of x^e in the polynomial
 	   */
 	public BigInteger coefficientAt(BigInteger e) {
@@ -676,20 +671,19 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	public Thread getThread(){
 		return _thread;
 	}
-	
-	 /**
-	  * throws an interrupt exception if not running
-	  * @throws FFaplException
-	  */
-	  protected void isRunning() throws FFaplAlgebraicException
-	  {
-		if(_thread != null){
-			if(_thread.isInterrupted()){
+
+	/**
+	 * throws an interrupt exception if not running
+	 *
+	 * @throws FFaplException
+	 */
+	protected void isRunning() throws FFaplAlgebraicException {
+		if (_thread != null) {
+			if (_thread.isInterrupted()) {
 				throw new FFaplAlgebraicException(null, IAlgebraicError.INTERRUPT);
 			}
-			
 		}
-	  }
+	}
 
 	@Override
 	public Polynomial addR(Polynomial summand) {
