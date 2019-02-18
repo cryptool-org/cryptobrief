@@ -15,6 +15,9 @@ import ffapl.types.FFaplTypeCrossTable;
 import java.math.BigInteger;
 import java.util.*;
 
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.ZERO;
+
 /**
  * @author Alexander Ortner
  * @version 1.0
@@ -56,7 +59,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 		_polynomialMap = new TreeMap<BigInteger, BigInteger>();
 		_thread = thread;
 		//initial polynom c^e
-		if(! c.equals(BigInteger.ZERO)){
+		if(! c.equals(ZERO)){
 			_polynomialMap.put(e,c);
 		}
 		
@@ -84,7 +87,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	private ArrayList<Polynomial> extractValuesfromString(String s) throws FFaplAlgebraicException {
 		
 		ArrayList<Polynomial> list = new ArrayList<>();
-		System.out.println("Wert der �bergeben wurde: " +s);
+		System.out.println("Wert der übergeben wurde: " +s);
 		String withoutSquareB = s.replaceAll("\\[|\\]", "");
 		System.out.println(withoutSquareB);
                 //split at "+"
@@ -128,9 +131,9 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 					String[] secondsplit = d[i].split("\\^");
 					BigInteger base = BigInteger.valueOf(Long.parseLong(secondsplit[0]));
 					BigInteger exp = BigInteger.valueOf(Long.parseLong(secondsplit[1]));
-					temp.setPolynomial(Algorithm.squareAndMultiply(base, exp, this._thread), BigInteger.ZERO);
+					temp.setPolynomial(Algorithm.squareAndMultiply(base, exp, this._thread), ZERO);
 				} else {
-					temp.setPolynomial(BigInteger.valueOf(Long.parseLong(d[i])), BigInteger.ZERO);
+					temp.setPolynomial(BigInteger.valueOf(Long.parseLong(d[i])), ZERO);
 				}
 				list.add(temp);
 			}
@@ -140,17 +143,28 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 
 
 	/**
-	 * Returns the degree of the Polynom
+	 * Returns the degree of the Polynomial
 	 * @return
 	 */
-	public BigInteger degree(){
-		 if(_polynomialMap.keySet().size() > 0){
-		    return new BInteger(((SortedSet<BigInteger>)_polynomialMap.keySet()).last(), _thread);
-		 }else{
-			 return BigInteger.ZERO;
-		 }
+	public BigInteger degree() {
+		clearZeroCoefficients();
+
+		if (_polynomialMap.keySet().size() > 0)
+			return new BInteger(_polynomialMap.lastKey(), _thread);
+		else
+			return ZERO;
 	}
-	
+
+	/**
+	 * Cleans up the polynomials exponent -> coefficient map,
+	 * removing any coefficients that are zero.
+	 *
+	 * @return true if any zero-valued coefficients were removed
+	 */
+	private boolean clearZeroCoefficients() {
+		return this.polynomial().values().removeAll(Collections.singleton(ZERO));
+	}
+
 	/**
 	 * Adds the specified Polynom <Code> ply </Code> to the current Polynom
 	 * @param ply
@@ -163,7 +177,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 			if(this._polynomialMap.containsKey(e1)){
 				c2 = this._polynomialMap.get(e1);
 				c2 = c2.add(c1);
-				if(c2.equals(BigInteger.ZERO)){
+				if(c2.equals(ZERO)){
 					//sum is zero
 					this._polynomialMap.remove(e1);
 				}else{
@@ -181,14 +195,14 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	 */
 	public Polynomial getDerivation(){
 		Polynomial ply = this.clone();
-		ply.setPolynomial(BigInteger.ZERO, BigInteger.ZERO);
+		ply.setPolynomial(ZERO, ZERO);
 		BigInteger e, c;
 		for(Iterator<BigInteger> itr = _polynomialMap.keySet().iterator(); itr.hasNext();){
 			e = itr.next();
-			if(e.compareTo(BigInteger.ZERO) > 0){
+			if(e.compareTo(ZERO) > 0){
 				c = _polynomialMap.get(e);
 				c = c.multiply(e);
-				e = e.subtract(BigInteger.ONE);
+				e = e.subtract(ONE);
 				ply.add(c, e);
 			}
 		}
@@ -216,7 +230,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 			if(this._polynomialMap.containsKey(e1)){
 				c2 = this._polynomialMap.get(e1);
 				c2 = c2.subtract(c1);
-				if(c2.equals(BigInteger.ZERO)){
+				if(c2.equals(ZERO)){
 					//sum is zero
 					this._polynomialMap.remove(e1);
 				}else{
@@ -274,7 +288,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 			c1 = _polynomialMap.get(e1);
 			e1 = e1.add(e);//add exponent
 			c1 = c1.multiply(c); // multiply coefficient
-			if(!c1.equals(BigInteger.ZERO)){
+			if(!c1.equals(ZERO)){
 				polynomTable.put(e1, c1);
 			}			
 		}
@@ -291,7 +305,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	 * @throws FFaplAlgebraicException
 	 */
 	public Polynomial pow(BigInteger exponent) throws FFaplAlgebraicException{
-		if(exponent.compareTo(BigInteger.ZERO) < 0){
+		if(exponent.compareTo(ZERO) < 0){
 			String[] arguments = {exponent.toString(), 
 								 this.classInfo() + " -> " + this + 
 										FFaplInterpreter.tokenImage[FFaplInterpreter.POWER].replace("\"", "") + exponent };
@@ -332,6 +346,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	 * @return
 	 */
 	public Set<BigInteger> exponents(){
+		clearZeroCoefficients();
 		return this._polynomialMap.keySet();
 	}
 	
@@ -362,7 +377,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	 */
 	public BigInteger calculate(BInteger val) throws FFaplAlgebraicException {
 		BigInteger c, e, result;
-		result = BigInteger.ZERO;
+		result = ZERO;
 		for(Iterator<BigInteger> itr =  _polynomialMap.keySet().iterator(); itr.hasNext(); ){
 			e = itr.next();
 			c = _polynomialMap.get(e);
@@ -376,7 +391,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	 * @return
 	 */
 	public boolean isMonic(){
-		return this._polynomialMap.get(this.degree()).equals(BigInteger.ONE);
+		return this._polynomialMap.get(this.degree()).equals(ONE);
 	}
 	
 	/**
@@ -384,11 +399,8 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	 * @return
 	 */
 	public boolean isZero(){
-		return(!( _polynomialMap.keySet().size() > 0) || 
-				( _polynomialMap.keySet().size() == 1 
-				 &&  _polynomialMap.keySet().contains(BigInteger.ZERO)
-				 && this._polynomialMap.get(BigInteger.ZERO).equals(BigInteger.ZERO)
-						));
+		clearZeroCoefficients();
+		return _polynomialMap.isEmpty();
 	}
 	
 	/**
@@ -396,9 +408,10 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	 * @return
 	 */
 	public boolean isOne(){
+		clearZeroCoefficients();
 		if( _polynomialMap.keySet().size() == 1){
-			if (this._polynomialMap.containsKey(BigInteger.ZERO)){
-				if(this._polynomialMap.get(BigInteger.ZERO).equals(BigInteger.ONE)){
+			if (this._polynomialMap.containsKey(ZERO)){
+				if(this._polynomialMap.get(ZERO).equals(ONE)){
 					return true;
 				}
 			}
@@ -411,10 +424,10 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	 * @return
 	 */
 	public BigInteger leadingCoefficient(){
-		if( _polynomialMap.keySet().size() > 0){
+		if (_polynomialMap.isEmpty()) {
+			return new BInteger(ZERO, _thread);
+		} else {
 			return new BInteger(this._polynomialMap.get(this.degree()), _thread);
-		}else{
-			return new BInteger(BigInteger.ZERO, _thread);
 		}
 	}
 	
@@ -427,7 +440,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 		if(_polynomialMap.containsKey(e)){
 			return new BInteger(this._polynomialMap.get(e), _thread);
 		}else{
-			return new BInteger(BigInteger.ZERO, _thread);
+			return new BInteger(ZERO, _thread);
 		}
 	}
 	
@@ -456,7 +469,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 		BigInteger e;
 		for(Iterator<BigInteger> itr = tmp.iterator(); itr.hasNext(); ){
 			e = itr.next();
-			if(ply.polynomial().get(e).equals(BigInteger.ZERO)){
+			if(ply.polynomial().get(e).equals(ZERO)){
 				ply.polynomial().remove(e);
 			}
 		}
@@ -473,7 +486,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 		Polynomial ply;
 		
 		if(val instanceof BigInteger){
-			ply = new Polynomial((BigInteger) val, BigInteger.ZERO, _thread);
+			ply = new Polynomial((BigInteger) val, ZERO, _thread);
 		}else if(val instanceof PolynomialRC){
 			return ((PolynomialRC) val).equals(this);	
 		}else if(val instanceof Polynomial){
@@ -525,7 +538,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	 */
 	public Polynomial negate() throws FFaplAlgebraicException{
 		Polynomial ply = this.clone();
-		ply.multiply(BigInteger.ONE.negate(), BigInteger.ZERO);
+		ply.multiply(ONE.negate(), ZERO);
 		return ply;
 	}
 	
@@ -541,7 +554,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 		for(Iterator<BigInteger> itr =  _polynomialMap.keySet().iterator(); itr.hasNext(); ){
 			e = itr.next();
 			c = ply.polynomial().get(e).mod(modulus);
-			if(c.equals(BigInteger.ZERO)){
+			if(c.equals(ZERO)){
 				ply.polynomial().remove(e);
 			}else{
 				ply.polynomial().put(e, c);
@@ -562,7 +575,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 			isRunning();
 			e = itr.next();
 			c = ply.polynomial().get(e).divide(divisor);
-			if(c.equals(BigInteger.ZERO)){
+			if(c.equals(ZERO)){
 				ply.polynomial().remove(e);
 			}else{
 				ply.polynomial().put(e, c);
@@ -576,7 +589,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	 * @throws FFaplAlgebraicException
 	 */
 	public void divide(Polynomial ply) throws FFaplAlgebraicException{
-		if(ply.degree().compareTo(BigInteger.ONE) > 0){
+		if(ply.degree().compareTo(ONE) > 0){
 			String[]arguments = {this + " " + FFaplInterpreter.tokenImage[FFaplInterpreter.DIVIDE].replace("\"", "") + " " + ply};
 			throw new FFaplAlgebraicException(arguments, IAlgebraicError.DIVISION_NOT_REASONABLE);
 		}else{
@@ -608,7 +621,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 		    	//	str = str + "\n";
 		    	//	counter ++;//reset counter
 		    	//}
-		    	if(c.compareTo(BigInteger.ZERO) < 0){
+		    	if(c.compareTo(ZERO) < 0){
 		    		if(! str.equals("")){
 			    		//negative coefficient
 			    		str = str + " - ";
@@ -622,14 +635,14 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 		    		}
 		    	}
 		    	tmp = "";
-		    	if(! e.equals(BigInteger.ZERO)){
-		    		if(! e.equals(BigInteger.ONE)){
+		    	if(! e.equals(ZERO)){
+		    		if(! e.equals(ONE)){
 		    			tmp = "x^" + e;
 		    		}else{
 		    			tmp = "x";
 		    		}
 		    	}
-		    	if(! (c.abs().equals(BigInteger.ONE) && !e.equals(BigInteger.ZERO))){
+		    	if(! (c.abs().equals(ONE) && !e.equals(ZERO))){
 		    		tmp = c.abs() + tmp;
 		    	}
 		    	
@@ -709,7 +722,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	@Override
 	public Polynomial scalarMultR(BigInteger factor) throws FFaplAlgebraicException {
 		Polynomial product = this.clone();
-		product.multiply(factor, BigInteger.ZERO);
+		product.multiply(factor, ZERO);
 		return product;
 	}
 

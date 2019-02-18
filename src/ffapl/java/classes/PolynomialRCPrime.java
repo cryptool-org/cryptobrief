@@ -3,11 +3,16 @@
  */
 package ffapl.java.classes;
 
-import java.math.BigInteger;
-import java.util.TreeMap;
-
+import ffapl.exception.FFaplException;
 import ffapl.java.exception.FFaplAlgebraicException;
 import ffapl.java.interfaces.IJavaType;
+import ffapl.java.math.Algorithm;
+
+import java.math.BigInteger;
+import java.util.Map;
+import java.util.TreeMap;
+
+import static java.math.BigInteger.*;
 
 /**
  * @author Alexander Ortner
@@ -15,8 +20,6 @@ import ffapl.java.interfaces.IJavaType;
  *
  */
 public class PolynomialRCPrime extends PolynomialRC {
-
-	
 	
 	/**
 	 * Constructor
@@ -62,6 +65,98 @@ public class PolynomialRCPrime extends PolynomialRC {
 	 */
 	public PolynomialRCPrime(long c, long e, long modulus, Thread thread) throws FFaplAlgebraicException{
 		this(BigInteger.valueOf(c), BigInteger.valueOf(e), BigInteger.valueOf(modulus), thread);
+	}
+
+	/**
+	 * Checks if a polynomial is primitive mod a Prime p (the modulus of this polynomial).
+	 * <p>
+	 * From: COMPUTING PRIMITIVE POLYNOMIALS - THEORY AND ALGORITHM <br />
+	 * By: Sean E. O'Connor <br />
+	 * URL: http://www.seanerikoconnor.freeservers.com/Mathematics/AbstractAlgebra/PrimitivePolynomials/theory.html#AlgoforFinding
+	 *
+	 * @param _thread
+	 * @return true if f is a primitive polynomial mod p
+	 */
+	public boolean isPrimitivePolynomial(Thread _thread)
+			throws FFaplException {
+		return isPrimitivePolynomial(null, null, _thread);
+	}
+
+	/**
+	 * Checks if a polynomial is primitive mod a Prime p (the modulus of this polynomial).
+	 * Accepts precomputed factorizations of r and p-1 to speed up checking multiple polynomials with the same parameters.
+	 * <p>
+	 * From: COMPUTING PRIMITIVE POLYNOMIALS - THEORY AND ALGORITHM <br />
+	 * By: Sean E. O'Connor <br />
+	 * URL: http://www.seanerikoconnor.freeservers.com/Mathematics/AbstractAlgebra/PrimitivePolynomials/theory.html#AlgoforFinding
+	 *
+	 * @param factorsOfR         precomputed factorization of r := (p^n - 1)/(p - 1)
+	 * @param factorsOfPMinusOne precomputed factorization of (p - 1)
+	 * @return true if f is a primitive polynomial mod p
+	 */
+	public boolean isPrimitivePolynomial(Map<BigInteger, BigInteger> factorsOfR, Map<BigInteger, BigInteger> factorsOfPMinusOne, Thread _thread)
+			throws FFaplException {
+
+		BigInteger p = this.characteristic();
+		BigInteger n = this.degree();
+		BigInteger pMinusOne = p.subtract(ONE);
+		BigInteger r = p.pow(n.intValue()).subtract(ONE).divide(pMinusOne);
+
+		if (factorsOfR == null)
+			factorsOfR = Algorithm.FactorInteger(new BInteger(r, _thread));
+		if (factorsOfPMinusOne == null)
+			factorsOfPMinusOne = Algorithm.FactorInteger(new BInteger(pMinusOne, _thread));
+
+		// [Step 2]
+		BigInteger a0 = this.coefficientAt(ZERO);
+		// a_0 * (-1)^n
+		BigInteger a0TimesMinusOneToTheN = (n.mod(TWO).compareTo(ZERO) == 0) ? a0 : a0.negate();
+		// create galois field element object with value
+		GaloisField tmpGF = new GaloisField(p, new Polynomial(1, 1, _thread), _thread);
+		tmpGF.setValue(new Polynomial(a0TimesMinusOneToTheN, ZERO, _thread));
+
+		// assert that a_0 * (-1)^n is a primitive root of p
+		if (!tmpGF.isPrimitiveRoot(factorsOfPMinusOne))
+			return false;
+
+		// [Step 3]
+		// assert that f has no linear factors (as linear factors imply reducibility)
+		if (this.hasLinearFactors())
+			return false;
+
+		// [Step 4]
+		// apply berlekamp polynomial factorization to check for reducibility
+		// assert that the Q-matrix of f has a nullity less than 2 (nullity of two or greater implies reducibility)
+		if (this.findQMatrix(_thread).nullity(2) == 2)
+			return false;
+
+		// [Step 5]
+		// assert that x^r is an integer (a) without any other coefficients
+		GaloisField x = new GaloisField(p, this, _thread);
+		// x = 1 * x^1
+		x.setValue(new Polynomial(ONE, ONE, _thread));
+		// x^r
+		GaloisField xToTheR = x.powR(r);
+		// assert that x^r === a, where a is an integer
+		if (xToTheR.value().degree().compareTo(ZERO) != 0)
+			return false;
+
+		// [Step 6]
+		BigInteger a = xToTheR.value().coefficientAt(ZERO);
+		// assert that a === (-1)^n * a0 mod f, p
+		if (!a.equals(a0TimesMinusOneToTheN))
+			return false;
+
+		// [Step 7]
+		for (BigInteger factor : factorsOfR.keySet())
+			// skip test if p_i | (p-1) (divides)
+			if (!factor.mod(pMinusOne).equals(ZERO))
+				// otherwise, assert that x^(r/p_i) is not an integer
+				if (x.powR(r.divide(factor)).value().degree().compareTo(ZERO) == 0)
+					return false;
+
+		// [Step 8]
+		return true;
 	}
 	
 	@Override

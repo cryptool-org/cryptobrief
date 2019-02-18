@@ -14,7 +14,8 @@ import java.math.BigInteger;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static java.math.BigInteger.*;
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.ZERO;
 
 /**
  * @author Alexander Ortner
@@ -599,168 +600,29 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
     }
 
 	/**
-	 * Finds a primitive polynomial (which generates a field in which x is primitive) for a given Finite Field GF(p^n)
-	 * <p>
-	 * From: COMPUTING PRIMITIVE POLYNOMIALS - THEORY AND ALGORITHM
-	 * By: Sean E. O'Connor
-	 * URL: http://www.seanerikoconnor.freeservers.com/Mathematics/AbstractAlgebra/PrimitivePolynomials/theory.html#AlgoforFinding
-	 *
-	 * @param p characteristic
-	 * @param n degree
-	 * @return primitive polynomial
-	 */
-    public static Polynomial findPrimitivePolynomial(BigInteger p, BigInteger n, Thread _thread) throws FFaplException {
-
-        // Step 0
-        // r := ( p^n - 1 ) / ( p - 1 )
-        BigInteger r = p.pow(n.intValue()).subtract(ONE).divide(p.subtract(ONE));
-        // factorize r
-        TreeMap<BigInteger, BigInteger> factorsOfR = Algorithm.FactorInteger(new BInteger(r,_thread));
-
-        // factorize p-1
-		TreeMap<BigInteger, BigInteger> factorsOfPMinus1 = Algorithm.FactorInteger(new BInteger(p.subtract(ONE),_thread));
-
-        // Step 1
-        // iterate over possible polynomials (monic, of order n)
-        PolynomialRC f_x = new PolynomialRC(ONE, n, p, _thread); // start with just x^n
-        boolean allPossiblePolynomialsIterated = false;
-
-        while (!allPossiblePolynomialsIterated) {
-
-        	// [Step 2 - 7]
-            if (isPrimitivePolynomial(f_x, p, factorsOfR, factorsOfPMinus1, _thread)) {
-            	// [Step 8]
-            	return f_x;
-			}
-
-            // [Step 1] find next polynomial by counting through coefficients
-            boolean nextPolynomialFound = false;
-            BigInteger current = ZERO;
-            // iterate until done or no more coefficients left
-            while (!nextPolynomialFound && current.compareTo(n) < 0) {
-                // add one to current, check if it is modulo reducible
-				// if it is, reduce, then go to next coefficient
-                BigInteger currentItem = f_x.coefficientAt(current).add(ONE);
-                if (currentItem.compareTo(p) == 0) {
-					if (current.compareTo(ZERO) == 0)
-						// polynomials with constant term a_0 = 0 are reducible (divisible by x)
-						// therefore not primitive and will be skipped
-						currentItem = ONE;
-					else
-						currentItem = ZERO;
-				} else {
-					nextPolynomialFound = true;
-				}
-
-                f_x.polynomial().put(current, currentItem);
-                current = current.add(ONE);
-            }
-
-            if (!nextPolynomialFound) {
-                allPossiblePolynomialsIterated = true;
-            }
-        }
-
-        return null;
-    }
-
-	/**
-	 *
-	 * @param f the polynomial
-	 * @param p characteristic
-	 * @param factorsOfR precomputed factorization of r := (p^n - 1)/(p - 1)
-	 * @param factorsOfPMinusOne precomputed factorization of (p - 1)
-	 * @return
-	 * @throws FFaplAlgebraicException
-	 */
-	public static boolean isPrimitivePolynomial(PolynomialRC f, BigInteger p, Map<BigInteger, BigInteger> factorsOfR, Map<BigInteger, BigInteger> factorsOfPMinusOne, Thread _thread)
-            throws FFaplException {
-
-		BigInteger n = f.degree();
-		BigInteger pMinusOne = p.subtract(ONE);
-        BigInteger r = p.pow(n.intValue()).subtract(ONE).divide(pMinusOne);
-
-
-		// [Step 2]
-		BigInteger a0 = f.coefficientAt(ZERO);
-		// a_0 * (-1)^n
-		BigInteger a0TimesMinusOneToTheN = (n.mod(TWO).compareTo(ZERO)==0) ? a0 : a0.negate();
-		// assert that a_0 * (-1)^n is a primitive root of p
-		if (!isPrimitiveRoot(a0TimesMinusOneToTheN, p, factorsOfPMinusOne, _thread))
-			return false;
-
-		// [Step 3]
-		// assert that f has no linear factors (as linear factors imply reducibility)
-		if (f.hasLinearFactors())
-			return false;
-
-		// [Step 4]
-		// apply berlekamp polynomial factorization to check for reducibility
-		// assert that the Q-matrix of f has a nullity less than 2 (nullity of two or greater implies reducibility)
-		if (f.findQMatrix(p, n, _thread).nullity(2) == 2)
-			return false;
-
-		// [Step 5]
-		// assert that x^r is an integer (a) without any other coefficients
-		GaloisField x = new GaloisField(p, f, _thread);
-		// x = 1 * x^1
-		TreeMap<BigInteger, BigInteger> polyMap = new TreeMap<>();
-		polyMap.put(ONE, ONE);
-		x.setValue(new Polynomial(polyMap, _thread));
-		// x^r
-		GaloisField xToTheR = x.powR(r);
-		// assert that x^r === a, where a is an integer
-		if (xToTheR.value().leadingCoefficient().compareTo(ZERO) != 0)
-			return false;
-
-		// [Step 6]
-        BigInteger a = xToTheR.value().coefficientAt(ZERO);
-        // assert that a === (-1)^n * a0 mod f, p
-        if (!a.equals(a0TimesMinusOneToTheN))
-            return false;
-
-        // [Step 7]
-		for (BigInteger factor : factorsOfR.keySet())
-			// skip test if p_i | (p-1) (divides)
-			if (!factor.mod(pMinusOne).equals(ZERO))
-				// otherwise, assert that x^(r/p_i) is not an integer
-				if (x.powR(r.divide(factor)).value().leadingCoefficient().compareTo(ZERO) == 0)
-					return false;
-
-		// [Step 8]
-		return true;
-	}
-
-	/**
-	 * Checks whether a is a primitive Root of p
+	 * Checks whether a is a primitive root (primitive element) in GF(p^n)
 	 * by checking for each distinct prime factor {@code q} of {@code p-1}
 	 * if a<sup>(p-1)/q</sup> != 1 (mod p)
 	 *
-	 * @return true, if a is a primitive value of p
-	 */
-	public static boolean isPrimitiveRoot(BigInteger a, BigInteger p,
-										  Map<BigInteger, BigInteger> factorsOfPMinusOne,
-										  Thread _thread) throws FFaplAlgebraicException {
-		// zero values cant be primitive roots. negative values are invalid.
-		if (a.compareTo(ZERO) <= 0)
-			return false;
+     * @return true, if a is a primitive value of p
+     */
+    public boolean isPrimitiveRoot(Map<BigInteger, BigInteger> factorsOfPMinusOne)
+            throws FFaplAlgebraicException {
 
-		a = a.mod(p);
+        // zero is not a primitive root
+        if (this.value().isZero())
+            return false;
 
-		// (modulo reduced) zero values cant be primitive roots
-		if (a.compareTo(ZERO) == 0)
-			return false;
+        BigInteger pMinusOne = this.characteristic().subtract(ONE);
 
-		BigInteger pMinusOne = p.subtract(ONE);
-
-		// factor p-1 (if not already supplied by callee)
+        // factor p-1 (if not already supplied by callee)
 		if (factorsOfPMinusOne == null)
 			factorsOfPMinusOne = Algorithm.FactorInteger(new BInteger(pMinusOne, _thread));
 
 		// for each distinct prime factor q...
 		for (Map.Entry<BigInteger, BigInteger> distinctPrime : factorsOfPMinusOne.entrySet()) {
 			// ... check if a^((p-1)/q) != 1
-			if (a.modPow(pMinusOne.divide(distinctPrime.getKey()), p).compareTo(ONE) == 0) {
+			if (this.powR(pMinusOne.divide(distinctPrime.getKey())).value().isOne()) {
 				return false;
 			}
 		}
@@ -768,8 +630,33 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 		return true;
 	}
 
-	public GaloisField findPrimitiveElement() {
-    	// TODO use findPrimitivePolynomial() to find a GF where x is primitive, then convert to this GF
-    	return null;
+	public GaloisField getPrimitiveRoot() throws FFaplException {
+
+		BigInteger p = this.characteristic(),
+				n = this.irrPolynomial().degree(),
+				r = p.pow(n.intValue()).subtract(ONE).divide(p.subtract(ONE));
+
+		// factorize r, if necessary
+		TreeMap<BigInteger, BigInteger> factorsOfR = Algorithm.FactorInteger(new BInteger(r, _thread));
+		// factorize p-1
+		TreeMap<BigInteger, BigInteger> factorsOfPMinusOne = Algorithm.FactorInteger(new BInteger(p.subtract(ONE), _thread));
+
+		// create instance with value "x"
+		GaloisField x = new GaloisField(p, this.irrPolynomial(), _thread);
+		// x = 1 * x^1
+		x.setValue(new Polynomial(ONE, ONE, _thread));
+
+		if (this.irrPolynomial().isPrimitivePolynomial(factorsOfR, factorsOfPMinusOne, _thread)) {
+			// the irreducible polynomial of this field is primitive
+			// -> field element x is primitive
+			return x;
+		} else {
+			// polynomial is not primitive. find one that is
+			PolynomialRCPrime f = Algorithm.getPrimitivePolynomial(p, n, factorsOfR, factorsOfPMinusOne, _thread);
+
+			// then convert the element "x" from that field to this field
+			// TODO convert field elements
+			return null;
+		}
 	}
 }

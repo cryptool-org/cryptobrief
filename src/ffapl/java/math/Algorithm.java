@@ -20,8 +20,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
-import static java.math.BigInteger.ONE;
-import static java.math.BigInteger.ZERO;
+import static java.math.BigInteger.*;
 
 /**
  * Algorithms needed for Algebraic calculations
@@ -887,6 +886,83 @@ public class Algorithm {
 			throw new FFaplAlgebraicException(messages,
 					IAlgebraicError.TO_HIGH_EXPONENT);
 		}
+	}
+
+	/**
+	 * Finds a primitive polynomial (which generates a field in which x is primitive)
+	 * for a given Finite Field GF(p^n) where p is prime
+	 * <p>
+	 * From: COMPUTING PRIMITIVE POLYNOMIALS - THEORY AND ALGORITHM
+	 * By: Sean E. O'Connor
+	 * URL: http://www.seanerikoconnor.freeservers.com/Mathematics/AbstractAlgebra/PrimitivePolynomials/theory.html#AlgoforFinding
+	 *
+	 * @param p characteristic
+	 * @param n degree
+	 * @return primitive polynomial
+	 */
+	public static PolynomialRCPrime getPrimitivePolynomial(BigInteger p, BigInteger n, TreeMap<BigInteger, BigInteger> factorsOfR, TreeMap<BigInteger, BigInteger> factorsOfPMinusOne, Thread _thread)
+			throws FFaplException {
+		if (p == null || n == null || n.compareTo(TWO) < 0)
+			throw new FFaplException();
+
+		// [Step 0]
+
+		// the constructor of Prime (called in the constructor of PolyRCPrime)
+		// will throw an exception if p is not prime
+		PolynomialRCPrime f = new PolynomialRCPrime(ONE, n, p, _thread); // start with just x^n
+
+		// r := ( p^n - 1 ) / ( p - 1 )
+		BigInteger r = p.pow(n.intValue()).subtract(ONE).divide(p.subtract(ONE));
+
+		// factorize r, if necessary
+		if (factorsOfR == null)
+			factorsOfR = Algorithm.FactorInteger(new BInteger(r,_thread));
+
+		// factorize p-1
+		if (factorsOfPMinusOne == null)
+			factorsOfPMinusOne = Algorithm.FactorInteger(new BInteger(p.subtract(ONE),_thread));
+
+		// [Step 1]
+		// iterate over possible polynomials (monic, of order n
+		boolean allPossiblePolynomialsIterated = false;
+
+		while (!allPossiblePolynomialsIterated) {
+
+			// [Step 2 - 7]
+			if (f.isPrimitivePolynomial(factorsOfR, factorsOfPMinusOne, _thread)) {
+				// [Step 8]
+				return f;
+			}
+
+			// [Step 1] find next polynomial by counting through coefficients
+			boolean nextPolynomialFound = false;
+			BigInteger current = ZERO;
+			// iterate until done or no more coefficients left
+			while (!nextPolynomialFound && current.compareTo(n) < 0) {
+				// add one to current, check if it is modulo reducible
+				// if it is, reduce, then go to next coefficient
+				BigInteger currentItem = f.coefficientAt(current).add(ONE);
+				if (currentItem.compareTo(p) == 0) {
+					if (current.compareTo(ZERO) == 0)
+						// polynomials with constant term a_0 = 0 are reducible (divisible by x)
+						// therefore not primitive and will be skipped
+						currentItem = ONE;
+					else
+						currentItem = ZERO;
+				} else {
+					nextPolynomialFound = true;
+				}
+
+				f.polynomial().put(current, currentItem);
+				current = current.add(ONE);
+			}
+
+			if (!nextPolynomialFound) {
+				allPossiblePolynomialsIterated = true;
+			}
+		}
+
+		return null;
 	}
 	
 	/**

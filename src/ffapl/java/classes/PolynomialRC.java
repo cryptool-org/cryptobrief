@@ -502,7 +502,7 @@ public class PolynomialRC extends Polynomial {
 		BInteger one = new BInteger(ONE, _thread);
 
 		// for every a in [1,p-1] (p being the characteristic)
-		while (current.compareTo(this._characteristic) <= 0) {
+		while (current.compareTo(this.characteristic()) <= 0) {
 			// check if f(a) = 0 (mod p)
 			// i.e. if the polynomial has a root caused by a linear factor
 			if (this.calculate(current).compareTo(ZERO) == 0)
@@ -513,19 +513,19 @@ public class PolynomialRC extends Polynomial {
 		return false;
 	}
 
-	public Matrix<BInteger> findQMatrix(BigInteger characteristic, BigInteger degree, Thread _thread) throws FFaplException {
+	public Matrix<BInteger> findQMatrix(Thread _thread) throws FFaplException {
 
-		if(characteristic.compareTo(TWO) < 0 || degree.compareTo(TWO) < 0)
+		if(this.characteristic().compareTo(TWO) < 0 || degree().compareTo(TWO) < 0)
 			throw new FFaplException("Cannot generate Q-Matrix with degree or characteristic less than 2");
 
-		Matrix<BInteger> Q = new Matrix<>(degree.longValue(), degree.longValue(), new BInteger(ZERO, _thread));
+		Matrix<BInteger> Q = new Matrix<>(degree().longValue(), this.degree().longValue(), new BInteger(ZERO, _thread));
 		BInteger one = new BInteger(ONE, _thread);
 
 		// first row is zero
 		// (entry at 1,1 would be 1 but result will have identity matrix subtracted)
 
-		PolynomialRC x = new PolynomialRC(ONE, ONE, characteristic, _thread);
-		PolynomialRC xp = (PolynomialRC) x.clone().pow(characteristic);
+		PolynomialRC x = new PolynomialRC(ONE, ONE, this.characteristic(), _thread);
+		PolynomialRC xp = (PolynomialRC) x.clone().pow(this.characteristic());
 		xp.mod(this);
 		PolynomialRC q = (PolynomialRC) xp.clone();
 
@@ -537,7 +537,7 @@ public class PolynomialRC extends Polynomial {
 
 		// k-th row are the coefficients of x^(k-1)p
 		// (matrix indices start at 1)
-		for (long k = 3; k < degree.longValue(); k++) {
+		for (long k = 3; k < this.degree().longValue(); k++) {
 			q = (PolynomialRC) q.multR(xp);
 			q.mod(this);
 

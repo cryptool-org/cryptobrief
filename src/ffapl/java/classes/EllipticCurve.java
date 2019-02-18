@@ -1,5 +1,6 @@
 package ffapl.java.classes;
 
+import ffapl.exception.FFaplException;
 import ffapl.java.exception.FFaplAlgebraicException;
 import ffapl.java.interfaces.IAlgebraicError;
 import ffapl.java.interfaces.IJavaType;
@@ -1493,13 +1494,43 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 				if (_gf.characteristic().equals(TWO))
 				{
 				    if (_gf.irrPolynomial().isOne()) {
-				        // todo check the four trivial cases
+				    	// check the four trivial cases
+						Polynomial[] p = {new Polynomial(_thread),
+								new Polynomial(1, 0, _thread)};
+
+						_x_gf = p[0];
+						_y_gf = p[0];
+						if (weierstrassEquationIsValid())
+							return;
+
+						_x_gf = p[0];
+						_y_gf = p[1];
+						if (weierstrassEquationIsValid())
+							return;
+
+						_x_gf = p[1];
+						_y_gf = p[0];
+						if (weierstrassEquationIsValid())
+							return;
+
+						_x_gf = p[1];
+						_y_gf = p[1];
+						if (weierstrassEquationIsValid())
+							return;
+
+						return;
+						// throw exception
                     }
 
-					GaloisField b_ = c.divR(b.multR(b)); // b variable used in the thesis
-					GaloisField alpha; // generator
-
-					alpha = _gf.findPrimitiveElement();
+				    // b variable used in the thesis
+					GaloisField b_ = c.divR(b.multR(b));
+					// generator
+					GaloisField alpha = null;
+					try {
+						alpha = _gf.getPrimitiveRoot();
+					} catch (FFaplException e) {
+						e.printStackTrace();
+					}
 
 					// create galois field element with value one, needed for matching later
 					GaloisField one = new GaloisField(TWO, _gf.irrPolynomial(), _thread);
