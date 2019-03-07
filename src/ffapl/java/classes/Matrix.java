@@ -248,7 +248,7 @@ public class Matrix<V extends IAlgebraicOperations<V>>
     /**
      * Multiplies two matrices {@code A mxn} and {@code B nxp}.
      * For matrix-vector multiplications ({@code p = 1})
-     * consider using {@link #multiplyVector(NavigableMap)} instead.
+     * consider using {@link #multiplyVectorRight(NavigableMap)} instead.
      *
      * @param A factor
      * @param B factor
@@ -348,7 +348,7 @@ public class Matrix<V extends IAlgebraicOperations<V>>
     /**
      * Multiplies this matrix (A mxn) with another matrix (B nxp).
      * For matrix-vector multiplications ({@code p = 1})
-     * consider using {@link #multiplyVector(NavigableMap)} instead.
+     * consider using {@link #multiplyVectorRight(NavigableMap)} instead.
      *
      * @param B factor
      * @return product ({@code C mxp})
@@ -524,6 +524,9 @@ public class Matrix<V extends IAlgebraicOperations<V>>
                 // entries of row should be within the matrix
                 row.lowerKey(1L) == null && row.higherKey(this.n) == null) {
 
+            // clear default values
+            row.values().removeAll(Collections.singleton(this.getDefaultValue()));
+
             return matrix.put(i, new TreeMap(row));
         }
 
@@ -576,6 +579,21 @@ public class Matrix<V extends IAlgebraicOperations<V>>
         } else {
             return null;
         }
+    }
+
+    /**
+     * Get a whole row {@code i}.
+     * Note that zero values are represented by missing entries.
+     * Thus, calling this method on a zero row will give an empty map.
+     *
+     * @param i row
+     * @retur n the row
+     */
+    public TreeMap<Long, V> getRow(long i) {
+        if (!validCoordinates(i, 1L))
+            return null;
+
+        return matrix.getOrDefault(i, new TreeMap<>());
     }
 
     /**
@@ -680,15 +698,15 @@ public class Matrix<V extends IAlgebraicOperations<V>>
     }
 
     /**
-     * Multiplies with a vector. Uses sparsity of matrix and vector
-     * and tries to do as few multiplications as possible.
+     * Multiplies with a vector on the right (i.e. M = M.v). Assumes column vector.
+     * Uses sparsity of matrix and vector and tries to do as few multiplications as possible.
      *
      * @param factor factor (vector)
      * @return product
      * @throws FFaplAlgebraicException if addition or multiplication
      *                                 of values fails
      */
-    public TreeMap<Long, V> multiplyVector(NavigableMap<Long, V> factor) throws FFaplAlgebraicException {
+    public TreeMap<Long, V> multiplyVectorRight(NavigableMap<Long, V> factor) throws FFaplAlgebraicException {
         TreeMap<Long, V> product = new TreeMap<>();
 
         for (Map.Entry<Long, TreeMap<Long, V>> rowEntry : matrix.entrySet()) {
@@ -717,6 +735,21 @@ public class Matrix<V extends IAlgebraicOperations<V>>
         }
 
         return product;
+    }
+
+    /**
+     * Multiplies with a vector on the right (i.e. M = v.M). Assumes row vector.
+     * Uses {@link Matrix#multiply(Matrix)} for calculations.
+     *
+     * @param factor factor (vector)
+     * @return product
+     * @throws FFaplAlgebraicException if addition or multiplication
+     *                                 of values fails
+     */
+    public TreeMap<Long, V> multiplyVectorLeft(NavigableMap<Long, V> factor) throws FFaplAlgebraicException {
+        Matrix<V> vM = new Matrix<>(1, this.getN(), getDefaultValue());
+        vM.setRow(1, factor);
+        return vM.multiply(this).getRow(1);
     }
 
     /**
@@ -895,6 +928,16 @@ public class Matrix<V extends IAlgebraicOperations<V>>
         }
 
         return permutation;
+    }
+
+    /**
+     * Prepares this matrix (representing a system of linear equations)
+     * for being solved for multiple "right hand sides".
+     *
+     * Right now, just a method stub, as I could not find a method to factorize Residue Matrices.
+     *
+     */
+    public void prepareForSolving() {
     }
 
     /**

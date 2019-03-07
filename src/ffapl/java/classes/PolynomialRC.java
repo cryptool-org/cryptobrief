@@ -4,7 +4,6 @@
 package ffapl.java.classes;
 
 import ffapl.FFaplInterpreter;
-import ffapl.exception.FFaplException;
 import ffapl.java.exception.FFaplAlgebraicException;
 import ffapl.java.interfaces.IAlgebraicError;
 import ffapl.java.interfaces.IJavaType;
@@ -513,41 +512,49 @@ public class PolynomialRC extends Polynomial {
 		return false;
 	}
 
-	public Matrix<BInteger> findQMatrix(Thread _thread) throws FFaplException {
+	public Matrix<ResidueClass> getQMatrix(PolynomialRC x, boolean subtractId, boolean useXToTheP, Thread _thread) throws FFaplAlgebraicException {
 
 		if(this.characteristic().compareTo(TWO) < 0 || degree().compareTo(TWO) < 0)
-			throw new FFaplException("Cannot generate Q-Matrix with degree or characteristic less than 2");
+			// cannot generate Q-Matrix with degree or characteristic less than 2
+			throw new FFaplAlgebraicException(new Object[0], IAlgebraicError.VAL_LESS_EQUAL_ZERO);
 
-		Matrix<BInteger> Q = new Matrix<>(degree().longValue(), this.degree().longValue(), new BInteger(ZERO, _thread));
-		BInteger one = new BInteger(ONE, _thread);
+		Matrix<ResidueClass> Q = new Matrix<>(degree().longValue(), this.degree().longValue(), new ResidueClass(ZERO, this.characteristic()));
+		ResidueClass one = new ResidueClass(ONE, this.characteristic());
 
-		// first row is zero
+		if (!subtractId)
+			Q.set(1, 1, one);
+		// otherwise first row is zero
 		// (entry at 1,1 would be 1 but result will have identity matrix subtracted)
 
-		PolynomialRC x = new PolynomialRC(ONE, ONE, this.characteristic(), _thread);
-		PolynomialRC xp = (PolynomialRC) x.clone().pow(this.characteristic());
-		xp.mod(this);
-		PolynomialRC q = (PolynomialRC) xp.clone();
+		if (x == null) {
+			x = new PolynomialRC(ONE, ONE, this.characteristic(), _thread);
+			if (useXToTheP) {
+				x = (PolynomialRC) x.pow(this.characteristic());
+				x.mod(this);
+			}
+		}
+		PolynomialRC q = (PolynomialRC) x.clone();
 
 		// second row are the coefficients of x^p
-		xp._polynomialMap.forEach((BigInteger e, BigInteger c)
-				-> Q.set(2, e.add(one).longValue(), new BInteger(c, _thread)));
+		x._polynomialMap.forEach((BigInteger e, BigInteger c)
+				-> Q.set(2, e.add(ONE).longValue(), new ResidueClass(c, this.characteristic())));
 		// subtract identity matrix
 		Q.set(1, 1, Q.get(1, 1).subR(one));
 
 		// k-th row are the coefficients of x^(k-1)p
 		// (matrix indices start at 1)
 		for (long k = 3; k < this.degree().longValue(); k++) {
-			q = (PolynomialRC) q.multR(xp);
+			q = (PolynomialRC) q.multR(x);
 			q.mod(this);
 
 			// variables in lambda function should be effectively final
 			long finalK = k;
 			q._polynomialMap.forEach((BigInteger e, BigInteger c)
-					-> Q.set(finalK, e.add(one).longValue(), new BInteger(c, _thread)));
+					-> Q.set(finalK, e.add(ONE).longValue(), new ResidueClass(c, this.characteristic())));
 
 			// subtract identity matrix
-			Q.set(k, k, Q.get(k, k).subR(one));
+			if (subtractId)
+				Q.set(k, k, Q.get(k, k).subR(one));
 		}
 
 		return Q;

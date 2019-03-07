@@ -901,9 +901,9 @@ public class Algorithm {
 	 * @return primitive polynomial
 	 */
 	public static PolynomialRCPrime getPrimitivePolynomial(BigInteger p, BigInteger n, TreeMap<BigInteger, BigInteger> factorsOfR, TreeMap<BigInteger, BigInteger> factorsOfPMinusOne, Thread _thread)
-			throws FFaplException {
+			throws FFaplAlgebraicException {
 		if (p == null || n == null || n.compareTo(TWO) < 0)
-			throw new FFaplException();
+			throw new FFaplAlgebraicException(new Object[0], IAlgebraicError.VALUE_IS_NULL);
 
 		// [Step 0]
 
@@ -923,7 +923,7 @@ public class Algorithm {
 			factorsOfPMinusOne = Algorithm.FactorInteger(new BInteger(p.subtract(ONE),_thread));
 
 		// [Step 1]
-		// iterate over possible polynomials (monic, of order n
+		// iterate over possible polynomials (monic, of order n)
 		boolean allPossiblePolynomialsIterated = false;
 
 		while (!allPossiblePolynomialsIterated) {
@@ -964,10 +964,13 @@ public class Algorithm {
 
 		return null;
 	}
-	
+
 	/**
-	 * @param n
-	 * @param p
+	 * Generates a random polynomial modulo p of degree n.
+	 * (i.e. the coefficient of x^n will be non-zero)
+	 *
+	 * @param n degree
+	 * @param p module
 	 * @return a random polynomial of degree n modulo p
 	 * @throws FFaplAlgebraicException
 	 */
@@ -976,9 +979,9 @@ public class Algorithm {
 		Thread thread = p.getThread();
 		RNG_Placebo rnd1 = new RNG_Placebo(ONE, p, thread);
 		RNG_Placebo rnd2 = new RNG_Placebo(p, thread);
-		
+
 		if (n.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) <= 0){
-			
+
 			ply = new PolynomialRC(rnd1.next(), n, p, thread);
 			while(ply.isZero()){
 				ply = new PolynomialRC(rnd1.next(), n, p, thread);
@@ -991,11 +994,32 @@ public class Algorithm {
 			throw new FFaplAlgebraicException(messages,
 					IAlgebraicError.TO_HIGH_EXPONENT);
 		}
-		
+
 		return ply;
 	}
-	
-	
+
+	/**
+	 * Generates a random polynomial modulo p of degree <b>up to</b> n.
+	 *
+	 * @param n maximal degree
+	 * @param p module
+	 * @return a random polynomial modulo p of degree up to n
+	 * @throws FFaplAlgebraicException
+	 */
+	public static PolynomialRC getTrueRandomPolynomial(BInteger n, BInteger p) throws FFaplAlgebraicException {
+		Thread thread = p.getThread();
+		PolynomialRC ply = new PolynomialRC(p, thread);
+		RNG_Placebo rnd = new RNG_Placebo(p.subR(new BInteger(ONE, thread)), thread);
+
+		// will throw an arithmeticException if n is greater than Integer.MAX_VALUE
+		n.intValueExact();
+
+		for (int i = 0; i <= n.intValue(); i++)
+			ply.add(rnd.next(), BigInteger.valueOf(i));
+
+		return ply;
+	}
+
 	/**
 	 * Search for prime factors with Pollard's rho, Pollard's p-1 and linear search.
 	 * @param n
@@ -1780,7 +1804,7 @@ public class Algorithm {
 		}
 	  }
 	  
-	  /**
+	  /*/**
 	   * multiply elements of a Vector
 	   * @param vals
 	   * @param thread

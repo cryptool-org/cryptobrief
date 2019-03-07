@@ -44,7 +44,7 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 		_irrply = new PolynomialRCPrime(polynomial.polynomial(), _p, _thread);
 
 		if(! Algorithm.isIrreducible(_irrply)){
-			Object arguments[] = {_irrply};
+			Object[] arguments = {_irrply};
 			throw new FFaplAlgebraicException(arguments, IAlgebraicError.NOTIRREDUCIBLE);
 		}
 		_value = new PolynomialRCPrime(_p, _thread);
@@ -622,15 +622,17 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 		// for each distinct prime factor q...
 		for (Map.Entry<BigInteger, BigInteger> distinctPrime : factorsOfPMinusOne.entrySet()) {
 			// ... check if a^((p-1)/q) != 1
-			if (this.powR(pMinusOne.divide(distinctPrime.getKey())).value().isOne()) {
-				return false;
+			if (!distinctPrime.getKey().equals(ONE)) {
+				if (this.powR(pMinusOne.divide(distinctPrime.getKey())).value().isOne()) {
+					return false;
+				}
 			}
 		}
 
 		return true;
 	}
 
-	public GaloisField getPrimitiveRoot() throws FFaplException {
+	public GaloisField getPrimitiveRoot() throws FFaplAlgebraicException {
 
 		BigInteger p = this.characteristic(),
 				n = this.irrPolynomial().degree(),
@@ -651,12 +653,13 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 			// -> field element x is primitive
 			return x;
 		} else {
+			throw new FFaplAlgebraicException(new Object[0], IAlgebraicError.NOT_IMPLEMENTED);
+
 			// polynomial is not primitive. find one that is
-			PolynomialRCPrime f = Algorithm.getPrimitivePolynomial(p, n, factorsOfR, factorsOfPMinusOne, _thread);
+			//PolynomialRCPrime f = Algorithm.getPrimitivePolynomial(p, n, factorsOfR, factorsOfPMinusOne, _thread);
 
 			// then convert the element "x" from that field to this field
 			// TODO convert field elements
-			return null;
 		}
 	}
 }

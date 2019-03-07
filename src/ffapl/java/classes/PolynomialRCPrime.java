@@ -95,7 +95,7 @@ public class PolynomialRCPrime extends PolynomialRC {
 	 * @return true if f is a primitive polynomial mod p
 	 */
 	public boolean isPrimitivePolynomial(Map<BigInteger, BigInteger> factorsOfR, Map<BigInteger, BigInteger> factorsOfPMinusOne, Thread _thread)
-			throws FFaplException {
+			throws FFaplAlgebraicException {
 
 		BigInteger p = this.characteristic();
 		BigInteger n = this.degree();
@@ -127,7 +127,7 @@ public class PolynomialRCPrime extends PolynomialRC {
 		// [Step 4]
 		// apply berlekamp polynomial factorization to check for reducibility
 		// assert that the Q-matrix of f has a nullity less than 2 (nullity of two or greater implies reducibility)
-		if (this.findQMatrix(_thread).nullity(2) == 2)
+		if (this.getQMatrix(null, true, true, _thread).nullity(2) == 2)
 			return false;
 
 		// [Step 5]
@@ -149,11 +149,13 @@ public class PolynomialRCPrime extends PolynomialRC {
 
 		// [Step 7]
 		for (BigInteger factor : factorsOfR.keySet())
-			// skip test if p_i | (p-1) (divides)
-			if (!factor.mod(pMinusOne).equals(ZERO))
-				// otherwise, assert that x^(r/p_i) is not an integer
-				if (x.powR(r.divide(factor)).value().degree().compareTo(ZERO) == 0)
-					return false;
+			// skip if factor is one (factorization can return one as a prime factor)
+			if (factor.equals(ONE))
+				// skip test if p_i | (p-1) (divides)
+				if (!factor.mod(pMinusOne).equals(ZERO))
+					// otherwise, assert that x^(r/p_i) is not an integer
+					if (x.powR(r.divide(factor)).value().degree().compareTo(ZERO) == 0)
+						return false;
 
 		// [Step 8]
 		return true;

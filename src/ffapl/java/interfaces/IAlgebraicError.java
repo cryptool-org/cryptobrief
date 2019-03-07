@@ -108,9 +108,17 @@ public interface IAlgebraicError {
     public static final int EC_BASEFIELD_ERROR = 1130;
 
     public static final int EC_GET_PARAMETER_ERROR = 1131;
-	
-    public static final int NOT_IMPLEMENTED = 9999;
-	/** 
+
+	/** Field element is not primitive **/
+	public static final int NOT_PRIMITIVE = 1133;
+
+	/** Q-Matrix cannot be computed for degree or characteristic less than two **/
+	public static final int Q_MATRIX_DEGREE = 1134;
+
+	public static final int NOT_IMPLEMENTED = 9999;
+
+
+    /**
 	 * Return the compiler error number.
 	 * @return error number
 	 */
