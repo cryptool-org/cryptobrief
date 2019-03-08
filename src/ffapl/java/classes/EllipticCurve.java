@@ -1461,7 +1461,7 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 				if (subfield)
 					degree = ZERO;
 
-				this._x_gf = Algorithm.getRandomPolynomial(new BInteger(degree,_thread), new BInteger(_gf.characteristic(),_thread));
+				this._x_gf = Algorithm.getTrueRandomPolynomial(new BInteger(degree,_thread), new BInteger(_gf.characteristic(),_thread));
 				GaloisField b = _gf.clone();
 				GaloisField c = _gf.clone();
 				GaloisField d = _gf.clone();
@@ -1562,20 +1562,19 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 						TreeMap<Long, ResidueClass> solution = base.solve(bVector, true);
 
 						// the polynomial t, expressed through the base of the powers of alpha
-						TreeMap<Long, ResidueClass> tBaseform = new TreeMap<>();
+						TreeMap<Long, ResidueClass> tBaseForm = new TreeMap<>();
 						// t_0 is in {0,1}, choose one at random
 						ResidueClass t_i = new ResidueClass((new SecureRandom()).nextInt(2), 2);
 
+                        // t_i+1 = t_i + b_i+1
 						for (long i = 1; i <= n; i++) {
-
-							tBaseform.put(i, t_i);
-
-							// t_i+1 = t_i + b_i+1
+							tBaseForm.put(i, t_i);
 							t_i = t_i.addR(solution.getOrDefault(i, new ResidueClass(ZERO, TWO)));
 						}
 
 						// expand t into normal form by multiplying with the base
-						TreeMap<Long, ResidueClass> t = base.multiplyVectorLeft(tBaseform);
+                        // t = t_0 * alpha + t_1 * alpha^2 + t_2 * alpha^4 + .... + t_n-1 * alpha^2^n-1
+						TreeMap<Long, ResidueClass> t = base.multiplyVectorLeft(tBaseForm);
 						TreeMap<BigInteger, BigInteger> tMap = new TreeMap<>();
 
 						// transform t into needed format for cast to polynomial
@@ -1585,6 +1584,7 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 						GaloisField tField = new GaloisField(_gf.characteristic(), _gf.irrPolynomial(), _thread);
 						tField.setValue(new Polynomial(tMap, _thread));
 
+						// y = t*B(x)
 						_y_gf = tField.multR(b).value();
 
 						// TODO remove when done
