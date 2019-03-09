@@ -537,13 +537,15 @@ public class PolynomialRC extends Polynomial {
 
 		// second row are the coefficients of x^p
 		x._polynomialMap.forEach((BigInteger e, BigInteger c)
-				-> Q.set(2, e.add(ONE).longValue(), new ResidueClass(c, this.characteristic())));
+				-> Q.set(2, e.longValue() + 1, new ResidueClass(c, this.characteristic())));
+
 		// subtract identity matrix
-		Q.set(1, 1, Q.get(1, 1).subR(one));
+		if (subtractId)
+			Q.set(2, 2, Q.get(2, 2).subR(one));
 
 		// k-th row are the coefficients of x^(k-1)p
 		// (matrix indices start at 1)
-		for (long k = 3; k < this.degree().longValue(); k++) {
+		for (long k = 3; k <= this.degree().longValue(); k++) {
 			q = (PolynomialRC) q.multR(x);
 			q.mod(this);
 

@@ -110,7 +110,7 @@ public class PolynomialRCPrime extends PolynomialRC {
 		// [Step 2]
 		BigInteger a0 = this.coefficientAt(ZERO);
 		// a_0 * (-1)^n
-		BigInteger a0TimesMinusOneToTheN = (n.mod(TWO).compareTo(ZERO) == 0) ? a0 : a0.negate();
+		BigInteger a0TimesMinusOneToTheN = (n.mod(TWO).compareTo(ZERO) == 0) ? a0 : a0.negate().mod(p);
 		// create galois field element object with value
 		GaloisField tmpGF = new GaloisField(p, new Polynomial(1, 1, _thread), _thread);
 		tmpGF.setValue(new Polynomial(a0TimesMinusOneToTheN, ZERO, _thread));
@@ -127,7 +127,7 @@ public class PolynomialRCPrime extends PolynomialRC {
 		// [Step 4]
 		// apply berlekamp polynomial factorization to check for reducibility
 		// assert that the Q-matrix of f has a nullity less than 2 (nullity of two or greater implies reducibility)
-		if (this.getQMatrix(null, true, true, _thread).nullity(2) == 2)
+		if (this.getQMatrix(null, true, true, _thread).nullity(2) >= 2)
 			return false;
 
 		// [Step 5]
