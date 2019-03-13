@@ -138,7 +138,7 @@ public class PolynomialRCPrime extends PolynomialRC {
 		// x^r
 		GaloisField xToTheR = x.powR(r);
 		// assert that x^r === a, where a is an integer
-		if (xToTheR.value().degree().compareTo(ZERO) != 0)
+		if (!xToTheR.value().isConstant())
 			return false;
 
 		// [Step 6]
@@ -148,14 +148,20 @@ public class PolynomialRCPrime extends PolynomialRC {
 			return false;
 
 		// [Step 7]
-		for (BigInteger factor : factorsOfR.keySet())
+		for (BigInteger factor : factorsOfR.keySet()) {
+
 			// skip if factor is one (factorization can return one as a prime factor)
-			if (factor.equals(ONE))
-				// skip test if p_i | (p-1) (divides)
-				if (!factor.mod(pMinusOne).equals(ZERO))
+			if (!factor.equals(ONE)) {
+
+				// skip test if p_i | (p-1) <=> p-1 === 0 mod p_i
+				if (!pMinusOne.mod(factor).equals(ZERO)) {
+
 					// otherwise, assert that x^(r/p_i) is not an integer
-					if (x.powR(r.divide(factor)).value().degree().compareTo(ZERO) == 0)
+					if (x.powR(r.divide(factor)).value().isConstant())
 						return false;
+				}
+			}
+		}
 
 		// [Step 8]
 		return true;

@@ -527,7 +527,9 @@ public class Matrix<V extends IAlgebraicOperations<V>>
             // clear default values
             row.values().removeAll(Collections.singleton(this.getDefaultValue()));
 
-            return matrix.put(i, new TreeMap(row));
+            // diamond operator "<>" could be used here instead of "<Long, V>"
+            // but then this would be an unchecked assignment: 'java.util.TreeMap' to 'java.util.TreeMap<Long,V>'
+            return matrix.put(i, new TreeMap<Long, V>(row));
         }
 
         return null;

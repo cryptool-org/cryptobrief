@@ -620,10 +620,13 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 			factorsOfPMinusOne = Algorithm.FactorInteger(new BInteger(pMinusOne, _thread));
 
 		// for each distinct prime factor q...
-		for (Map.Entry<BigInteger, BigInteger> distinctPrime : factorsOfPMinusOne.entrySet()) {
-			// ... check if a^((p-1)/q) != 1
-			if (!distinctPrime.getKey().equals(ONE)) {
-				if (this.powR(pMinusOne.divide(distinctPrime.getKey())).value().isOne()) {
+		for (BigInteger distinctPrime : factorsOfPToTheNMinusOne) {
+
+			// ... that is not one ...
+			if (!distinctPrime.equals(ONE)) {
+
+				// ... check if a^((p^n-1)/q) != 1
+				if (this.powR(pToTheNMinusOne.divide(distinctPrime)).value().isOne()) {
 					return false;
 				}
 			}

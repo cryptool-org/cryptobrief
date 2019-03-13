@@ -78,7 +78,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	public Polynomial(String s, Thread thread) throws FFaplAlgebraicException {
 		this(thread);
 		ArrayList<Polynomial> list = extractValuesfromString(s);
-		System.out.println(list.toString());
+		//System.out.println(list.toString());
 		for(Polynomial p : list){
 			add(p);
 		}
@@ -87,9 +87,9 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	private ArrayList<Polynomial> extractValuesfromString(String s) throws FFaplAlgebraicException {
 		
 		ArrayList<Polynomial> list = new ArrayList<>();
-		System.out.println("Wert der übergeben wurde: " +s);
+		//System.out.println("Wert der übergeben wurde: " +s);
 		String withoutSquareB = s.replaceAll("\\[|\\]", "");
-		System.out.println(withoutSquareB);
+		//System.out.println(withoutSquareB);
                 //split at "+"
 		String[] d = withoutSquareB.trim().split("\\+");
                 //split at "-"
@@ -109,7 +109,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
                 minusSplit.toArray(d);
                 
 		for(int i = 0; i < d.length; i++){
-			System.out.println(d[i]);
+			//System.out.println(d[i]);
 			if(d[i].contains("x")){
 				int index = d[i].indexOf("x");
 				long c = 1, e = 1;
@@ -157,7 +157,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 
 	/**
 	 * Cleans up the polynomials exponent -> coefficient map,
-	 * removing any coefficients that are zero.
+	 * removing any coefficients that equal to zero.
 	 *
 	 * @return true if any zero-valued coefficients were removed
 	 */
@@ -391,7 +391,8 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	 * @return
 	 */
 	public boolean isMonic(){
-		return this._polynomialMap.get(this.degree()).equals(ONE);
+		clearZeroCoefficients();
+		return ONE.equals(this._polynomialMap.lastEntry().getValue());
 	}
 	
 	/**
@@ -408,15 +409,16 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	 * @return
 	 */
 	public boolean isOne(){
+		return this.isMonic() && this.isConstant();
+	}
+
+	/**
+	 * Returns true if polynomial is constant, i.e. has degree 0.
+	 * @return
+	 */
+	public boolean isConstant() {
 		clearZeroCoefficients();
-		if( _polynomialMap.keySet().size() == 1){
-			if (this._polynomialMap.containsKey(ZERO)){
-				if(this._polynomialMap.get(ZERO).equals(ONE)){
-					return true;
-				}
-			}
-		}
-		return false;
+		return ZERO.equals(degree());
 	}
 	
 	/**
