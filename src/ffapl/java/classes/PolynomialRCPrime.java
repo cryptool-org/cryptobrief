@@ -111,12 +111,9 @@ public class PolynomialRCPrime extends PolynomialRC {
 		BigInteger a0 = this.coefficientAt(ZERO);
 		// a_0 * (-1)^n
 		BigInteger a0TimesMinusOneToTheN = (n.mod(TWO).compareTo(ZERO) == 0) ? a0 : a0.negate().mod(p);
-		// create galois field element object with value
-		GaloisField tmpGF = new GaloisField(p, new Polynomial(1, 1, _thread), _thread);
-		tmpGF.setValue(new Polynomial(a0TimesMinusOneToTheN, ZERO, _thread));
 
 		// assert that a_0 * (-1)^n is a primitive root of p
-		if (!tmpGF.isPrimitiveRoot(factorsOfPMinusOne))
+		if (!(new ResidueClass(a0TimesMinusOneToTheN, p).isPrimitiveRoot(factorsOfPMinusOne)))
 			return false;
 
 		// [Step 3]

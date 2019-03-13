@@ -5,10 +5,14 @@ import ffapl.java.exception.FFaplAlgebraicException;
 import ffapl.java.interfaces.IAlgebraicError;
 import ffapl.java.interfaces.IAlgebraicOperations;
 import ffapl.java.interfaces.IJavaType;
+import ffapl.java.math.Algorithm;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import static java.math.BigInteger.*;
 
 /**
  * @author Alexander Ortner
@@ -464,4 +468,37 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
         power.pow(exponent);
         return power;
     }
+
+	/**
+	 * Checks whether a is a primitive root in Z_p
+	 * by checking for each distinct prime factor {@code q} of {@code p-1}
+	 * if a<sup>(p-1)/q</sup> != 1 (mod p)
+	 *
+	 * @return true, if a is a primitive value of p
+	 */
+	public boolean isPrimitiveRoot(Map<BigInteger, BigInteger> factorsOfPMinusOne)
+			throws FFaplAlgebraicException {
+
+		// zero is not a primitive root
+		if (this._value == null || this._value.equals(ZERO))
+			return false;
+
+		BigInteger pMinusOne = this.modulus().subtract(ONE);
+
+		// factor p-1 (if not already supplied by callee)
+		if (factorsOfPMinusOne == null)
+			factorsOfPMinusOne = Algorithm.FactorInteger(new BInteger(pMinusOne, _thread));
+
+		// for each distinct prime factor q...
+		for (BigInteger factor : factorsOfPMinusOne.keySet()) {
+			// ... check if a^((p-1)/q) != 1
+			if (!factor.equals(ONE)) {
+				if (this.powR(pMinusOne.divide(factor))._value.equals(ONE)) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
 }

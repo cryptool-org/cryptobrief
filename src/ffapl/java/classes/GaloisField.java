@@ -11,11 +11,11 @@ import ffapl.java.interfaces.IJavaType;
 import ffapl.java.math.Algorithm;
 
 import java.math.BigInteger;
-import java.util.Map;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.TreeMap;
 
-import static java.math.BigInteger.ONE;
-import static java.math.BigInteger.ZERO;
+import static java.math.BigInteger.*;
 
 /**
  * @author Alexander Ortner
@@ -600,24 +600,34 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
     }
 
 	/**
-	 * Checks whether a is a primitive root (primitive element) in GF(p^n)
-	 * by checking for each distinct prime factor {@code q} of {@code p-1}
-	 * if a<sup>(p-1)/q</sup> != 1 (mod p)
+	 * Checks whether a is a primitive root (primitive element) in GF(p<sup>n</sup>)
+	 * by checking for each distinct prime factor q of p<sup>n</sup>-1
+	 * if a<sup>(p^n-1)/q</sup> != 1 (mod p)
 	 *
+     * @param factorsOfPToTheNMinusOne the distinct prime factors of p^n-1
      * @return true, if a is a primitive value of p
      */
-    public boolean isPrimitiveRoot(Map<BigInteger, BigInteger> factorsOfPMinusOne)
+    public boolean isPrimitiveRoot(Set<BigInteger> factorsOfPToTheNMinusOne)
             throws FFaplAlgebraicException {
 
         // zero is not a primitive root
         if (this.value().isZero())
             return false;
 
-        BigInteger pMinusOne = this.characteristic().subtract(ONE);
+        BigInteger n = this._irrply.degree();
+        BigInteger p = this.characteristic();
 
-        // factor p-1 (if not already supplied by callee)
-		if (factorsOfPMinusOne == null)
-			factorsOfPMinusOne = Algorithm.FactorInteger(new BInteger(pMinusOne, _thread));
+        // in GF(2) the element '1' is the only primitive element
+		// as it is the only element in the multiplicative group
+        if (p.equals(TWO) && n.equals(ONE))
+        	return this.value().isOne();
+
+        // p^n - 1 is the size of the multiplicative group, every element (except zero) to this power is one
+        BigInteger pToTheNMinusOne = p.pow(n.intValueExact()).subtract(ONE);
+
+        // factor p^n-1 (if not already supplied by callee)
+		if (factorsOfPToTheNMinusOne == null)
+			factorsOfPToTheNMinusOne = Algorithm.FactorInteger(new BInteger(pToTheNMinusOne, _thread)).keySet();
 
 		// for each distinct prime factor q...
 		for (BigInteger distinctPrime : factorsOfPToTheNMinusOne) {
@@ -639,30 +649,43 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 
 		BigInteger p = this.characteristic(),
 				n = this.irrPolynomial().degree(),
-				r = p.pow(n.intValue()).subtract(ONE).divide(p.subtract(ONE));
+				r = p.pow(n.intValueExact()).subtract(ONE).divide(p.subtract(ONE));
 
-		// factorize r, if necessary
+		// factorize r
 		TreeMap<BigInteger, BigInteger> factorsOfR = Algorithm.FactorInteger(new BInteger(r, _thread));
 		// factorize p-1
 		TreeMap<BigInteger, BigInteger> factorsOfPMinusOne = Algorithm.FactorInteger(new BInteger(p.subtract(ONE), _thread));
+		// determine factors of p^n-1 (merge factors of r=(p^n-1)/(p-1) with factors of p-1)
+		LinkedHashSet<BigInteger> factorsOfPToTheNMinusOne = new LinkedHashSet<>(factorsOfR.keySet());
+		factorsOfPToTheNMinusOne.addAll(factorsOfPMinusOne.keySet());
 
 		// create instance with value "x"
-		GaloisField x = new GaloisField(p, this.irrPolynomial(), _thread);
+		GaloisField prim = new GaloisField(p, this.irrPolynomial(), _thread);
 		// x = 1 * x^1
-		x.setValue(new Polynomial(ONE, ONE, _thread));
+		prim.setValue(new Polynomial(ONE, ONE, _thread));
 
 		if (this.irrPolynomial().isPrimitivePolynomial(factorsOfR, factorsOfPMinusOne, _thread)) {
 			// the irreducible polynomial of this field is primitive
 			// -> field element x is primitive
-			return x;
+			return prim;
 		} else {
+
+		    // find a primitive root, try random ones until one fits
+		    do {
+		        prim.setValue(Algorithm.getTrueRandomPolynomial(new BInteger(n, _thread), new BInteger(p, _thread)));
+            } while (!prim.isPrimitiveRoot(factorsOfPToTheNMinusOne));
+
+		    return prim;
+
+			/*
 			throw new FFaplAlgebraicException(new Object[0], IAlgebraicError.NOT_IMPLEMENTED);
 
 			// polynomial is not primitive. find one that is
-			//PolynomialRCPrime f = Algorithm.getPrimitivePolynomial(p, n, factorsOfR, factorsOfPMinusOne, _thread);
+			PolynomialRCPrime f = Algorithm.getPrimitivePolynomial(p, n, factorsOfR, factorsOfPMinusOne, _thread);
 
 			// then convert the element "x" from that field to this field
 			// TODO convert field elements
+			*/
 		}
 	}
 }
