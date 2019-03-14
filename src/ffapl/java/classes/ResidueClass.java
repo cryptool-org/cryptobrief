@@ -31,7 +31,7 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 	 */
 	public ResidueClass(BigInteger modulus) throws FFaplAlgebraicException{
 		_modulus = modulus;
-		_value = BigInteger.ZERO;
+		_value = ZERO;
                 if (modulus.signum() < 1)
                 {
                         Object[] arguments ={};
@@ -45,7 +45,7 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 	 * @param modulus
 	 */
 	public ResidueClass(long modulus) throws FFaplAlgebraicException{
-		this(BigInteger.valueOf(modulus));
+		this(valueOf(modulus));
 	}
 
 	/**
@@ -64,7 +64,7 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 	 * @param modulus
 	 */
 	public ResidueClass(long value, long modulus){
-		this(BigInteger.valueOf(value), BigInteger.valueOf(modulus));
+		this(valueOf(value), valueOf(modulus));
 	}
 
 	public ResidueClass() {
@@ -198,10 +198,10 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 	public void pow(BigInteger value) throws FFaplAlgebraicException{
 		//Algorithm from Montgomery Powering Ladder
 		List<Byte> v  = toByteList(value.abs());
-     	BigInteger r0 = BigInteger.ONE;
+     	BigInteger r0 = ONE;
 		BigInteger r1;
 
-		if(value.compareTo(BigInteger.ZERO) <= 0){
+		if(value.compareTo(ZERO) <= 0){
 			 r1 = this.inverse().value();
 		}else{
 			 r1 = _value;
@@ -226,7 +226,7 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 	 * @throws FFaplAlgebraicException
 	 */
 	public void pow(long value) throws FFaplAlgebraicException{
-		this.pow(BigInteger.valueOf(value));
+		this.pow(valueOf(value));
 	}
 
 	/**
@@ -353,7 +353,7 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 	 */
 	public void mod(ResidueClass rc) throws FFaplAlgebraicException {
 		if(this.isCompatibleTo(rc)){
-			if((rc.value()).compareTo(BigInteger.ZERO) <= 0){
+			if((rc.value()).compareTo(ZERO) <= 0){
 				Object[] arguments = {_value + " " +
 						FFaplInterpreter.tokenImage[FFaplInterpreter.MODULO].replace("\"", "") + " " + rc.value(), rc.value()};
 				throw new FFaplAlgebraicException(arguments, IAlgebraicError.VAL_LESS_EQUAL_ZERO);

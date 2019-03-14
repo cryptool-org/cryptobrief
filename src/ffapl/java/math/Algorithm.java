@@ -827,7 +827,7 @@ public class Algorithm {
 		GaloisField l;
 		Thread thread = f.getThread();
 		//TODO check irreducible
-		if(f.degree().compareTo(ONE) < 0 && !f.isMonic() && !isIrreducible(f)){
+		if(f.degree().compareTo(ONE) < 0 || !f.isMonic() || !isIrreducible(f)){
 			//degree must be >= 1
 			return false;
 		}

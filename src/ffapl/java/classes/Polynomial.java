@@ -610,51 +610,50 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	 * @return
 	 */
 	public static String plyToString(Polynomial ply){
-		BigInteger e, c;
 		TreeMap<BigInteger, BigInteger> polynomialTable = ply.polynomial();
-		String str = "" , tmp = "";
+		StringBuilder stringBuilder = new StringBuilder();
 		//int counter = 1;
 		//int max = Integer.MAX_VALUE;//max character in a line;
-		if( polynomialTable.keySet().size() > 0){	
-			for(Iterator<BigInteger> itr = polynomialTable.keySet().iterator(); itr.hasNext(); ){   	
-		    	e = itr.next();
-		    	c = polynomialTable.get(e);
-		    	//if(str.length() > counter * max){
-		    	//	str = str + "\n";
-		    	//	counter ++;//reset counter
-		    	//}
-		    	if(c.compareTo(ZERO) < 0){
-		    		if(! str.equals("")){
-			    		//negative coefficient
-			    		str = str + " - ";
-		    		}else{
-		    			str = str + " -";
-		    		}
-		    	}else{
-		    		if(! str.equals("")){
-		    		//positive coeffiecient
-		    			str = str + " + ";
-		    		}
-		    	}
-		    	tmp = "";
-		    	if(! e.equals(ZERO)){
-		    		if(! e.equals(ONE)){
-		    			tmp = "x^" + e;
-		    		}else{
-		    			tmp = "x";
-		    		}
-		    	}
-		    	if(! (c.abs().equals(ONE) && !e.equals(ZERO))){
-		    		tmp = c.abs() + tmp;
-		    	}
-		    	
-		    	str = str + tmp;
-		    }
+		if( polynomialTable.keySet().size() > 0){
+			for (BigInteger e : polynomialTable.keySet()) {
+				BigInteger c = polynomialTable.get(e);
+				//if(str.length() > counter * max){
+				//	str = str + "\n";
+				//	counter ++;//reset counter
+				//}
+				if (c.compareTo(ZERO) < 0) {
+					if (stringBuilder.length() != 0) {
+						//negative coefficient
+						stringBuilder.append(" - ");
+					} else {
+						stringBuilder.append(" -");
+					}
+				} else {
+					if (stringBuilder.length() != 0) {
+						//positive coeffiecient
+						stringBuilder.append(" + ");
+					}
+				}
+
+				// only print coefficient if it is not one, except for x^0
+				if (!c.abs().equals(ONE) || e.equals(ZERO)) {
+					stringBuilder.append(c.abs());
+				}
+
+				if (!e.equals(ZERO)) {
+					if (!e.equals(ONE)) {
+						stringBuilder.append("x^").append(e);
+					} else {
+						stringBuilder.append("x");
+					}
+				}
+			}
+
+			return stringBuilder.toString();
 		}else{
 			//Polynom is Zero
-			str = "0";
+			return "0";
 		}
-		return str;
 	}
 
 	@Override

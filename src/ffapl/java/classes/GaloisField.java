@@ -435,7 +435,7 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 			throw new FFaplAlgebraicException(arguments, IAlgebraicError.NO_MULTINVERSE);
 		}
 
-		tmp = (PolynomialRC[]) Algorithm.eea(val.value(), val.irrPolynomial());
+		tmp = Algorithm.eea(val.value(), val.irrPolynomial());
 		//tmp = [d, s, t] .... d = s*g + t*h
 		if(! tmp[0].isOne()){
 			//d <> 1

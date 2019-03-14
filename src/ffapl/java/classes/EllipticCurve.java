@@ -1447,206 +1447,220 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 
 
 
-	public void setRandomPoint(boolean subfield) throws FFaplAlgebraicException
+	public boolean setRandomPoint(boolean subfield) throws FFaplAlgebraicException
 	{
-		if (!this.parametersSet()) return;
+		if (!this.parametersSet()) return false;
 		this._isPAI = false;
 
+		//RC
+		if (this.isGf())
+			return this.setRandomPointGF(subfield);
+		else //RC
+			return this.setRandomPointRC();
+	}
 
-		do
-		{
-			if (this.isGf())
-			{
-				BigInteger degree = _gf.irrPolynomial().degree().subtract(ONE);
-				if (subfield)
-					degree = ZERO;
+	private boolean setRandomPointGF(boolean subfield) throws FFaplAlgebraicException {
 
-				this._x_gf = Algorithm.getTrueRandomPolynomial(new BInteger(degree,_thread), new BInteger(_gf.characteristic(),_thread));
-				GaloisField b = _gf.clone();
-				GaloisField c = _gf.clone();
-				GaloisField d = _gf.clone();
-				GaloisField foo = _gf.clone();
+		BigInteger degree = _gf.irrPolynomial().degree().subtract(ONE);
+		if (subfield)
+			degree = ZERO;
+		long n = degree.longValueExact() + 1;
 
-				c.setValue(new Polynomial(0,0, _thread));
+		// create galois field element with values zero and one, needed later
+		GaloisField zero = _gf.clone();
+		zero.setValue(new Polynomial(_thread));
+		GaloisField one = _gf.clone();
+		one.setValue(new Polynomial(1, 0, _thread));
 
-				foo.setValue(_x_gf);
-				foo.pow(3);
-				c.subtract(foo); //-x^3
+		// precalculate values for char 2, so they dont have to be calculated each loop cycle
+		Matrix<ResidueClass> base = null;
 
-				foo.setValue(_x_gf);
-				foo.pow(2); //x^2
-				foo.multiply(_a2_gf); //a_2*x^2
-				c.subtract(foo); //-x^3-a_2*x^2
+		if (this._gf.characteristic().equals(TWO)) {
+			// get a primitive root of this field
+			GaloisField alpha = _gf.getPrimitiveRoot();
+			// from it, create a base of this field as matrix of base vectors (vertical)
+			base = new Matrix<>(n, n, new ResidueClass(ZERO, TWO));
+			// matrix indices start at 1
+			for (long j = 1; j <= n; j++) {
+				TreeMap<BigInteger, BigInteger> tmp = alpha.value()._polynomialMap;
 
-				foo.setValue(_x_gf);
-				foo.multiply(_a4_gf);
-				c.subtract(foo); //-x^3-a_2*x^2-a_4*x
+				// put vector representation of alpha^2^j in the matrix at row j
+				for (Map.Entry<BigInteger, BigInteger> entry : tmp.entrySet())
+					base.set(entry.getKey().longValue() + 1, j, new ResidueClass(entry.getValue(), TWO));
 
-				c.subtract(_a6_gf); //-x^3-a_2*x^2-a_4*x-a_6
+				// alpha = alpha^2 => in step j alpha is alpha^2^j
+				alpha = alpha.multR(alpha);
 
-				b.setValue(_x_gf);
-				b.multiply(_a1_gf);
-				b.add(_a3_gf);
-
-
-
-
-				if (_gf.characteristic().equals(TWO))
-				{
-				    if (_gf.irrPolynomial().isOne()) {
-				    	// check the four trivial cases
-						Polynomial[] p = {new Polynomial(_thread),
-								new Polynomial(1, 0, _thread)};
-
-						for (int i = 0; i <= 1; i++) {
-							for (int j = 0; j <= 1; j++) {
-								_x_gf = p[i];
-								_y_gf = p[j];
-								if (weierstrassEquationIsValid())
-									return;
-							}
-						}
-
-						return;
-						// throw exception (would need to change some code, as new exceptions will be thrown)
-					}
-
-					// create galois field element with values zero and one, needed for matching later
-					GaloisField zero = new GaloisField(TWO, _gf.irrPolynomial(), _thread);
-					GaloisField one = new GaloisField(TWO, _gf.irrPolynomial(), _thread);
-					one.setValue(new Polynomial(1, 0, _thread));
-
-					if (b.equals(zero)) {
-						// B(x) == 0, thus y = +- sqrt( -C(x) )
-
-						throw new FFaplAlgebraicException(null, IAlgebraicError.NOT_IMPLEMENTED);
-
-					} else {
-						// B(x) != 0
-
-						// lowercase b variable used in the thesis
-						GaloisField b_ = c.divR(b.multR(b));
-						// generator
-						GaloisField alpha = _gf.getPrimitiveRoot();
-
-						long n = degree.longValueExact() + 1;
-
-						// create base as matrix of base vectors (vertical)
-						Matrix<ResidueClass> base = new Matrix<>(n, n, new ResidueClass(ZERO, TWO));
-
-						// matrix indices start at 1
-						for (long j = 1; j <= n; j++) {
-
-							TreeMap<BigInteger, BigInteger> tmp = alpha.value()._polynomialMap;
-
-							// put vector representation of alpha^2^j in the matrix at row j
-							for (Map.Entry<BigInteger, BigInteger> entry : tmp.entrySet()) {
-								base.set(entry.getKey().longValue() + 1, j, new ResidueClass(entry.getValue(), TWO));
-							}
-
-							// alpha = alpha^2 => in step j alpha is alpha^2^j
-							alpha = alpha.multR(alpha);
-
-							// if alpha^j == 1 for j<n, alpha is not primitive
-							if (alpha.equals(one))
-								throw new FFaplAlgebraicException(new Object[0], IAlgebraicError.NOT_PRIMITIVE);
-						}
-
-						// prepare vector p as "right side" of Ax=b system of linear equations
-						TreeMap<Long, ResidueClass> bVector = new TreeMap<>();
-						for (Map.Entry<BigInteger, BigInteger> entry : b_.value()._polynomialMap.entrySet())
-							// offset +1 for keys, as matrix indices start at one
-							bVector.put(entry.getKey().longValue() + 1, new ResidueClass(entry.getValue(), TWO));
-
-						// solve base * s = b (as a classic system of linear equations)
-						TreeMap<Long, ResidueClass> solution = base.solve(bVector, true);
-
-						// the polynomial t, expressed through the base of the powers of alpha
-						TreeMap<Long, ResidueClass> tBaseForm = new TreeMap<>();
-						// t_0 is in {0,1}, choose one at random
-						ResidueClass t_i = new ResidueClass((new SecureRandom()).nextInt(2), 2);
-
-                        // t_i+1 = t_i + b_i+1
-						for (long i = 1; i <= n; i++) {
-							tBaseForm.put(i, t_i);
-							t_i = t_i.addR(solution.getOrDefault(i, new ResidueClass(ZERO, TWO)));
-						}
-
-						// expand t into normal form by multiplying with the base
-                        // t = t_0 * alpha + t_1 * alpha^2 + t_2 * alpha^4 + .... + t_n-1 * alpha^2^n-1
-						TreeMap<Long, ResidueClass> t = base.multiplyVectorLeft(tBaseForm);
-						TreeMap<BigInteger, BigInteger> tMap = new TreeMap<>();
-
-						// transform t into needed format for cast to polynomial
-						// (matrix indices start at one)
-						t.forEach((index, item) -> tMap.put(valueOf(index - 1), item.value()));
-
-						GaloisField tField = new GaloisField(_gf.characteristic(), _gf.irrPolynomial(), _thread);
-						tField.setValue(new Polynomial(tMap, _thread));
-
-						// y = t*B(x)
-						_y_gf = tField.multR(b).value();
-
-						// TODO remove when done
-						//throw new FFaplAlgebraicException(new Object[0], IAlgebraicError.NOT_IMPLEMENTED);
-					}
-				}
-				else //Charakteristik != 2
-				{
-					d.setValue(b.value());
-					d.pow(2);
-					d.divide(new BigInteger("4"));
-					d.subtract(c); //b^2/4 - c
-
-
-					d.setValue(Algorithm.sqrt(d).value());
-
-
-
-					foo.setValue(b.value());
-					foo.divide(new BigInteger("2"));
-					foo = foo.negate();
-
-					if (new RNG_Placebo(ZERO, ONE, _thread).next().equals(ONE))
-					{
-						foo.add(d);
-					}
-					else
-					{
-						foo.subtract(d);
-					}
-
-					this._y_gf = foo.value();
-				}
-
+				// if alpha^j == 1 for j<n, alpha is not primitive (*should* not happen)
+				if (alpha.equals(one))
+					throw new FFaplAlgebraicException(new Object[0], IAlgebraicError.NOT_PRIMITIVE);
 			}
-			else //RC
+			base.prepareForSolving();
+		}
+
+		// loop until a valid point is found
+		do {
+
+			this._x_gf = Algorithm.getTrueRandomPolynomial(new BInteger(degree,_thread), new BInteger(_gf.characteristic(),_thread));
+			GaloisField b = _gf.clone();
+			GaloisField c = _gf.clone();
+			GaloisField d = _gf.clone();
+			GaloisField foo = _gf.clone();
+
+			c.setValue(new Polynomial(0,0, _thread));
+
+			foo.setValue(_x_gf);
+			foo.pow(3);
+			c.subtract(foo); //-x^3
+
+			foo.setValue(_x_gf);
+			foo.pow(2); //x^2
+			foo.multiply(_a2_gf); //a_2*x^2
+			c.subtract(foo); //-x^3-a_2*x^2
+
+			foo.setValue(_x_gf);
+			foo.multiply(_a4_gf);
+			c.subtract(foo); //-x^3-a_2*x^2-a_4*x
+
+			c.subtract(_a6_gf); //-x^3-a_2*x^2-a_4*x-a_6
+
+			b.setValue(_x_gf);
+			b.multiply(_a1_gf);
+			b.add(_a3_gf);
+
+			// char 2
+			if (_gf.characteristic().equals(TWO)) {
+
+				// in case of GF(2^1) = Z_2
+				if (_gf.irrPolynomial().isOne()) {
+					// check the four trivial cases
+					Polynomial[] p = {new Polynomial(_thread),
+							new Polynomial(1, 0, _thread)};
+
+					for (int i = 0; i <= 1; i++) {
+						for (int j = 0; j <= 1; j++) {
+							_x_gf = p[i];
+							_y_gf = p[j];
+							if (weierstrassEquationIsValid())
+								return true;
+							else
+								return false;
+//								throw new FFaplAlgebraicException(new Object[0], IAlgebraicError.NOT_IMPLEMENTED);
+						}
+					}
+
+					return false;
+					// throw exception (would need to change some code, as new exceptions will be thrown)
+				}
+
+				if (b.equals(zero)) {
+					// B(x) == 0, thus y = +- sqrt( -C(x) )
+					_y_gf = Algorithm.sqrt(c.negate()).value();
+					if ((new SecureRandom()).nextInt(2) == 1)
+						_y_gf.negate();
+
+					if (weierstrassEquationIsValid())
+						return true;
+					else
+						return false;
+//						throw new FFaplAlgebraicException(new Object[0], IAlgebraicError.NOT_IMPLEMENTED);
+
+				} else {
+					// B(x) != 0
+
+					// lowercase b variable used in the thesis
+					GaloisField b_ = c.divR(b.multR(b));
+
+					// prepare vector p as "right side" of Ax=b system of linear equations
+					TreeMap<Long, ResidueClass> bVector = new TreeMap<>();
+					for (Map.Entry<BigInteger, BigInteger> entry : b_.value()._polynomialMap.entrySet())
+						// offset +1 for keys, as matrix indices start at one
+						bVector.put(entry.getKey().longValue() + 1, new ResidueClass(entry.getValue(), TWO));
+
+					// solve base * s = b (as a classic system of linear equations)
+					// (warning as base is precalculated in an if block)
+					TreeMap<Long, ResidueClass> solution = base.solve(bVector, true);
+
+					// the polynomial t, expressed through the base of the powers of alpha
+					TreeMap<Long, ResidueClass> tBaseForm = new TreeMap<>();
+					// t_0 is in {0,1}, choose one at random
+					ResidueClass t_i = new ResidueClass((new SecureRandom()).nextInt(2), 2);
+
+					// t_i+1 = t_i + b_i+1
+					for (long i = 1; i <= n; i++) {
+						tBaseForm.put(i, t_i);
+						t_i = t_i.addR(solution.getOrDefault(i, new ResidueClass(ZERO, TWO)));
+					}
+
+					// expand t into normal form by multiplying with the base
+					// t = t_0 * alpha + t_1 * alpha^2 + t_2 * alpha^4 + .... + t_n-1 * alpha^2^n-1
+					TreeMap<Long, ResidueClass> t = base.multiplyVectorLeft(tBaseForm);
+					TreeMap<BigInteger, BigInteger> tMap = new TreeMap<>();
+
+					// transform t into needed format for cast to polynomial
+					// (matrix indices start at one)
+					t.forEach((index, item) -> tMap.put(valueOf(index - 1), item.value()));
+
+					GaloisField tField = new GaloisField(_gf.characteristic(), _gf.irrPolynomial(), _thread);
+					tField.setValue(new Polynomial(tMap, _thread));
+
+					// y = t*B(x)
+					_y_gf = tField.multR(b).value();
+				}
+			}
+			else //Charakteristik != 2
 			{
-				BigInteger b,c,d;
-				this._x_rc = new BInteger(new RNG_Placebo(this._rc.modulus(), _thread).next(),_thread);
-				b = _a1_rc.multiply(_x_rc).add(_a3_rc);
-				c = _x_rc.pow(3).add(_a2_rc.multiply(_x_rc.pow(2))).add(_a4_rc.multiply(_x_rc)).add(_a6_rc);
+				d.setValue(b.value());
+				d.pow(2);
+				d.divide(new BigInteger("4"));
+				d.subtract(c); //b^2/4 - c
 
-				d = b.pow(2).divide(new BigInteger("4")).add(c);
-				d = d.mod(_rc.modulus());
 
-				if (new RNG_Placebo(ZERO, ONE,_thread).next().equals(ONE))
+				d.setValue(Algorithm.sqrt(d).value());
+
+
+
+				foo.setValue(b.value());
+				foo.divide(new BigInteger("2"));
+				foo = foo.negate();
+
+				if (new RNG_Placebo(ZERO, ONE, _thread).next().equals(ONE))
 				{
-					this._y_rc = new BInteger(b.divide(new BInteger("2",_thread)).negate().add(Algorithm.sqrtMod(d, _rc.modulus(),false)),_thread);
+					foo.add(d);
 				}
 				else
 				{
-					this._y_rc = new BInteger(b.divide(new BigInteger("2")).negate().subtract(Algorithm.sqrtMod(d, _rc.modulus(),false)),_thread);
+					foo.subtract(d);
 				}
-				this._y_rc = new BInteger(this._y_rc.mod(_rc.modulus()),_thread);
+
+				this._y_gf = foo.value();
 			}
-		}
-		while (!weierstrassEquationIsValid() || ( this._isGf && subfield && this._y_gf.degree().intValue() > 0));
 
+		} while (!weierstrassEquationIsValid() || (subfield && !this._y_gf.isConstant()));
 
+		return true;
 	}
 
+	private boolean setRandomPointRC() throws FFaplAlgebraicException {
+		do {
+			BigInteger b, c, d;
+			this._x_rc = new BInteger(new RNG_Placebo(this._rc.modulus(), _thread).next(), _thread);
+			b = _a1_rc.multiply(_x_rc).add(_a3_rc);
+			c = _x_rc.pow(3).add(_a2_rc.multiply(_x_rc.pow(2))).add(_a4_rc.multiply(_x_rc)).add(_a6_rc);
 
+			d = b.pow(2).divide(valueOf(4)).add(c);
+			d = d.mod(_rc.modulus());
+
+			if (new RNG_Placebo(ZERO, ONE, _thread).next().equals(ONE)) {
+				this._y_rc = new BInteger(b.divide(TWO).negate().add(Algorithm.sqrtMod(d, _rc.modulus(), false)), _thread);
+			} else {
+				this._y_rc = new BInteger(b.divide(TWO).negate().subtract(Algorithm.sqrtMod(d, _rc.modulus(), false)), _thread);
+			}
+			this._y_rc = new BInteger(this._y_rc.mod(_rc.modulus()), _thread);
+		} while (!weierstrassEquationIsValid());
+
+		return true;
+	}
 
 	public BigInteger getOrder() throws FFaplAlgebraicException
 	{
