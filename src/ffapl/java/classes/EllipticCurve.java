@@ -6,7 +6,6 @@ import ffapl.java.interfaces.IJavaType;
 import ffapl.java.math.Algorithm;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -474,7 +473,7 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 				bar = new Polynomial(0,0,_thread);
 
 				bar.add(this._x_gf); //x1
-				bar.pow(new BigInteger("2")); //x1^2
+				bar.pow(TWO); //x1^2
 				bar.multiply(new Polynomial(3,0,_thread)); //3*x1^2
 
 
@@ -528,15 +527,15 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 				bar = new Polynomial(0,0,_thread);
 
 				bar = this._x_gf.clone();
-				bar.pow(new BigInteger("3"));
-				bar.multiply(new BigInteger("-1"), ZERO);
+				bar.pow(valueOf(3));
+				bar.multiply(valueOf(-1), ZERO);
 
 				nu.add(bar);
 				bar = this._a4_gf.clone();
 				bar.multiply(this._x_gf);
 				nu.add(bar);
 				bar = this._a6_gf.clone();
-				bar.multiply(new BigInteger("2"), ZERO);
+				bar.multiply(TWO, ZERO);
 				nu.add(bar);
 				bar = this._a3_gf.clone();
 				bar.multiply(this._y_gf);
@@ -544,7 +543,7 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 
 
 				nu1 = this._y_gf.clone();
-				nu1.multiply(new BigInteger("2"), ZERO);
+				nu1.multiply(TWO, ZERO);
 				bar = this._a1_gf.clone();
 				bar.multiply(this._x_gf);
 				nu1.add(bar);
@@ -593,7 +592,7 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 
 
 			x3 = l.clone();
-			x3.pow(new BigInteger("2"));
+			x3.pow(TWO);
 
 			bar = l.clone();
 			bar.multiply(this._a1_gf);
@@ -606,7 +605,7 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 
 			y3 = l.clone();
 			y3.add(this._a1_gf);
-			y3.multiply(new BigInteger("-1"), ZERO);
+			y3.multiply(valueOf(-1), ZERO);
 			y3.multiply(x3);
 			y3.subtract(nu);
 			y3.subtract(this._a3_gf);
@@ -672,12 +671,12 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 			}
 			else if (this._x_rc.equals(ec._x_rc))
 			{
-				l = l.add(this._x_rc).pow(2).multiply(new BigInteger("3"));
-				l = l.add(this._x_rc.multiply(_a2_rc).multiply(new BigInteger("2")));
+				l = l.add(this._x_rc).pow(2).multiply(valueOf(3));
+				l = l.add(this._x_rc.multiply(_a2_rc).multiply(TWO));
 				l = l.add(this._a4_rc);
 				l = l.subtract(this._a1_rc.multiply(this._y_rc));
 
-				l1 = l1.add(this._y_rc.multiply(new BigInteger("2")));
+				l1 = l1.add(this._y_rc.multiply(TWO));
 				l1 = l1.add(this._a1_rc.multiply(this._x_rc));
 				l1 = l1.add(this._a3_rc);
 
@@ -688,10 +687,10 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 
 				nu = nu.subtract(this._x_rc.pow(3));
 				nu = nu.add(this._a4_rc.multiply(this._x_rc));
-				nu = nu.add(this._a6_rc.multiply(new BigInteger("2")));
+				nu = nu.add(this._a6_rc.multiply(TWO));
 				nu = nu.subtract(this._a3_rc.multiply(this._y_rc));
 
-				nu1 = nu1.add(this._y_rc.multiply(new BigInteger("2")));
+				nu1 = nu1.add(this._y_rc.multiply(TWO));
 				nu1 = nu1.add(this._a1_rc.multiply(this._x_rc));
 				nu1 = nu1.add(this._a3_rc);
 
@@ -759,7 +758,7 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 		EllipticCurve ec = this;
 		if (factor.max(ZERO).equals(ZERO))
 		{
-			factor = factor.multiply(new BigInteger("-1"));
+			factor = factor.multiply(valueOf(-1));
 			ec = this.clone();
 			ec.setPAI(true);
 			ec.sub(this);
@@ -801,7 +800,7 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 			b2 = ZERO;
 			b2 = b2.add(this._a1_rc);
 			b2 = b2.pow(2);
-			b2 = b2.add(this._a2_rc.multiply(new BigInteger("4")));
+			b2 = b2.add(this._a2_rc.multiply(valueOf(4)));
 
 			b4 = ZERO;
 			b4 = b4.add(this._a4_rc).add(this._a4_rc);
@@ -810,22 +809,22 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 			b6 = ZERO;
 			b6 = b6.add(this._a3_rc);
 			b6 = b6.pow(2);
-			b6 = b6.add(this._a6_rc.multiply(new BigInteger("4")));
+			b6 = b6.add(this._a6_rc.multiply(valueOf(4)));
 
 			b8 = ZERO;
 			b8 = b8.add(this._a1_rc);
 			b8 = b8.pow(2);
 			b8 = b8.multiply(this._a6_rc);
-			b8 = b8.add(this._a2_rc.multiply(this._a6_rc).multiply(new BigInteger("4")));
+			b8 = b8.add(this._a2_rc.multiply(this._a6_rc).multiply(valueOf(4)));
 			b8 = b8.subtract(this._a1_rc.multiply(this._a3_rc).multiply(this._a4_rc));
 			b8 = b8.add(this._a3_rc.multiply(this._a3_rc).multiply(this._a2_rc));
 			b8 = b8.subtract(this._a4_rc.multiply(this._a4_rc));
 
 			d = ZERO;
 			d = d.subtract(b2.pow(2).multiply(b8));
-			d = d.subtract(b4.pow(3).multiply(new BigInteger("8")));
-			d = d.subtract(b6.pow(2).multiply(new BigInteger("27")));
-			d = d.add(b2.multiply(b4).multiply(b6).multiply(new BigInteger("9")));
+			d = d.subtract(b4.pow(3).multiply(valueOf(8)));
+			d = d.subtract(b6.pow(2).multiply(valueOf(27)));
+			d = d.add(b2.multiply(b4).multiply(b6).multiply(valueOf(9)));
 
 			d = d.mod(_rc.modulus());
 
@@ -1452,7 +1451,6 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 		if (!this.parametersSet()) return false;
 		this._isPAI = false;
 
-		//RC
 		if (this.isGf())
 			return this.setRandomPointGF(subfield);
 		else //RC
@@ -1465,6 +1463,11 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 		if (subfield)
 			degree = ZERO;
 		long n = degree.longValueExact() + 1;
+		boolean gf2 = this._gf.characteristic().equals(TWO);
+
+		// in case of GF(2^1) = Z_2
+		if (gf2 && n == 1)
+			return setRandomPointGF2();
 
 		// create galois field element with values zero and one, needed later
 		GaloisField zero = _gf.clone();
@@ -1475,26 +1478,8 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 		// precalculate values for char 2, so they dont have to be calculated each loop cycle
 		Matrix<ResidueClass> base = null;
 
-		if (this._gf.characteristic().equals(TWO)) {
-			// get a primitive root of this field
-			GaloisField alpha = _gf.getPrimitiveRoot();
-			// from it, create a base of this field as matrix of base vectors (vertical)
-			base = new Matrix<>(n, n, new ResidueClass(ZERO, TWO));
-			// matrix indices start at 1
-			for (long j = 1; j <= n; j++) {
-				TreeMap<BigInteger, BigInteger> tmp = alpha.value()._polynomialMap;
-
-				// put vector representation of alpha^2^j in the matrix at row j
-				for (Map.Entry<BigInteger, BigInteger> entry : tmp.entrySet())
-					base.set(entry.getKey().longValue() + 1, j, new ResidueClass(entry.getValue(), TWO));
-
-				// alpha = alpha^2 => in step j alpha is alpha^2^j
-				alpha = alpha.multR(alpha);
-
-				// if alpha^j == 1 for j<n, alpha is not primitive (*should* not happen)
-				if (alpha.equals(one))
-					throw new FFaplAlgebraicException(new Object[0], IAlgebraicError.NOT_PRIMITIVE);
-			}
+		if (gf2) {
+			base = _gf.getBase();
 			base.prepareForSolving();
 		}
 
@@ -1504,7 +1489,7 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 			this._x_gf = Algorithm.getTrueRandomPolynomial(new BInteger(degree,_thread), new BInteger(_gf.characteristic(),_thread));
 			GaloisField b = _gf.clone();
 			GaloisField c = _gf.clone();
-			GaloisField d = _gf.clone();
+			// temporary value
 			GaloisField foo = _gf.clone();
 
 			c.setValue(new Polynomial(0,0, _thread));
@@ -1529,44 +1514,14 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 			b.add(_a3_gf);
 
 			// char 2
-			if (_gf.characteristic().equals(TWO)) {
+			if (gf2) {
+				if (b.equals(zero)) { // B(x) == 0, thus y = +- sqrt( -C(x) )
 
-				// in case of GF(2^1) = Z_2
-				if (_gf.irrPolynomial().isOne()) {
-					// check the four trivial cases
-					Polynomial[] p = {new Polynomial(_thread),
-							new Polynomial(1, 0, _thread)};
-
-					for (int i = 0; i <= 1; i++) {
-						for (int j = 0; j <= 1; j++) {
-							_x_gf = p[i];
-							_y_gf = p[j];
-							if (weierstrassEquationIsValid())
-								return true;
-							else
-								return false;
-//								throw new FFaplAlgebraicException(new Object[0], IAlgebraicError.NOT_IMPLEMENTED);
-						}
-					}
-
-					return false;
-					// throw exception (would need to change some code, as new exceptions will be thrown)
-				}
-
-				if (b.equals(zero)) {
-					// B(x) == 0, thus y = +- sqrt( -C(x) )
 					_y_gf = Algorithm.sqrt(c.negate()).value();
-					if ((new SecureRandom()).nextInt(2) == 1)
+					if (new RNG_Placebo(ZERO, ONE, _thread).next().equals(ONE))
 						_y_gf.negate();
 
-					if (weierstrassEquationIsValid())
-						return true;
-					else
-						return false;
-//						throw new FFaplAlgebraicException(new Object[0], IAlgebraicError.NOT_IMPLEMENTED);
-
-				} else {
-					// B(x) != 0
+				} else { // B(x) != 0
 
 					// lowercase b variable used in the thesis
 					GaloisField b_ = c.divR(b.multR(b));
@@ -1578,13 +1533,13 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 						bVector.put(entry.getKey().longValue() + 1, new ResidueClass(entry.getValue(), TWO));
 
 					// solve base * s = b (as a classic system of linear equations)
-					// (warning as base is precalculated in an if block)
-					TreeMap<Long, ResidueClass> solution = base.solve(bVector, true);
+					// (warning as base is pre-calculated in an if block)
+					TreeMap<Long, ResidueClass> solution = base.solve(bVector, false);
 
 					// the polynomial t, expressed through the base of the powers of alpha
 					TreeMap<Long, ResidueClass> tBaseForm = new TreeMap<>();
 					// t_0 is in {0,1}, choose one at random
-					ResidueClass t_i = new ResidueClass((new SecureRandom()).nextInt(2), 2);
+					ResidueClass t_i = new ResidueClass(new RNG_Placebo(ZERO, ONE, _thread).next(), TWO);
 
 					// t_i+1 = t_i + b_i+1
 					for (long i = 1; i <= n; i++) {
@@ -1607,21 +1562,19 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 					// y = t*B(x)
 					_y_gf = tField.multR(b).value();
 				}
-			}
-			else //Charakteristik != 2
-			{
+
+			} else { //Charakteristik != 2
+
+				GaloisField d = _gf.clone();
 				d.setValue(b.value());
 				d.pow(2);
-				d.divide(new BigInteger("4"));
+				d.divide(valueOf(4));
 				d.subtract(c); //b^2/4 - c
 
-
 				d.setValue(Algorithm.sqrt(d).value());
-
-
-
+				
 				foo.setValue(b.value());
-				foo.divide(new BigInteger("2"));
+				foo.divide(TWO);
 				foo = foo.negate();
 
 				if (new RNG_Placebo(ZERO, ONE, _thread).next().equals(ONE))
@@ -1639,6 +1592,25 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 		} while (!weierstrassEquationIsValid() || (subfield && !this._y_gf.isConstant()));
 
 		return true;
+	}
+
+	private boolean setRandomPointGF2() throws FFaplAlgebraicException {
+		// check the four trivial cases (those are the only possible ones)
+		Polynomial[] p = {new Polynomial(_thread),
+				new Polynomial(1, 0, _thread)};
+
+		for (int i = 0; i <= 1; i++) {
+			for (int j = 0; j <= 1; j++) {
+				_x_gf = p[i];
+				_y_gf = p[j];
+				if (weierstrassEquationIsValid())
+					return true;
+			}
+		}
+
+		throw new FFaplAlgebraicException(new Object[0], IAlgebraicError.NOT_IMPLEMENTED);
+//		return false; // as all possible values have been checked
+		// throw exception (would need to change some code, as new exceptions will be thrown)
 	}
 
 	private boolean setRandomPointRC() throws FFaplAlgebraicException {
@@ -1695,11 +1667,11 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 
 		temp1.setValue(x);
 		temp1.pow(2);
-		temp1.multiply(new BigInteger("3"));
+		temp1.multiply(valueOf(3));
 		slope = temp1.clone(); //3x^2
 
 		temp1.setValue(x);
-		temp1.multiply(new BigInteger("2"));
+		temp1.multiply(TWO);
 		temp1.multiply(_a2_gf);
 		slope.add(temp1); //3x^2 + 2*x*a2
 
@@ -1713,7 +1685,7 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 
 
 		temp1.setValue(y);
-		temp1.multiply(new BigInteger("2"));
+		temp1.multiply(TWO);
 
 
 		temp2.setValue(x);

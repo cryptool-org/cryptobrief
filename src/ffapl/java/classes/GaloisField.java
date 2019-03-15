@@ -12,6 +12,7 @@ import ffapl.java.math.Algorithm;
 
 import java.math.BigInteger;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -687,5 +688,31 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 			// TODO convert field elements
 			*/
 		}
+	}
+
+	public Matrix<ResidueClass> getBase() throws FFaplAlgebraicException {
+    	long n = this._irrply.degree().longValueExact();
+
+		// get a primitive root of this field
+		GaloisField alpha = this.getPrimitiveRoot();
+		// from it, create a base of this field as matrix of base vectors (vertical)
+		Matrix<ResidueClass> base = new Matrix<>(n, n, new ResidueClass(ZERO, TWO));
+		// matrix indices start at 1
+		for (long j = 1; j <= n; j++) {
+			TreeMap<BigInteger, BigInteger> tmp = alpha.value()._polynomialMap;
+
+			// put vector representation of alpha^2^j in the matrix at row j
+			for (Map.Entry<BigInteger, BigInteger> entry : tmp.entrySet())
+				base.set(entry.getKey().longValue() + 1, j, new ResidueClass(entry.getValue(), TWO));
+
+			// alpha = alpha^2 => in step j alpha is alpha^2^j
+			alpha = alpha.multR(alpha);
+
+			// if alpha^j == 1 for j<n, alpha is not primitive (*should* not happen)
+			if (alpha.value().isOne())
+				throw new FFaplAlgebraicException(new Object[0], IAlgebraicError.NOT_PRIMITIVE);
+		}
+
+		return base;
 	}
 }
