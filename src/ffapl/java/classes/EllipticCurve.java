@@ -1,5 +1,6 @@
 package ffapl.java.classes;
 
+import ffapl.FFaplInterpreter;
 import ffapl.java.exception.FFaplAlgebraicException;
 import ffapl.java.interfaces.IAlgebraicError;
 import ffapl.java.interfaces.IJavaType;
@@ -1483,6 +1484,7 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 			base.prepareForSolving();
 		}
 
+		long tries = 0;
 		// loop until a valid point is found
 		do {
 
@@ -1589,6 +1591,15 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 				this._y_gf = foo.value();
 			}
 
+//			System.out.println("Trying combination:");
+//			System.out.println("x: "+_x_gf);
+//			System.out.println("y: "+_y_gf);
+
+			// after 1000 tries, warn user of slow operation
+			if (++tries == 1000)
+				((FFaplInterpreter) (Thread.currentThread())).getLogger().displaySlowOperationWarning();
+//			if (tries % 100 == 0)
+//				System.out.println(tries);
 		} while (!weierstrassEquationIsValid() || (subfield && !this._y_gf.isConstant()));
 
 		return true;
@@ -1608,9 +1619,8 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 			}
 		}
 
-		throw new FFaplAlgebraicException(new Object[0], IAlgebraicError.NOT_IMPLEMENTED);
-//		return false; // as all possible values have been checked
-		// throw exception (would need to change some code, as new exceptions will be thrown)
+		throw new FFaplAlgebraicException(new String[]{_gf.toString()}, IAlgebraicError.EC_NO_POINTS);
+		// return false; // as all possible values have been checked
 	}
 
 	private boolean setRandomPointRC() throws FFaplAlgebraicException {

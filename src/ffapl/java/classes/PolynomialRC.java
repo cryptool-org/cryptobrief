@@ -467,12 +467,19 @@ public class PolynomialRC extends Polynomial {
 		}
 		//super.postTask();
 	}
-	
+
 	@Override
-	public String toString(){
-		return super.toString();
+	public int hashCode() {
+		return this.toString().hashCode() ^ this.characteristic().hashCode();
 	}
-	
+
+	@Override
+	public boolean equals(Object f) {
+		return f instanceof PolynomialRC
+				&& plyequal((PolynomialRC) f)
+				&& this._characteristic.equals(((PolynomialRC) f)._characteristic);
+	}
+
 	@Override
 	public int typeID() {
 		return IJavaType.POLYNOMIALRC;
@@ -514,9 +521,9 @@ public class PolynomialRC extends Polynomial {
 
 	public Matrix<ResidueClass> getQMatrix(PolynomialRC x, boolean subtractId, boolean useXToTheP, Thread _thread) throws FFaplAlgebraicException {
 
-		if(this.characteristic().compareTo(TWO) < 0 || degree().compareTo(TWO) < 0)
+		if (this.characteristic().compareTo(TWO) < 0 || degree().compareTo(TWO) < 0)
 			// cannot generate Q-Matrix with degree or characteristic less than 2
-			throw new FFaplAlgebraicException(new Object[0], IAlgebraicError.VAL_LESS_EQUAL_ZERO);
+			throw new FFaplAlgebraicException(new Object[0], IAlgebraicError.Q_MATRIX_DEGREE);
 
 		Matrix<ResidueClass> Q = new Matrix<>(degree().longValue(), this.degree().longValue(), new ResidueClass(ZERO, this.characteristic()));
 		ResidueClass one = new ResidueClass(ONE, this.characteristic());

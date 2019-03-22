@@ -634,7 +634,7 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 		for (BigInteger distinctPrime : factorsOfPToTheNMinusOne) {
 
 			// ... that is not one ...
-			if (!distinctPrime.equals(ONE)) {
+			if (distinctPrime.compareTo(ONE) > 0) {
 
 				// ... check if a^((p^n-1)/q) != 1
 				if (this.powR(pToTheNMinusOne.divide(distinctPrime)).value().isOne()) {
@@ -652,7 +652,7 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 				n = this.irrPolynomial().degree(),
 				r = p.pow(n.intValueExact()).subtract(ONE).divide(p.subtract(ONE));
 
-		// factorize r
+		// factorize r = p^n - 1
 		TreeMap<BigInteger, BigInteger> factorsOfR = Algorithm.FactorInteger(new BInteger(r, _thread));
 		// factorize p-1
 		TreeMap<BigInteger, BigInteger> factorsOfPMinusOne = Algorithm.FactorInteger(new BInteger(p.subtract(ONE), _thread));
@@ -665,29 +665,11 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 		// x = 1 * x^1
 		prim.setValue(new Polynomial(ONE, ONE, _thread));
 
-		if (this.irrPolynomial().isPrimitivePolynomial(factorsOfR, factorsOfPMinusOne, _thread)) {
-			// the irreducible polynomial of this field is primitive
-			// -> field element x is primitive
-			return prim;
-		} else {
+		// find a primitive root, try random ones until one fits (try x first)
+		while (!prim.isPrimitiveRoot(factorsOfPToTheNMinusOne))
+			prim.setValue(Algorithm.getTrueRandomPolynomial(new BInteger(n, _thread), new BInteger(p, _thread)));
 
-		    // find a primitive root, try random ones until one fits
-		    do {
-		        prim.setValue(Algorithm.getTrueRandomPolynomial(new BInteger(n, _thread), new BInteger(p, _thread)));
-            } while (!prim.isPrimitiveRoot(factorsOfPToTheNMinusOne));
-
-		    return prim;
-
-			/*
-			throw new FFaplAlgebraicException(new Object[0], IAlgebraicError.NOT_IMPLEMENTED);
-
-			// polynomial is not primitive. find one that is
-			PolynomialRCPrime f = Algorithm.getPrimitivePolynomial(p, n, factorsOfR, factorsOfPMinusOne, _thread);
-
-			// then convert the element "x" from that field to this field
-			// TODO convert field elements
-			*/
-		}
+		return prim;
 	}
 
 	public Matrix<ResidueClass> getBase() throws FFaplAlgebraicException {

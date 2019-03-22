@@ -610,6 +610,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	 * @return
 	 */
 	public static String plyToString(Polynomial ply){
+		ply.clearZeroCoefficients();
 		TreeMap<BigInteger, BigInteger> polynomialTable = ply.polynomial();
 		StringBuilder stringBuilder = new StringBuilder();
 		//int counter = 1;

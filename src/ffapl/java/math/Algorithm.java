@@ -1,5 +1,6 @@
 package ffapl.java.math;
 
+import ffapl.FFaplInterpreter;
 import ffapl.exception.FFaplException;
 import ffapl.java.classes.*;
 import ffapl.java.exception.FFaplAlgebraicException;
@@ -32,6 +33,30 @@ public class Algorithm {
 
 	//for prime evaluation
 	//private static int _certainty = 100;
+
+	/**
+	 * Cache for results of integer factorizations.
+	 * Implemented as a nested TreeMap.
+	 * Contains mappings of the form
+	 * <p>
+	 * n -> {p1->e1,p2->e2,...,pn->en},
+	 * where n = p1^e1 * p2^e2 * ... * pn^en.
+	 * <p>
+	 * Furthermore, a mapping of n -> null indicates that n is composite,
+	 * but no factorization is given. This happens, if a number is checked for primality only,
+	 * as a full factorization is much more computation-intensive.
+	 */
+	private static TreeMap<BigInteger, TreeMap<BigInteger, BigInteger>> factorizationCache;
+
+	/**
+	 * Cache for results of tests for irreducibility on polynomials.
+	 * Implemented as a HashMap.
+	 * Contains mappings of the form
+	 * <p>
+	 * f -> irreducible(f),
+	 * where irreducible(f) is true iff f is an irreducible polynomial modulo its module.
+	 */
+	private static HashMap<PolynomialRC, Boolean> irreduciblePolyCache;
 	
 	private static byte[] zeroPadding(BigInteger k) {
 		byte[] keyInput = k.toByteArray();
@@ -765,12 +790,16 @@ public class Algorithm {
 		}		
 		return s;
 	}
-	
+
 	/**
 	 * Testing a polynomial for irreducibility
 	 * see: Handbook of applied Cryptography Algorithm: 4.69
-	 * @param f
-	 * @return
+	 * <p>
+	 * Uses the {@link Algorithm#irreduciblePolyCache} to avoid unnecessary computations
+	 * by saving results and looking up before calculating.
+	 *
+	 * @param f the polynomial to test
+	 * @return true iff f is irreducible
 	 * @throws FFaplAlgebraicException
 	 */
 	public static boolean isIrreducible(PolynomialRC f) throws FFaplAlgebraicException{
@@ -778,23 +807,34 @@ public class Algorithm {
 		BigInteger m;
 		Prime p;
 		Thread thread = f.getThread();
-		if(f.characteristic() instanceof Prime){
+
+		// to make caching easier, use return-at-end pattern
+		Boolean result;
+
+		// look up poly in cache
+		if (irreduciblePolyCache != null && (result = irreduciblePolyCache.get(f)) != null)
+			return result;
+		if (f.characteristic() instanceof Prime) {
 			p = (Prime) f.characteristic();
-		} else{
+		} else {
 			p = new Prime(f.characteristic(), thread);
 		}
-		if(f.degree().compareTo(ONE) < 0){
-			//degree must be >= 1
-			return false;
-		}
+
 		f = f.getMonic();
 		m = f.degree();
-		
-		
+		//degree must be >= 1
+		if(m.equals(ZERO))
+			return false;
+
+		if (m.compareTo(valueOf(100)) > 0)
+			((FFaplInterpreter) (Thread.currentThread())).getLogger().displaySlowOperationWarning();
+
+
 		x = new PolynomialRC(ONE, ONE, p, thread);
 		//System.out.println("f = " + f);
 		//System.out.println("x = " + x);
 		u = (PolynomialRC) x.clone();
+		result = true;
 		for(long i = 1; i <= m.divide(new BigInteger("2")).longValue(); i++){
 			//System.out.println("u = " + u);
 			u = squareAndMultiply(u, p, f);
@@ -808,10 +848,16 @@ public class Algorithm {
 			//System.out.println("--");
 			if(! (!d.isZero() && d.degree().equals(ZERO))){
 				//Grad von Polynom is 0 d.h. einheit im Körper
-				return false;
-			}			
-		}		
-		return true;
+				result = false;
+				break;
+			}
+		}
+
+		// put result into cache, initialize cache if necessary
+		if (irreduciblePolyCache == null)
+			irreduciblePolyCache = new HashMap<>();
+		irreduciblePolyCache.put(f,result);
+		return result;
 	}
 	
 	/**
@@ -1021,6 +1067,62 @@ public class Algorithm {
 	}
 
 	/**
+	 * Tests if a given integer is probably prime.
+	 * Correct up to a false-positive rate
+	 * of no more than 2<sup>-c</sup>, where c is the certainty parameter.
+	 * <p>
+	 * Thus, if a call to this method returns false,
+	 * the integer is guaranteed to be composite,
+	 * but if true is returned, it may still be composite
+	 * with a chance of no more than 2<sup>-c</sup>.
+	 * <p>
+	 * Note: this method uses the {@link BigInteger#isProbablePrime(int)} method
+	 * but additionally implements caching via the {@link Algorithm#factorizationCache}.
+	 *
+	 * @param value     the value to check
+	 * @param certainty the certainty c to which to test.
+	 * @return true if the value is probably prime
+	 */
+	public static boolean isProbablePrime(BigInteger value, int certainty) {
+		if (value == null)
+			return false;
+		TreeMap<BigInteger, BigInteger> factors;
+		Boolean result;
+
+		if (factorizationCache == null) {
+			// case 1: no factorization cache: create new, then add result to cache
+			factorizationCache = new TreeMap<>();
+			result = value.isProbablePrime(certainty);
+
+		} else if ((factors = factorizationCache.get(value)) != null) {
+			// case 2: factorization cache exists and factorization != null: check factorization
+			return factors.size() == 1 && factors.get(value).equals(ONE);
+
+		} else if (factorizationCache.containsKey(value)) {
+			// case 3: factorization is null: check if there is a mapping
+			return false;
+
+		} else {
+			// case 4: no mapping: check primality, then add result to cache
+			result = value.isProbablePrime(certainty);
+		}
+
+		// add result to cache
+		if (result) {
+			// value is prime: add known factorization to cache
+			factors = new TreeMap<>();
+			factors.put(value, ONE);
+			factorizationCache.put(value, factors);
+
+		} else {
+			// value is not prime: factorization is unknown. thus, add null to cache as marker.
+			factorizationCache.put(value, null);
+		}
+
+		return result;
+	}
+
+	/**
 	 * Search for prime factors with Pollard's rho, Pollard's p-1 and linear search.
 	 * @param n
 	 * @return prime factors of n
@@ -1034,112 +1136,138 @@ public class Algorithm {
 		Stack<BInteger> factors = new Stack<BInteger>();
 		TreeMap<BigInteger, BigInteger> result = new TreeMap<BigInteger, BigInteger>();
 		TreeMap<BigInteger, BigInteger> primeFact;
-		
-		
-		if(n.compareTo(ONE) == 0){
-			addPrimeFactor(result, n);
-		}else if(n.isProbablePrime(100)){
-			addPrimeFactor(result, n);
-		}else{
-		
-			Bdefault = BInteger.valueOf(100000, thread);
-			//prework find small prime factors
-			min = BigInteger.valueOf(2);
-			max = BigInteger.valueOf(997);//try first 168 primes
-			
-			fact2 = n;
-			while(min.compareTo(max) <= 0){
-				isRunning(thread);
-				primeFact = Algorithm.primeFactorInteger(fact2, min, max);
-				
-				if(primeFact != null){
-					//prime factor <= max found
-					fact1 = primeFactorValue(primeFact, thread);
-					combinePrimeFactor(result, primeFact);
-					min = primeFactor(primeFact, thread);
-					fact2 = (BInteger) fact2.divide(fact1);
-					//System.out.println(fact2);
-					if(fact2.isProbablePrime(100)){
-						addPrimeFactor(result, fact2);
-						break;//finished
-					}else if(fact2.compareTo(ONE) == 0){
-						break;//finished
-					}
-				}else{
-					//prime factor higher than max
-					factors.push(fact2);
-					break;
-				}
+
+		if (n.compareTo(ONE) <= 0) {
+			if (n.compareTo(ZERO) >= 0) {
+				// for one and zero the factorization consists only of the number itself
+				addPrimeFactor(result, n);
+				return result;
+
+			} else {
+				// for negative numbers, factorize the absolute value and add negative one
+				result = FactorInteger(n.negateR());
+				addPrimeFactor(result, new BInteger(valueOf(-1), thread));
 			}
-			
-			while(factors.size() > 0){
-				isRunning(thread);
-				val = factors.pop();
-				//PollardRho
-				fact1 = Algorithm.PollardRho(val, thread);
-				
-				if(fact1 != null && 
-						(val.compareTo(fact1) != 0 || fact1.isProbablePrime(100))){
-					//factor found
-					//System.out.println("Pollard Rho " +  fact1);
-					fact2 = (BInteger) val.divide(fact1);
-					if(!(val.compareTo(fact1) != 0)){
-						addPrimeFactor(result, fact1);
-					}else if(fact1.compareTo(ONE) > 0){
-						factors.push(fact1);
-					}
-					if(fact2.isProbablePrime(100)){
-						addPrimeFactor(result, fact2);
-					}else if(fact2.compareTo(ONE) > 0){
+		} else {
+
+			TreeMap<BigInteger, BigInteger> tmp;
+			if (factorizationCache != null && ((tmp = factorizationCache.get(n)) != null)) {
+				return (TreeMap<BigInteger, BigInteger>) tmp.clone();
+
+			} else if (isProbablePrime(n, 100)) {
+				addPrimeFactor(result, n);
+				return result;
+
+			} else {
+
+				if (n.bitLength() > 35) {
+					((FFaplInterpreter) (Thread.currentThread())).getLogger().displaySlowOperationWarning();
+					// logger.log(new FFaplWarning(new Object[0],IAlgebraicError.WARNING_OPERATION_SLOW, null));
+				}
+
+				Bdefault = BInteger.valueOf(100000, thread);
+				//prework find small prime factors
+				min = BigInteger.valueOf(2);
+				max = BigInteger.valueOf(997);//try first 168 primes
+
+				fact2 = n;
+				while (min.compareTo(max) <= 0) {
+					isRunning(thread);
+					primeFact = Algorithm.primeFactorInteger(fact2, min, max);
+
+					if (primeFact != null) {
+						//prime factor <= max found
+						fact1 = primeFactorValue(primeFact, thread);
+						combinePrimeFactor(result, primeFact);
+						min = primeFactor(primeFact, thread);
+						fact2 = (BInteger) fact2.divide(fact1);
+						//System.out.println(fact2);
+						if (isProbablePrime(fact2, 100)) {
+							addPrimeFactor(result, fact2);
+							break;//finished
+						} else if (fact2.compareTo(ONE) == 0) {
+							break;//finished
+						}
+					} else {
+						//prime factor higher than max
 						factors.push(fact2);
+						break;
 					}
-				}else{
-					//PollardP-1
-					nB = (BInteger) val.divide(BigInteger.valueOf(2));				
-					B = min(Bdefault, nB);
-					fact1 = Algorithm.PollardPMinusOne(val, B);
-					
-					if(fact1 != null && 
-							(val.compareTo(fact1) != 0 || fact1.isProbablePrime(100))){
+				}
+
+				while (factors.size() > 0) {
+					isRunning(thread);
+					val = factors.pop();
+					//PollardRho
+					fact1 = Algorithm.PollardRho(val, thread);
+
+					if (fact1 != null &&
+							(val.compareTo(fact1) != 0 || isProbablePrime(fact1, 100))) {
 						//factor found
-						//System.out.println("Pollard p-1: " + fact1);
+						//System.out.println("Pollard Rho " +  fact1);
 						fact2 = (BInteger) val.divide(fact1);
-						if(!(val.compareTo(fact1) != 0)){
+						if (!(val.compareTo(fact1) != 0)) {
 							addPrimeFactor(result, fact1);
-						}else if(fact1.compareTo(ONE) > 0){
+						} else if (fact1.compareTo(ONE) > 0) {
 							factors.push(fact1);
 						}
-						if(fact2.isProbablePrime(100)){
+						if (isProbablePrime(fact2, 100)) {
 							addPrimeFactor(result, fact2);
-						}else if(fact2.compareTo(ONE) > 0){
+						} else if (fact2.compareTo(ONE) > 0) {
 							factors.push(fact2);
 						}
-					}else{
-						//Iteration
-						//return prime
-						primeFact = Algorithm.primeFactorInteger(val, min);
-						
-						fact1 = primeFactorValue(primeFact, thread);
-						//adds result to table
-						combinePrimeFactor(result, primeFact);
-						if(fact1 != null){
-							//System.out.println("Iteration " +  fact1);
+					} else {
+						//PollardP-1
+						nB = (BInteger) val.divide(BigInteger.valueOf(2));
+						B = min(Bdefault, nB);
+						fact1 = Algorithm.PollardPMinusOne(val, B);
+
+						if (fact1 != null &&
+								(val.compareTo(fact1) != 0 || isProbablePrime(fact1, 100))) {
 							//factor found
+							//System.out.println("Pollard p-1: " + fact1);
 							fact2 = (BInteger) val.divide(fact1);
-							
-							if(fact2.isProbablePrime(100)){
+							if (!(val.compareTo(fact1) != 0)) {
+								addPrimeFactor(result, fact1);
+							} else if (fact1.compareTo(ONE) > 0) {
+								factors.push(fact1);
+							}
+							if (isProbablePrime(fact2, 100)) {
 								addPrimeFactor(result, fact2);
-							}else if(fact2.compareTo(ONE) > 0){
+							} else if (fact2.compareTo(ONE) > 0) {
 								factors.push(fact2);
 							}
-						}else{
-							System.out.println("error");
+						} else {
+							//Iteration
+							//return prime
+							primeFact = Algorithm.primeFactorInteger(val, min);
+
+							fact1 = primeFactorValue(primeFact, thread);
+							//adds result to table
+							combinePrimeFactor(result, primeFact);
+							if (fact1 != null) {
+								//System.out.println("Iteration " +  fact1);
+								//factor found
+								fact2 = (BInteger) val.divide(fact1);
+
+								if (isProbablePrime(fact2, 100)) {
+									addPrimeFactor(result, fact2);
+								} else if (fact2.compareTo(ONE) > 0) {
+									factors.push(fact2);
+								}
+							} else {
+								System.out.println("error");
+							}
 						}
 					}
 				}
 			}
 		}
-		
+
+		if (factorizationCache == null)
+			factorizationCache = new TreeMap<>();
+		factorizationCache.put(n, result);
+
 		return result;
 	}
 	
@@ -1155,7 +1283,7 @@ public class Algorithm {
 		TreeMap<BigInteger, BigInteger> result = new TreeMap<BigInteger, BigInteger>();
 		
 		p = new BInteger(BigInteger.valueOf(2), thread);
-		if(n.isProbablePrime(100)){
+		if(isProbablePrime(n, 100)){
 			result.put(n, new BInteger(ONE, thread));
 		}else{
 			while(n.compareTo(ONE) > 0 && p.compareTo(n) <= 0){
@@ -1561,7 +1689,7 @@ public class Algorithm {
 		ResidueClass a;
 		Thread thread = n.getThread();
 		RNG_Placebo rand;
-		if(n.isProbablePrime(100)){
+		if(isProbablePrime(n, 100)){
 			return n;
 		}		
 		rand = new RNG_Placebo(BigInteger.valueOf(2), n.subtract(ONE), n.getThread());
@@ -1641,7 +1769,7 @@ public class Algorithm {
 		BInteger p, d;
 		Thread thread = n.getThread();
 		TreeMap<BigInteger, BigInteger> result = new TreeMap<BigInteger, BigInteger>();
-		if(n.isProbablePrime(100)){
+		if(isProbablePrime(n, 100)){
 			result.put(n, BigInteger.ONE);
 			return result;
 		}
@@ -1676,11 +1804,11 @@ public class Algorithm {
 		BInteger p, d;
 		Thread thread = n.getThread();
 		TreeMap<BigInteger, BigInteger> result = new TreeMap<BigInteger, BigInteger>();
-		if(n.isProbablePrime(100)){
+		if(isProbablePrime(n, 100)){
 			result.put(n, ONE);
 			return result;
 		}
-		if(min.isProbablePrime(100)){
+		if(isProbablePrime(min, 100)){
 			p = new BInteger(min, thread);
 		}else{
 			p = new BInteger(min.nextProbablePrime(), thread);
@@ -1715,11 +1843,11 @@ public class Algorithm {
 		BInteger p, d;
 		Thread thread = n.getThread();
 		TreeMap<BigInteger, BigInteger> result = new TreeMap<BigInteger, BigInteger>();
-		if(n.isProbablePrime(100)){
+		if(isProbablePrime(n, 100)){
 			result.put(n, ONE);
 			return result;
 		}
-		if(min.isProbablePrime(100)){
+		if(isProbablePrime(min, 100)){
 			p = new BInteger(min, thread);
 		}else{
 			p = new BInteger(min.nextProbablePrime(), thread);

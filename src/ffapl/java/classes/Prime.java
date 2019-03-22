@@ -3,13 +3,14 @@
  */
 package ffapl.java.classes;
 
-import java.math.BigInteger;
-import java.util.Random;
-
 import ffapl.java.exception.FFaplAlgebraicException;
 import ffapl.java.interfaces.IAlgebraicError;
 import ffapl.java.interfaces.IJavaType;
+import ffapl.java.math.Algorithm;
 import ffapl.types.FFaplTypeCrossTable;
+
+import java.math.BigInteger;
+import java.util.Random;
 
 /**
  * @author Alexander Ortner
@@ -106,7 +107,7 @@ public class Prime extends BInteger{
 	 * @throws FFaplAlgebraicException if value is not Prime
 	 */
 	private boolean checkIfPrime() throws FFaplAlgebraicException{
-		if(this.isProbablePrime(_certainty)){
+		if(Algorithm.isProbablePrime(this, _certainty)){
 			return true;
 		}else{
 			Object[] arguments = {this};
