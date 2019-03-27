@@ -124,7 +124,7 @@ public class PolynomialRCPrime extends PolynomialRC {
 		// [Step 4]
 		// apply berlekamp polynomial factorization to check for reducibility
 		// assert that the Q-matrix of f has a nullity less than 2 (nullity of two or greater implies reducibility)
-		if (this.getQMatrix(null, true, true, _thread).nullity(2) >= 2)
+		if (this.getQMatrix(null, true, true, _thread).nullity(2, true) >= 2)
 			return false;
 
 		// [Step 5]

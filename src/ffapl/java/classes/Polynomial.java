@@ -149,7 +149,10 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	public BigInteger degree() {
 		clearZeroCoefficients();
 
-		if (_polynomialMap.keySet().size() > 0)
+		if (_polynomialMap == null)
+			return null;
+
+		if (!_polynomialMap.keySet().isEmpty())
 			return new BInteger(_polynomialMap.lastKey(), _thread);
 		else
 			return ZERO;
@@ -162,7 +165,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	 * @return true if any zero-valued coefficients were removed
 	 */
 	private boolean clearZeroCoefficients() {
-		return this.polynomial().values().removeAll(Collections.singleton(ZERO));
+		return _polynomialMap != null && this._polynomialMap.values().removeAll(Collections.singleton(ZERO));
 	}
 
 	/**
@@ -392,7 +395,8 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	 */
 	public boolean isMonic(){
 		clearZeroCoefficients();
-		return ONE.equals(this._polynomialMap.lastEntry().getValue());
+		return _polynomialMap != null && _polynomialMap.lastEntry() != null &&
+				_polynomialMap.lastEntry().getValue().equals(ONE);
 	}
 	
 	/**
@@ -401,7 +405,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	 */
 	public boolean isZero(){
 		clearZeroCoefficients();
-		return _polynomialMap.isEmpty();
+		return _polynomialMap == null || _polynomialMap.isEmpty();
 	}
 	
 	/**
@@ -418,7 +422,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	 */
 	public boolean isConstant() {
 		clearZeroCoefficients();
-		return ZERO.equals(degree());
+		return _polynomialMap == null || degree().equals(ZERO);
 	}
 	
 	/**

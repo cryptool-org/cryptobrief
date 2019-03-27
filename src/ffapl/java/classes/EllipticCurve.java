@@ -1480,15 +1480,16 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 		Matrix<ResidueClass> base = null;
 
 		if (gf2) {
-			base = _gf.getBase();
+			base = _gf.getNormalBase();
 			base.prepareForSolving();
 		}
 
-		long tries = 0;
 		// loop until a valid point is found
+		long tries = 0;
 		do {
+			++tries;
 
-			this._x_gf = Algorithm.getTrueRandomPolynomial(new BInteger(degree,_thread), new BInteger(_gf.characteristic(),_thread));
+			this._x_gf = Algorithm.getRandomPolynomial(new BInteger(degree, _thread), new BInteger(_gf.characteristic(), _thread), false);
 			GaloisField b = _gf.clone();
 			GaloisField c = _gf.clone();
 			// temporary value
@@ -1517,41 +1518,60 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 
 			// char 2
 			if (gf2) {
-				if (b.equals(zero)) { // B(x) == 0, thus y = +- sqrt( -C(x) )
+				if (b.equals(zero)) { // B(x) == 0
 
-					_y_gf = Algorithm.sqrt(c.negate()).value();
-					if (new RNG_Placebo(ZERO, ONE, _thread).next().equals(ONE))
-						_y_gf.negate();
+					// thus y = +- sqrt( -C(x) )
+					// however, in GF(2^n) these two solutions are identical
+					_y_gf = Algorithm.sqrt(c).value();
 
 				} else { // B(x) != 0
 
 					// lowercase b variable used in the thesis
-					GaloisField b_ = c.divR(b.multR(b));
+					GaloisField b_ = c.divR(b.powR(TWO));
 
-					// prepare vector p as "right side" of Ax=b system of linear equations
+					// prepare vector b as "right side" of Ax=b system of linear equations
 					TreeMap<Long, ResidueClass> bVector = new TreeMap<>();
 					for (Map.Entry<BigInteger, BigInteger> entry : b_.value()._polynomialMap.entrySet())
 						// offset +1 for keys, as matrix indices start at one
 						bVector.put(entry.getKey().longValue() + 1, new ResidueClass(entry.getValue(), TWO));
 
-					// solve base * s = b (as a classic system of linear equations)
-					// (warning as base is pre-calculated in an if block)
-					TreeMap<Long, ResidueClass> solution = base.solve(bVector, false);
+					// solve base * bBaseForm = bVector (as a classic Ax=b system of linear equations)
+					// to express b as linear combination of base elements
+					// (base is pre-calculated, it does not need to change over subsequent iterations)
+					TreeMap<Long, ResidueClass> bBaseForm = base.solve(bVector, false);
+
+					// for a solution to exist, the sum over the coefficients of the base form of b has to be zero
+					boolean hasSolution = true;
+					for (Map.Entry<Long, ResidueClass> e :
+							bBaseForm.entrySet()) {
+						hasSolution ^= e.getValue()._value.equals(ONE);
+					}
+
+					// skip, if test fails
+					if (!hasSolution)
+						continue;
 
 					// the polynomial t, expressed through the base of the powers of alpha
 					TreeMap<Long, ResidueClass> tBaseForm = new TreeMap<>();
 					// t_0 is in {0,1}, choose one at random
 					ResidueClass t_i = new ResidueClass(new RNG_Placebo(ZERO, ONE, _thread).next(), TWO);
+					if (!t_i._value.equals(ZERO))
+						// indexing begins at 1
+						tBaseForm.put(1L, t_i);
 
 					// t_i+1 = t_i + b_i+1
-					for (long i = 1; i <= n; i++) {
-						tBaseForm.put(i, t_i);
-						t_i = t_i.addR(solution.getOrDefault(i, new ResidueClass(ZERO, TWO)));
+					for (long i = 2; i <= n; i++) {
+						ResidueClass b_ip1 = bBaseForm.get(i);
+						if (b_ip1 != null)
+							t_i = t_i.addR(b_ip1);
+
+						if (!t_i._value.equals(ZERO))
+							tBaseForm.put(i, t_i);
 					}
 
 					// expand t into normal form by multiplying with the base
 					// t = t_0 * alpha + t_1 * alpha^2 + t_2 * alpha^4 + .... + t_n-1 * alpha^2^n-1
-					TreeMap<Long, ResidueClass> t = base.multiplyVectorLeft(tBaseForm);
+					TreeMap<Long, ResidueClass> t = base.multiplyVectorRight(tBaseForm);
 					TreeMap<BigInteger, BigInteger> tMap = new TreeMap<>();
 
 					// transform t into needed format for cast to polynomial
@@ -1591,15 +1611,10 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 				this._y_gf = foo.value();
 			}
 
-//			System.out.println("Trying combination:");
-//			System.out.println("x: "+_x_gf);
-//			System.out.println("y: "+_y_gf);
-
 			// after 1000 tries, warn user of slow operation
-			if (++tries == 1000)
+			if (tries == 1000 && (Thread.currentThread() instanceof FFaplInterpreter))
 				((FFaplInterpreter) (Thread.currentThread())).getLogger().displaySlowOperationWarning();
-//			if (tries % 100 == 0)
-//				System.out.println(tries);
+
 		} while (!weierstrassEquationIsValid() || (subfield && !this._y_gf.isConstant()));
 
 		return true;

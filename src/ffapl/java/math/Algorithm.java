@@ -574,12 +574,12 @@ public class Algorithm {
 		else
 		{
 			q = p.pow(a.irrPolynomial().degree().intValue()); //int value range problem
-			aux1 = Algorithm.getRandomPolynomial(new BInteger(a.irrPolynomial().degree().subtract(ONE),null), new BInteger(p,null));
+			aux1 = Algorithm.getRandomPolynomial(new BInteger(a.irrPolynomial().degree().subtract(ONE),null), new BInteger(p,null), true);
 			aux2 = a.irrPolynomial();
 			
 			while (legendreSymbol(aux1,aux2).equals(ONE))
 			{
-				aux1 = Algorithm.getRandomPolynomial(new BInteger(a.irrPolynomial().degree().subtract(ONE),null), new BInteger(p,null));
+				aux1 = Algorithm.getRandomPolynomial(new BInteger(a.irrPolynomial().degree().subtract(ONE),null), new BInteger(p,null), true);
 			}
 			g.setValue(aux1);
 			t = q.subtract(ONE);
@@ -826,7 +826,7 @@ public class Algorithm {
 		if(m.equals(ZERO))
 			return false;
 
-		if (m.compareTo(valueOf(100)) > 0)
+		if (m.compareTo(valueOf(100)) > 0 && (Thread.currentThread() instanceof FFaplInterpreter))
 			((FFaplInterpreter) (Thread.currentThread())).getLogger().displaySlowOperationWarning();
 
 
@@ -889,7 +889,7 @@ public class Algorithm {
 		//	throw new FFaplAlgebraicException(arguments, IAlgebraicError.PRIMITIVE);
 		//}
 		//System.out.println(p + "," + m);
-		if(p.compareTo(BigInteger.valueOf(2)) == 0 && m.compareTo(ONE) == 0){
+		if(p.compareTo(valueOf(2)) == 0 && m.compareTo(ONE) == 0){
 			//spezialfall GF(2) und x+1 oder x
 			return true;
 		}
@@ -924,7 +924,7 @@ public class Algorithm {
 	public static PolynomialRC getIrreduciblePolynomial(BInteger n, BInteger p) throws FFaplAlgebraicException{
 		PolynomialRC plyInit;
 		Thread thread = p.getThread();
-		if (n.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) <= 0){
+		if (n.compareTo(valueOf(Integer.MAX_VALUE)) <= 0){
 			plyInit = new PolynomialRC(ONE, n, p, thread);
 			return irreduciblePolynomial(plyInit, ZERO, new Prime(p, thread), n);
 		}else{
@@ -1012,56 +1012,38 @@ public class Algorithm {
 	}
 
 	/**
-	 * Generates a random polynomial modulo p of degree n.
-	 * (i.e. the coefficient of x^n will be non-zero)
+	 * Generates a random polynomial modulo p of degree up to n.
+	 * Setting the {@code forceLeadingCoefficient} parameter to true will
+	 * guarantee the returned polynomial to have the exact degree n.
 	 *
-	 * @param n degree
-	 * @param p module
-	 * @return a random polynomial of degree n modulo p
-	 * @throws FFaplAlgebraicException
-	 */
-	public static PolynomialRC getRandomPolynomial(BInteger n, BInteger p) throws FFaplAlgebraicException {
-		PolynomialRC ply;
-		Thread thread = p.getThread();
-		RNG_Placebo rnd1 = new RNG_Placebo(ONE, p, thread);
-		RNG_Placebo rnd2 = new RNG_Placebo(p, thread);
-
-		if (n.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) <= 0){
-
-			ply = new PolynomialRC(rnd1.next(), n, p, thread);
-			while(ply.isZero()){
-				ply = new PolynomialRC(rnd1.next(), n, p, thread);
-			}
-			for(int i = 0; i < n.intValue(); i++){
-				ply.add(rnd2.next(), BigInteger.valueOf(i));
-			}
-		}else{
-			Object[] messages = {n};
-			throw new FFaplAlgebraicException(messages,
-					IAlgebraicError.TO_HIGH_EXPONENT);
-		}
-
-		return ply;
-	}
-
-	/**
-	 * Generates a random polynomial modulo p of degree <b>up to</b> n.
-	 *
-	 * @param n maximal degree
-	 * @param p module
+	 * @param n                       maximal degree
+	 * @param p                       module
+	 * @param forceLeadingCoefficient if set to true, the returned polynomial is guaranteed
+	 *                                to have a non-zero leading coefficient for x^n
 	 * @return a random polynomial modulo p of degree up to n
 	 * @throws FFaplAlgebraicException
 	 */
-	public static PolynomialRC getTrueRandomPolynomial(BInteger n, BInteger p) throws FFaplAlgebraicException {
+	public static PolynomialRC getRandomPolynomial(BInteger n, BInteger p, boolean forceLeadingCoefficient) throws FFaplAlgebraicException {
 		Thread thread = p.getThread();
 		PolynomialRC ply = new PolynomialRC(p, thread);
-		RNG_Placebo rnd = new RNG_Placebo(p.subR(new BInteger(ONE, thread)), thread);
 
-		// will throw an arithmeticException if n is greater than Integer.MAX_VALUE
-		n.intValueExact();
+		// generate coefficients less than p
+		BigInteger maxVal = p.subtract(ONE);
+		// for normal coefficients (can be zero)
+		RNG_Placebo rnd = new RNG_Placebo(ZERO, maxVal, thread);
 
-		for (int i = 0; i <= n.intValue(); i++)
-			ply.add(rnd.next(), BigInteger.valueOf(i));
+		// force a non-zero leading coefficient if requested
+		if (forceLeadingCoefficient)
+			ply.add(new RNG_Placebo(ONE, maxVal, thread).next(), n);
+		else
+			ply.add(rnd.next(), n);
+
+		// assign coefficients randomly
+		for (BigInteger i = ZERO; i.compareTo(n) < 0; i = i.add(ONE)) {
+			BigInteger c = rnd.next();
+			if (!c.equals(ZERO))
+				ply.add(c, i);
+		}
 
 		return ply;
 	}
@@ -1160,15 +1142,13 @@ public class Algorithm {
 
 			} else {
 
-				if (n.bitLength() > 35) {
+				if (n.bitLength() > 35 && (Thread.currentThread() instanceof FFaplInterpreter))
 					((FFaplInterpreter) (Thread.currentThread())).getLogger().displaySlowOperationWarning();
-					// logger.log(new FFaplWarning(new Object[0],IAlgebraicError.WARNING_OPERATION_SLOW, null));
-				}
 
 				Bdefault = BInteger.valueOf(100000, thread);
 				//prework find small prime factors
-				min = BigInteger.valueOf(2);
-				max = BigInteger.valueOf(997);//try first 168 primes
+				min = valueOf(2);
+				max = valueOf(997);//try first 168 primes
 
 				fact2 = n;
 				while (min.compareTo(max) <= 0) {
@@ -1218,7 +1198,7 @@ public class Algorithm {
 						}
 					} else {
 						//PollardP-1
-						nB = (BInteger) val.divide(BigInteger.valueOf(2));
+						nB = (BInteger) val.divide(valueOf(2));
 						B = min(Bdefault, nB);
 						fact1 = Algorithm.PollardPMinusOne(val, B);
 
@@ -1282,7 +1262,7 @@ public class Algorithm {
 		BInteger p, d;
 		TreeMap<BigInteger, BigInteger> result = new TreeMap<BigInteger, BigInteger>();
 		
-		p = new BInteger(BigInteger.valueOf(2), thread);
+		p = new BInteger(valueOf(2), thread);
 		if(isProbablePrime(n, 100)){
 			result.put(n, new BInteger(ONE, thread));
 		}else{
@@ -1692,7 +1672,7 @@ public class Algorithm {
 		if(isProbablePrime(n, 100)){
 			return n;
 		}		
-		rand = new RNG_Placebo(BigInteger.valueOf(2), n.subtract(ONE), n.getThread());
+		rand = new RNG_Placebo(valueOf(2), n.subtract(ONE), n.getThread());
 		a = new ResidueClass(rand.next(), n);
 		d = gcd((BInteger)a.value(), n);
 		q = BInteger.valueOf(2, n.getThread());
@@ -1901,9 +1881,9 @@ public class Algorithm {
 			    	}
 			    }
 			    
-				for(int i = start; p.compareTo(BigInteger.valueOf(i)) > 0; i++){
+				for(int i = start; p.compareTo(valueOf(i)) > 0; i++){
 					ply2 = (PolynomialRC) ply.clone();
-					ply2.add(BigInteger.valueOf(i), index);
+					ply2.add(valueOf(i), index);
 					//System.out.println(ply2);
 					ply2 = irreduciblePolynomial(ply2, index.add(ONE), p, n);
 					if (ply2 != null){

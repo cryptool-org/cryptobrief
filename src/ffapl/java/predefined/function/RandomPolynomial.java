@@ -10,9 +10,9 @@ import ffapl.java.interfaces.IPredefinedProcFunc;
 import ffapl.java.math.Algorithm;
 import ffapl.lib.FFaplPreProcFuncSymbol;
 import ffapl.lib.FFaplSymbol;
-import ffapl.lib.interfaces.IVm;
 import ffapl.lib.interfaces.ISymbol;
 import ffapl.lib.interfaces.ISymbolTable;
+import ffapl.lib.interfaces.IVm;
 import ffapl.types.FFaplInteger;
 import ffapl.types.FFaplPolynomial;
 
@@ -32,7 +32,7 @@ public class RandomPolynomial implements IPredefinedProcFunc {
 		BInteger n;
 		p = (BInteger) interpreter.popStack();
 		n = (BInteger) interpreter.popStack();
-	    interpreter.pushStack((Algorithm.getRandomPolynomial(n, p).getPolynomial()));
+	    interpreter.pushStack((Algorithm.getRandomPolynomial(n, p, true).getPolynomial()));
 	    interpreter.funcReturn();
 	}
 	

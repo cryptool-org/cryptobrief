@@ -99,7 +99,7 @@ public class Matrix<V extends IAlgebraicOperations<V>>
         this.defaultValue = matrix.getDefaultValue().clone();
 
         for (MatrixEntry<V> entry : matrix) {
-            this.set(entry.i, entry.j, entry.value);
+            this.set(entry.i, entry.j, entry.value.clone());
         }
     }
 
@@ -965,28 +965,37 @@ public class Matrix<V extends IAlgebraicOperations<V>>
 
     /**
      * Computes the nullity of this matrix,
-     * i.e. the number of columns that are not linear independent,
-     * == the number of columns minus the rank of this matrix
+     * i.e. the number of columns that are not linear independent
+     * == the number of columns minus the rank of this matrix.
+     * Note that if earlyOut is set to a value greater than zero,
+     * the returned value may not be the actual nullity.
+     * If this matrix is only ever needed for calculating its nullity,
+     * then the inPlace parameter should be set to true,
+     * thereby saving space, but potentially changing this matrix.
      * <p>
      * From Sean E. O'Connor: COMPUTING PRIMITIVE POLYNOMIALS - THEORY AND ALGORITHM
      *
-     * @param earlyOut break if nullity is shown to be greater than this
-     * @return the nullity of this matrix
+     * @param inPlace  determines if the calculation should be performed "in place"
+     * @param earlyOut break if nullity is shown to be at least this value
+     * @return the nullity of this matrix, or the earlyOut value
      * @throws FFaplAlgebraicException
      */
-    public long nullity(long earlyOut) throws FFaplAlgebraicException {
+    public long nullity(long earlyOut, boolean inPlace) throws FFaplAlgebraicException {
+        // only perform calculations in place if parameter inPlace is set
+        Matrix<V> A = inPlace ? this : this.clone();
+
         TreeSet<Long> pivotInCol = new TreeSet<>(); // Is included in the set if the column has a pivotal element.
         long nullity = 0;
         long pivotCol = -1; // No pivots yet.
 
         // Sweep through each row.
-        for (long row = 1; row <= this.getN(); row++) {
+        for (long row = 1; row <= A.getN(); row++) {
             // Search for a pivot in this row:  a non-zero element
             // in a column which had no previous pivot.
             boolean found = false;
-            if (this.hasNonZeroRowAt(row)) {
-                for (long col = 1; !found && col <= this.getN(); ++col) {
-                    if (this.hasNonZeroEntryAt(row, col) && !pivotInCol.contains(col)) {
+            if (A.hasNonZeroRowAt(row)) {
+                for (long col = 1; !found && col <= A.getN(); ++col) {
+                    if (A.hasNonZeroEntryAt(row, col) && !pivotInCol.contains(col)) {
                         found = true;
                         pivotCol = col;
                     }
@@ -1004,23 +1013,23 @@ public class Matrix<V extends IAlgebraicOperations<V>>
 
             // Found a pivot, q.
             else {
-                V q = this.get(row, pivotCol);
+                V q = A.get(row, pivotCol);
 
                 // Normalize the pivotal column.
-                for (long r = 1; r <= this.getN(); ++r) {
-                    this.set(r, pivotCol, this.get(r, pivotCol).divR(q));
+                for (long r = 1; r <= A.getN(); ++r) {
+                    A.set(r, pivotCol, A.get(r, pivotCol).divR(q));
                 }
 
                 // Do column reduction:  Add C times the pivotal column to the other
                 // columns where C = element in the other column at current row.
-                for (long col = 1; col <= this.getN(); ++col) {
+                for (long col = 1; col <= A.getN(); ++col) {
                     if (col != pivotCol) {
-                        V s = this.get(row, col);
+                        V s = A.get(row, col);
 
                         Long r = 1L;
-                        while (r <= this.getN() && (r = this.getNextRow(r, false)) != null) {
-                            V t = s.multR(this.get(r, pivotCol));
-                            this.set(r, col, t.addR(this.get(r, col)));
+                        while (r <= A.getN() && (r = A.getNextRow(r, false)) != null) {
+                            V t = s.multR(A.get(r, pivotCol));
+                            A.set(r, col, t.addR(A.get(r, col)));
                         }
                     }
                 }
