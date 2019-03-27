@@ -97,14 +97,6 @@ public class GUIPropertiesLogic {
 				myInputStream = new FileInputStream(file);
 				properties.load(myInputStream);
 				myInputStream.close();
-			}else{
-				//load initial install Data
-				file = new File(IProperties.PROPERTYFILEPATHINSTALL);
-				if (file.exists()) {
-					myInputStream = new FileInputStream(file);
-					properties.load(myInputStream);
-					myInputStream.close();
-				}
 			}
 		} catch (FileNotFoundException e) {
 			System.out.println("FileNotFoundException. Load default properties.");

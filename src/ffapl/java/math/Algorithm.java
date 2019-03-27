@@ -21,8 +21,6 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import ffapl.exception.FFaplException;
 import ffapl.exception.FFaplWarning;
 import ffapl.java.classes.*;

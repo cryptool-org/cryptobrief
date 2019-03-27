@@ -6,7 +6,6 @@ package sunset.gui.interfaces;
 import java.util.prefs.BackingStoreException;
 
 import sunset.gui.logic.GUIPropertiesLogic;
-import sunset.gui.util.WinRegistry;
 
 /**
  * @author Alexander Ortner
@@ -16,8 +15,6 @@ import sunset.gui.util.WinRegistry;
 public class IProperties {
 
 	public static String PROPERTYFILEPATH = "sunset/gui/gui.properties";
-	public static String PROPERTYFILEPATHINSTALL = getInstallPath()
-			+ "sunset.properties";
 	public static String PROPERTYFILE_PATH_USER = getUserHomePath()
 			+ "sunset_user.properties";
 	public static String PROPERTYFILE_DIRPATH_USER = getUserHomePath();
@@ -37,20 +34,6 @@ public class IProperties {
 	public final static String GUI_MAXIMIZED = "GUI.MAXIMIZED";
 	public final static String LOGGER_MODE = "LOGGER.MODE";
 	public final static String SYSTEM = "SYSTEM";
-
-	public static String getInstallPath() {
-		String installPath = "";
-
-		try {
-			installPath = WinRegistry.getRegKey(WinRegistry.HKEY_LOCAL_MACHINE,
-					"SOFTWARE\\Sunset", "Path")
-					+ System.getProperty("file.separator");
-		} catch (BackingStoreException e) {
-			installPath = "";
-			// System.out.println("No registry set for Sunset IDE, load default.");
-		}
-		return installPath;
-	}
 
 	public static String getUserHomePath() {
 		return System.getProperty("user.home")

@@ -6,8 +6,6 @@ import java.util.TreeMap;
 
 import javax.swing.tree.MutableTreeNode;
 
-import org.apache.commons.lang3.StringUtils;
-
 import sunset.gui.api.MutableTreeNodeApiEntry;
 import sunset.gui.api.jaxb.ApiEntry;
 import sunset.gui.api.jaxb.Function;
@@ -19,6 +17,7 @@ import sunset.gui.api.jaxb.Snippet;
 import sunset.gui.api.jaxb.SnippetList;
 import sunset.gui.api.jaxb.Type;
 import sunset.gui.api.jaxb.TypeList;
+import sunset.gui.util.StringUtil;
 import sunset.gui.util.SunsetBundle;
 
 public class ApiUtil {
@@ -117,7 +116,7 @@ public class ApiUtil {
 	private static String getUsageCode(Procedure entry) {
 		String result;
 		int i = 0;
-		if (StringUtils.isBlank(entry.getBody())) {
+		if (StringUtil.isBlank(entry.getBody())) {
 			result = entry.getName() + "(";
 			for (Parameter param : entry.getParameterList().getParameter()) {
 				if (i > 0) {

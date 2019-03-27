@@ -16,8 +16,6 @@ import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 import javax.xml.bind.JAXBException;
 
-import org.apache.commons.lang3.StringUtils;
-
 import sunset.gui.FFaplJFrame;
 import sunset.gui.api.MutableTreeNodeApiEntry;
 import sunset.gui.api.jaxb.Snippet;
@@ -28,6 +26,7 @@ import sunset.gui.listener.ActionListenerApplyApiEntry;
 import sunset.gui.listener.ActionListenerCloseWindow;
 import sunset.gui.listener.ActionListenerSaveApiEntry;
 import sunset.gui.logic.ApiLogic;
+import sunset.gui.util.StringUtil;
 import sunset.gui.util.TranslateGUIElements;
 
 @SuppressWarnings("serial")
@@ -238,7 +237,7 @@ public class JDialogAPICode extends FFaplJDialog {
 		snippet.setBody(jTextPane_Code.getText());
 		snippet.setName(jTextbox_name.getText());
 		snippet.setDescription(jTextArea_description.getText());
-		if(StringUtils.isNotBlank(snippet.getName())){
+		if(!StringUtil.isBlank(snippet.getName())){
 			ApiLogic.getInstance().persistSnippetCode(snippet);
 			this.frame.initLanguage();
 		}
