@@ -738,7 +738,7 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 				base.set(entry.getKey().longValueExact() + 1, i, new ResidueClass(entry.getValue(), _p));
 
 			// square the element every turn
-			free = free.powR(TWO);
+			free = free.powR(_p);
 
 			// cancel if any "base element" is one or zero
 			if (free._value.isOne() || free._value.isZero())

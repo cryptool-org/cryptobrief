@@ -127,6 +127,12 @@ public interface IAlgebraicError {
 	/** Integer Factorization can take a lot of time for big arguments **/
 	public static final int WARNING_FACTORIZATION_SLOW = 1206;
 
+	/** Task cannot be performed on non square matrix **/
+	public static final int  MATRIX_NOT_SQUARE = 1207;
+
+	/** Singular matrix cannot be LUP decomposed **/
+	public static final int SINGULAR_MATRIX = 1208;
+
 	/** Random points not implemented yet **/
 	public static final int NOT_IMPLEMENTED = 9999;
 

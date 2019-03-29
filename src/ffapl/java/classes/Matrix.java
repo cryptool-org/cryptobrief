@@ -74,6 +74,8 @@ public class Matrix<V extends IAlgebraicOperations<V>>
      */
     private TreeMap<Long, TreeMap<Long, V>> matrix = new TreeMap<>();
 
+    private LUPDecomposition lup;
+
     /**
      * Create an empty sparse matrix (A mxn) with all values set to the
      * default value.
@@ -939,7 +941,24 @@ public class Matrix<V extends IAlgebraicOperations<V>>
      * Right now, just a method stub, as I could not find a method to factorize Residue Matrices.
      *
      */
-    public void prepareForSolving() {
+    public static void prepareForSolving(Matrix<ResidueClass> A) {
+        if (A.lup != null || !A.getDefaultValue()._modulus.equals(BigInteger.TWO))
+            return;
+
+        try {
+            A.lup = new LUPDecomposition(A);
+        } catch (FFaplAlgebraicException e) {
+        }
+    }
+
+    public static TreeMap<Long, ResidueClass> solve(Matrix<ResidueClass> A, TreeMap<Long, ResidueClass> b, boolean inPlace) throws FFaplAlgebraicException {
+        if (A.lup != null) {
+            try {
+                return A.lup.solve(b);
+            } catch (FFaplAlgebraicException ignored) {
+            }
+        }
+        return A.solve(b, inPlace);
     }
 
     /**

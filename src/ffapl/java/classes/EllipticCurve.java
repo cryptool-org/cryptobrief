@@ -1481,7 +1481,7 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 
 		if (gf2) {
 			base = _gf.getNormalBase();
-			base.prepareForSolving();
+			Matrix.prepareForSolving(base);
 		}
 
 		// loop until a valid point is found
@@ -1538,7 +1538,7 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 					// solve base * bBaseForm = bVector (as a classic Ax=b system of linear equations)
 					// to express b as linear combination of base elements
 					// (base is pre-calculated, it does not need to change over subsequent iterations)
-					TreeMap<Long, ResidueClass> bBaseForm = base.solve(bVector, false);
+					TreeMap<Long, ResidueClass> bBaseForm = Matrix.solve(base, bVector, false);
 
 					// for a solution to exist, the sum over the coefficients of the base form of b has to be zero
 					boolean hasSolution = true;
