@@ -15,49 +15,54 @@ import static java.math.BigInteger.ONE;
  * Decomposition of Matrix {@code A} includes three matrices
  * {@code L} (lower triangular), {@code U} (upper triangular)
  * and {@code P} (permutation) such that {@code PA = LU}.
+ * Thus, {@code L.multiply(U).applyPermutation(P, true)}
+ * gives the original matrix A.
  * <p>
  * see Introduction to Algorithms, 3rd Ed., p813ff
  */
 public class LUPDecomposition {
 
+    /** Matrix size **/
     private long n;
+
+    /** modulus of the residue classes **/
     private BigInteger modulus;
 
     /**
-     * Joint representation matrix {@code LU} of lower triangular matrix {@code L}
+     * Joint representation matrix {@code LU nxn} of lower triangular matrix {@code L}
      * and upper triangular matrix {@code U}.
      * <p>
      * l_ij = i>j ? lu_ij : i==j ? 1 : 0;
      * u_ij = i>j ? 0 : lu_ij;
      */
-    Matrix<ResidueClass> LU;
+    private Matrix<ResidueClass> LU;
 
     /**
      * permutation "matrix" "P"
      * implemented as sparse vector
      */
-    TreeMap<Long, Long> P;
+    private TreeMap<Long, Long> P;
 
-    private static ResidueClass zero, one;
+    // ResidueClass elements for later (repeated) use, to save on instantiations
+    private ResidueClass zero, one;
 
     /**
      * Create LUP decomposition from square matrix.
      * <p>
      * see Introduction to Algorithms, 3rd Ed., p824
      *
-     * @param A matrix to decompose
+     * @param A nxn matrix to decompose
      */
     public LUPDecomposition(@NotNull Matrix<ResidueClass> A) throws FFaplAlgebraicException {
-//        if (!A.getDefaultValue()._modulus.equals(TWO))
-//            throw new FFaplAlgebraicException(new Object[0], IAlgebraicError.NOT_IMPLEMENTED);
         if (!A.isSquareMatrix())
             throw new FFaplAlgebraicException(new Object[0], IAlgebraicError.MATRIX_NOT_SQUARE);
 
         n = A.getM();
         modulus = A.getDefaultValue()._modulus;
 
+        // instantiate often used values
         zero = A.getDefaultValue();
-        one = new ResidueClass(ONE, A.getDefaultValue()._modulus);
+        one = new ResidueClass(ONE, modulus);
 
         LU = A.clone();
         P = new TreeMap<>();
@@ -67,7 +72,6 @@ public class LUPDecomposition {
             // find row for pivoting:
             // row i >= k such that a_ik != 0
             Long kPrime = null;
-            ResidueClass p = zero;
             for (Long i = LU.getNextRow(k, true); i != null; i = LU.getNextRow(i, false)) {
                 if (LU.hasNonZeroEntryAt(i, k)) {
                     kPrime = i;
@@ -99,8 +103,9 @@ public class LUPDecomposition {
 
                     // a_ik = a_ik/a_kk
                     ResidueClass a_ik = LU.get(i, k);
-                    if (!a_kk.equals(one)) {
-                        a_ik.divR(a_kk);
+                    // ResidueClass.equals only compares the moduli
+                    if (!a_kk._value.equals(ONE)) {
+                        a_ik = a_ik.divR(a_kk);
                         LU.set(i, k, a_ik);
                     }
 
@@ -152,6 +157,43 @@ public class LUPDecomposition {
         }
 
         return x;
+    }
+
+    /**
+     * Get explicit lower triangular matrix L of the decomposition.
+     *
+     * @return L
+     */
+    public Matrix<ResidueClass> getL() {
+        Matrix<ResidueClass> L = new Matrix<>(n, n, zero);
+
+        for (long i = 1; i <= n; i++) {
+            // head-map returns a map with all mappings with keys less than i
+            TreeMap row = LU.getRow(i);
+            if (row != null)
+                L.setRow(i, new TreeMap<>(LU.getRow(i).headMap(i)));
+            L.set(i, i, one);
+        }
+
+        return L;
+    }
+
+    /**
+     * Get explicit upper triangular matrix U of the decomposition.
+     *
+     * @return U
+     */
+    public Matrix<ResidueClass> getU() {
+        Matrix<ResidueClass> U = new Matrix<>(n, n, zero);
+
+        for (long i = 1; i <= n; i++) {
+            // tail-map returns a map with all mappings with keys greater than or equal to i
+            TreeMap row = LU.getRow(i);
+            if (row != null)
+                U.setRow(i, new TreeMap<>(LU.getRow(i).tailMap(i)));
+        }
+
+        return U;
     }
 
     /**

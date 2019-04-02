@@ -1529,16 +1529,10 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 					// lowercase b variable used in the thesis
 					GaloisField b_ = c.divR(b.powR(TWO));
 
-					// prepare vector b as "right side" of Ax=b system of linear equations
-					TreeMap<Long, ResidueClass> bVector = new TreeMap<>();
-					for (Map.Entry<BigInteger, BigInteger> entry : b_.value()._polynomialMap.entrySet())
-						// offset +1 for keys, as matrix indices start at one
-						bVector.put(entry.getKey().longValue() + 1, new ResidueClass(entry.getValue(), TWO));
-
-					// solve base * bBaseForm = bVector (as a classic Ax=b system of linear equations)
+                    // solve base * bBaseForm = bVector (as a classic Ax=b system of linear equations)
 					// to express b as linear combination of base elements
 					// (base is pre-calculated, it does not need to change over subsequent iterations)
-					TreeMap<Long, ResidueClass> bBaseForm = Matrix.solve(base, bVector, false);
+					TreeMap<Long, ResidueClass> bBaseForm = Matrix.solve(base, convertToVector(b_), false);
 
 					// for a solution to exist, the sum over the coefficients of the base form of b has to be zero
 					boolean hasSolution = true;
@@ -1571,15 +1565,10 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 
 					// expand t into normal form by multiplying with the base
 					// t = t_0 * alpha + t_1 * alpha^2 + t_2 * alpha^4 + .... + t_n-1 * alpha^2^n-1
-					TreeMap<Long, ResidueClass> t = base.multiplyVectorRight(tBaseForm);
-					TreeMap<BigInteger, BigInteger> tMap = new TreeMap<>();
+                    TreeMap<Long, ResidueClass> t = base.multiplyVectorRight(tBaseForm);
 
-					// transform t into needed format for cast to polynomial
-					// (matrix indices start at one)
-					t.forEach((index, item) -> tMap.put(valueOf(index - 1), item.value()));
-
-					GaloisField tField = new GaloisField(_gf.characteristic(), _gf.irrPolynomial(), _thread);
-					tField.setValue(new Polynomial(tMap, _thread));
+                    GaloisField tField = new GaloisField(_gf.characteristic(), _gf.irrPolynomial(), _thread);
+					tField.setValue(convertToPolynomial(t, _thread));
 
 					// y = t*B(x)
 					_y_gf = tField.multR(b).value();
@@ -1620,7 +1609,7 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 		return true;
 	}
 
-	private boolean setRandomPointGF2() throws FFaplAlgebraicException {
+    private boolean setRandomPointGF2() throws FFaplAlgebraicException {
 		// check the four trivial cases (those are the only possible ones)
 		Polynomial[] p = {new Polynomial(_thread),
 				new Polynomial(1, 0, _thread)};
@@ -1658,6 +1647,32 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 
 		return true;
 	}
+
+    public static TreeMap<Long, ResidueClass> convertToVector(GaloisField gf) {
+        return convertToVector(gf.value(), gf.characteristic());
+    }
+
+    public static TreeMap<Long, ResidueClass> convertToVector(Polynomial poly, BigInteger modulus) {
+        // prepare the polynomial as "right side" of Ax=b system of linear equations or for matrix multiplications
+        TreeMap<Long, ResidueClass> vector = new TreeMap<>();
+
+        for (Map.Entry<BigInteger, BigInteger> entry : poly._polynomialMap.entrySet()) {
+            // offset +1 for keys, as matrix indices start at one
+            vector.put(entry.getKey().longValue() + 1, new ResidueClass(entry.getValue(), modulus));
+        }
+
+        return vector;
+    }
+
+    public static Polynomial convertToPolynomial(TreeMap<Long, ResidueClass> t, Thread _thread) {
+        TreeMap<BigInteger, BigInteger> tMap = new TreeMap<>();
+
+        // transform t into needed format for cast to polynomial
+        // (matrix indices start at one)
+        t.forEach((exponent, coefficient) -> tMap.put(valueOf(exponent - 1), coefficient._value));
+
+        return new Polynomial(tMap, _thread);
+    }
 
 	public BigInteger getOrder() throws FFaplAlgebraicException
 	{

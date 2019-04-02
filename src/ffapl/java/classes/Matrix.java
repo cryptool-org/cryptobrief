@@ -230,7 +230,7 @@ public class Matrix<V extends IAlgebraicOperations<V>>
         if (map != null) {
             // do not swap if keys are equal. keys are considered equal iff:
             // their references match OR a call to their equals method returns true
-            if (key1 != key2 && (key1 == null || !key1.equals(key2))) {
+            if (!Objects.equals(key1, key2)) {
 
                 V value1 = map.getOrDefault(key1, default1);
                 V value2 = map.getOrDefault(key2, default2);
@@ -866,59 +866,71 @@ public class Matrix<V extends IAlgebraicOperations<V>>
 
     /**
      * Performs Gaussian Elimination and reduces this matrix to upper triangular form.
+     * Returns the nullity, or a lower bound for it,
+     * if a non-zero value was given for {@code earlyOut}.
+     * Optionally applies the same transformations to a column vector {@code b}
+     * or stores the permutations in a map (which rows were swapped in the process).
      * <p>
      * Algorithm is applied in place, it is required to clone this matrix in order to
      * use its normal form afterwards.
      *
-     * @param b          vector of constant terms
-     * @param trackSwaps whether to return a permutation index
-     * @return permutation map
+     * @param b           vector of constant terms (optional)
+     * @param permutation a Map to save the swaps in (optional)
+     * @param earlyOut    break and return this value if the matrix is shown
+     *                    to have at least this nullity.
+     * @return nullity of the matrix, or a lower bound for it,
+     * if {@code earlyOut} is set to a non-zero value
      * @throws FFaplAlgebraicException when operations on underlying objects fail
      */
-    public TreeMap<Long, Long> rowReduceInPlace(NavigableMap<Long, V> b, boolean trackSwaps) throws FFaplAlgebraicException {
+    public long rowReduceInPlace(NavigableMap<Long, V> b, TreeMap<Long, Long> permutation, long earlyOut) throws FFaplAlgebraicException {
         // TODO param: numerically stable (use max pivot, requires compareTo in interface)
         // TODO param: division free (multiply both rows by each others pivots)
-        long h = 1; // pivot row
-        long k = 1; // pivot column
 
-        // init permutation
-        TreeMap<Long, Long> permutation = null;
-        if (trackSwaps)
-            permutation = new TreeMap<>();
+        boolean solveForB = b != null;
+        boolean trackSwaps = permutation != null;
 
-        // iterate over rows, adjust pivot column in each iteration as well
-        for (; h <= m && k <= n; h++, k++) {
+        long nullity = 0;
 
-            // find pivot
+        // iterate over rows (h ~ current row, k ~ pivot column)
+        for (long h = 1, k = 1; h <= m && k <= n; k++) {
+
+            // find row with non-zero (pivot) element
             Long pivot = this.getNextRow(h, true);
             while (pivot != null && !this.hasNonZeroEntryAt(pivot, k)) {
                 pivot = this.getNextRow(pivot, false);
             }
 
-            if (pivot != null) {
-                // swap rows/entries in matrix, vector and (if needed) the permutation
-                this.swapRows(h, pivot);
+            // if no pivot can be found, no adjusting is necessary; increment nullity
+            if (pivot == null || !this.hasNonZeroEntryAt(pivot, k)) {
+                if (++nullity == earlyOut)
+                    return nullity;
+                continue;
+            }
+
+            // swap rows/entries in matrix, vector and (if needed) the permutation
+            this.swapRows(h, pivot);
+            if (solveForB)
                 swapMapItems(b, h, pivot);
+            if (trackSwaps)
+                swapMapItems(permutation, h, pivot, h, pivot, false);
 
-                if (trackSwaps)
-                    swapMapItems(permutation, h, pivot, h, pivot, false);
+            for (long i = h + 1; i <= m; i++) {
+                // only adjust row if pivot entry is non zero
+                if (this.hasNonZeroEntryAt(i, k)) {
+                    //factor =   A[i, k]  /     A[h, k]
+                    V factor = get(i, k).divR(get(h, k));
 
-                for (long i = h + 1; i <= m; i++) {
-                    // only adjust row if pivot entry is non zero
-                    if (this.hasNonZeroEntryAt(i, k)) {
-                        //factor =   A[i, k]  /     A[h, k]
-                        V factor = get(i, k).divR(get(h, k));
+                    // set pivot value of row to zero
+                    this.set(i, k, this.getDefaultValue());
 
-                        // set pivot value of row to zero
-                        this.set(i, k, this.getDefaultValue());
+                    // adjust other values in row
+                    for (long j = k + 1; j <= n; j++) {
+                        //A[i, j] = A[i, j]   -    A[h, j]   *   factor
+                        set(i, j, get(i, j).subR(get(h, j).multR(factor)));
+                    }
 
-                        // adjust other values in row
-                        for (long j = k + 1; j <= n; j++) {
-                            //A[i, j] = A[i, j]   -    A[h, j]   *   factor
-                            set(i, j, get(i, j).subR(get(h, j).multR(factor)));
-                        }
-
-                        // adjust value in vector
+                    // adjust value in vector
+                    if (solveForB) {
                         V b_h = b.get(h);
                         if (b_h != null) {
                             V b_i = b.getOrDefault(i, this.getDefaultValue());
@@ -928,57 +940,65 @@ public class Matrix<V extends IAlgebraicOperations<V>>
                     }
                 }
             }
-            // else: no pivot in this column, continue with the next
+            ++h;
         }
 
-        return permutation;
+        return nullity;
     }
 
     /**
-     * Prepares this matrix (representing a system of linear equations)
+     * Prepares a matrix (representing a system of linear equations)
      * for being solved for multiple "right hand sides".
+     * <p>
+     * Currently only supports residual matrices.
      *
-     * Right now, just a method stub, as I could not find a method to factorize Residue Matrices.
-     *
+     * @see LUPDecomposition
      */
     public static void prepareForSolving(Matrix<ResidueClass> A) {
+        if (A == null)
+            return;
+
         if (A.lup != null || !A.getDefaultValue()._modulus.equals(BigInteger.TWO))
             return;
 
         try {
             A.lup = new LUPDecomposition(A);
-        } catch (FFaplAlgebraicException e) {
+        } catch (FFaplAlgebraicException ignored) {
         }
     }
 
     public static TreeMap<Long, ResidueClass> solve(Matrix<ResidueClass> A, TreeMap<Long, ResidueClass> b, boolean inPlace) throws FFaplAlgebraicException {
+        if (A == null || b == null)
+            return null;
+
         if (A.lup != null) {
             try {
                 return A.lup.solve(b);
             } catch (FFaplAlgebraicException ignored) {
+                // if an error occurs, just solve normally
             }
         }
         return A.solve(b, inPlace);
     }
 
     /**
-     * Solves a system of linear equations given in form of a matrix {@code A} (this matrix)
+     * Solves a system of linear equations {@code Ax = b} given in form of a matrix {@code A} (this matrix)
      * and a vector {@code b} of constant terms, by reducing the Matrix to upper triangular form.
-     *
+     * <p>
      * Note that if the original matrix (this matrix) or the vector {@code b}
      * are needed after this operation, the inPlace switch should be set to false
      *
-     * @param b
+     * @param b       the vector b to solve Ax = b for
      * @param inPlace if set to true, all operations on this matrix and vector {@code b}
      *                will be done in place
-     * @return
+     * @return the solution vector x
      * @throws FFaplAlgebraicException
      */
     public TreeMap<Long, V> solve(NavigableMap<Long, V> b, boolean inPlace) throws FFaplAlgebraicException {
         Matrix<V> A = inPlace ? this : this.clone();
         b = inPlace ? b : new TreeMap<>(b);
 
-        A.rowReduceInPlace(b, false);
+        A.rowReduceInPlace(b, null, 0);
         return A.solveUpperTriangular(b);
     }
 
@@ -992,7 +1012,7 @@ public class Matrix<V extends IAlgebraicOperations<V>>
      * then the inPlace parameter should be set to true,
      * thereby saving space, but potentially changing this matrix.
      * <p>
-     * From Sean E. O'Connor: COMPUTING PRIMITIVE POLYNOMIALS - THEORY AND ALGORITHM
+     * Uses simple Gaussian Elimination.
      *
      * @param inPlace  determines if the calculation should be performed "in place"
      * @param earlyOut break if nullity is shown to be at least this value
@@ -1000,65 +1020,48 @@ public class Matrix<V extends IAlgebraicOperations<V>>
      * @throws FFaplAlgebraicException
      */
     public long nullity(long earlyOut, boolean inPlace) throws FFaplAlgebraicException {
+
+        long start = System.currentTimeMillis();
+
         // only perform calculations in place if parameter inPlace is set
         Matrix<V> A = inPlace ? this : this.clone();
+        return A.rowReduceInPlace(null, null, earlyOut);
+    }
 
-        TreeSet<Long> pivotInCol = new TreeSet<>(); // Is included in the set if the column has a pivotal element.
-        long nullity = 0;
-        long pivotCol = -1; // No pivots yet.
+    /**
+     * Applies a permutation to this matrix.
+     * The permutation is given as a TreeMap,
+     * where a mapping of key -> value determines,
+     * that the row {@code key} of this matrix should be
+     * moved to {@code value}.
+     * <p>
+     * If {@code inverse} is set to true, the inverse permutation is applied,
+     * i.e. the row {@code value} of this matrix is moved to {@code key}.
+     *
+     * @param permutation a map representing the permutation
+     * @param inverse     determines whether the inverse permutation should be applied
+     * @return
+     */
+    public Matrix<V> applyPermutation(TreeMap<Long, Long> permutation, boolean inverse) {
+        TreeMap<Long, TreeMap<Long, V>> newMatrix = new TreeMap<>();
 
-        // Sweep through each row.
-        for (long row = 1; row <= A.getN(); row++) {
-            // Search for a pivot in this row:  a non-zero element
-            // in a column which had no previous pivot.
-            boolean found = false;
-            if (A.hasNonZeroRowAt(row)) {
-                for (long col = 1; !found && col <= A.getN(); ++col) {
-                    if (A.hasNonZeroEntryAt(row, col) && !pivotInCol.contains(col)) {
-                        found = true;
-                        pivotCol = col;
-                    }
-                }
+        // for each row
+        for (Map.Entry<Long, Long> e : permutation.entrySet()) {
+            if (!inverse) {
+                newMatrix.put(e.getKey(), matrix.get(e.getValue()));
+                matrix.remove(e.getValue());
+            } else {
+                newMatrix.put(e.getValue(), matrix.get(e.getKey()));
+                matrix.remove(e.getKey());
             }
-
-            // No pivot;  increase nullity by 1.
-            if (!found) {
-                nullity++;
-
-                // Early out.
-                if (earlyOut > 0 && nullity >= earlyOut)
-                    return nullity;
-            }
-
-            // Found a pivot, q.
-            else {
-                V q = A.get(row, pivotCol);
-
-                // Normalize the pivotal column.
-                for (long r = 1; r <= A.getN(); ++r) {
-                    A.set(r, pivotCol, A.get(r, pivotCol).divR(q));
-                }
-
-                // Do column reduction:  Add C times the pivotal column to the other
-                // columns where C = element in the other column at current row.
-                for (long col = 1; col <= A.getN(); ++col) {
-                    if (col != pivotCol) {
-                        V s = A.get(row, col);
-
-                        Long r = 1L;
-                        while (r <= A.getN() && (r = A.getNextRow(r, false)) != null) {
-                            V t = s.multR(A.get(r, pivotCol));
-                            A.set(r, col, t.addR(A.get(r, col)));
-                        }
-                    }
-                }
-
-                // Record the presence of a pivot in this column.
-                pivotInCol.add(pivotCol);
-
-            } // found a pivot
         }
-        return nullity;
+
+        for (Map.Entry<Long, TreeMap<Long, V>> e : matrix.entrySet()) {
+            newMatrix.put(e.getKey(), e.getValue());
+        }
+
+        this.matrix = newMatrix;
+        return this;
     }
 
     @Override
@@ -1311,7 +1314,7 @@ public class Matrix<V extends IAlgebraicOperations<V>>
             if (o instanceof MatrixEntry) {
                 MatrixEntry e = (MatrixEntry) o;
                 return this.i == e.i && this.j == e.j &&
-                        (this.value == e.value || this.value != null && this.value.equals(e.value));
+                        Objects.equals(this.value, e.value);
             } else {
                 return false;
             }
