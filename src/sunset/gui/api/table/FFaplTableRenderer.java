@@ -5,7 +5,7 @@ import java.awt.Component;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import sunset.gui.api.jaxb.Parameter;
+import sunset.gui.api.spec.Parameter;
 import sunset.gui.util.StringUtil;
 
 public class FFaplTableRenderer extends DefaultTableCellRenderer {

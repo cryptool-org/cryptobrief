@@ -5,9 +5,9 @@ import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 
-import sunset.gui.api.jaxb.ApiSpecification;
-import sunset.gui.api.jaxb.Function;
-import sunset.gui.api.jaxb.Procedure;
+import sunset.gui.api.spec.ApiSpecification;
+import sunset.gui.api.spec.Function;
+import sunset.gui.api.spec.Procedure;
 import sunset.gui.logic.ApiLogic;
 import ffapl.java.matcher.CommentMatcher;
 import ffapl.java.matcher.FFaplMatcher;

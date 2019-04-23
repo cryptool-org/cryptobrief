@@ -10,7 +10,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JDialog;
 
 import sunset.gui.FFaplJFrame;
-import sunset.gui.api.jaxb.Snippet;
+import sunset.gui.api.spec.Snippet;
 import sunset.gui.dialog.JDialogAPI;
 import sunset.gui.dialog.JDialogAPICode;
 

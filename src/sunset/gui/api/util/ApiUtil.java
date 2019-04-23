@@ -7,16 +7,16 @@ import java.util.TreeMap;
 import javax.swing.tree.MutableTreeNode;
 
 import sunset.gui.api.MutableTreeNodeApiEntry;
-import sunset.gui.api.jaxb.ApiEntry;
-import sunset.gui.api.jaxb.Function;
-import sunset.gui.api.jaxb.FunctionList;
-import sunset.gui.api.jaxb.Parameter;
-import sunset.gui.api.jaxb.Procedure;
-import sunset.gui.api.jaxb.ProcedureList;
-import sunset.gui.api.jaxb.Snippet;
-import sunset.gui.api.jaxb.SnippetList;
-import sunset.gui.api.jaxb.Type;
-import sunset.gui.api.jaxb.TypeList;
+import sunset.gui.api.spec.ApiEntry;
+import sunset.gui.api.spec.Function;
+import sunset.gui.api.spec.FunctionList;
+import sunset.gui.api.spec.Parameter;
+import sunset.gui.api.spec.Procedure;
+import sunset.gui.api.spec.ProcedureList;
+import sunset.gui.api.spec.Snippet;
+import sunset.gui.api.spec.SnippetList;
+import sunset.gui.api.spec.Type;
+import sunset.gui.api.spec.TypeList;
 import sunset.gui.util.StringUtil;
 import sunset.gui.util.SunsetBundle;
 
