@@ -1479,11 +1479,6 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 		// precalculate values for char 2, so they dont have to be calculated each loop cycle
 		Matrix<ResidueClass> base = null;
 
-		if (gf2) {
-			base = _gf.getNormalBase();
-			Matrix.prepareForSolving(base);
-		}
-
 		// loop until a valid point is found
 		long tries = 0;
 		do {
@@ -1528,6 +1523,11 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 
 					// lowercase b variable used in the thesis
 					GaloisField b_ = c.divR(b.powR(TWO));
+
+					if (base == null) {
+						base = _gf.getNormalBase();
+						Matrix.prepareForSolving(base);
+					}
 
                     // solve base * bBaseForm = bVector (as a classic Ax=b system of linear equations)
 					// to express b as linear combination of base elements
