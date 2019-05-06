@@ -149,9 +149,10 @@ public class ApiLogic {
 		if(snippetCode != null) {
 			if(!snippetCode.getSnippetList().getSnippet().contains(snippet)) {
 				snippetCode.getSnippetList().getSnippet().add(snippet);
-				persistSnippetCode();
 			}
 		}
+		
+		persistSnippetCode();
 	}
 
 	public void deleteSnippetCode(Snippet snippet) throws IOException {
