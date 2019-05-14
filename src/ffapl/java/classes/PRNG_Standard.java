@@ -9,12 +9,14 @@ import java.security.SecureRandom;
 import ffapl.java.exception.FFaplAlgebraicException;
 import ffapl.java.interfaces.IJavaType;
 import ffapl.java.interfaces.IPseudoRandomGenerator;
+import ffapl.java.math.Algorithm;
 import ffapl.types.FFaplTypeCrossTable;
 
 /**
  * Build in PRNG
  * @author Alexander Ortner
  * @version 1.0
+ * Update (14.05.2019) by Stefan Rass: replaced SecureRandom by a humble hash chain, in order to get reproducible sequences upon the same seed
  *
  */
 public class PRNG_Standard implements IPseudoRandomGenerator {
@@ -25,6 +27,8 @@ public class PRNG_Standard implements IPseudoRandomGenerator {
 	private BInteger _seed;
 	private SecureRandom rg ;
 	private BInteger _max;
+	private JString _current; // current value of the hash chain
+	private int _exp;  // exponent to stretch the 256 bit hash into the sought length (not claiming this to be anyhow cryptographically justified or advisable)
 	
 	/**
 	 * Constructor
@@ -39,9 +43,12 @@ public class PRNG_Standard implements IPseudoRandomGenerator {
 		
 		rg = new SecureRandom();
 		rg.setSeed(seed.toByteArray());
+		
 		_thread = thread;
 		_seed = new BInteger(seed, thread);	
 		_max = new BInteger(max, thread);
+		_exp = 1 + max.bitLength() / 256; // we will use this factor to stretch the 256 bit value of the hash into the sought bitlength
+		_current = new JString(seed.toString());
 	}
 	
 	/**
@@ -70,8 +77,10 @@ public class PRNG_Standard implements IPseudoRandomGenerator {
 	 */
 	@Override
 	public BigInteger next() throws FFaplAlgebraicException{
-		BigInteger val = new BigInteger(_max.bitLength(), rg);
+		//BigInteger val = new BigInteger(_max.bitLength(), rg); // this would give an irreproducible sequence, since "seed" only supplements, but does not replace the inner seed of SecureRandom
+		BigInteger val = Algorithm.hashSHA256(_current).pow(_exp); // use a humble hash chain and expand the result
 		val = val.mod(_max.add(BigInteger.ONE));
+		_current = new JString(val.toString());
 	    return new BInteger(val, _thread);
 	}
 
