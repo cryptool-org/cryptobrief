@@ -13,7 +13,6 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -22,6 +21,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 import static java.math.BigInteger.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Algorithms needed for Algebraic calculations
@@ -631,7 +631,7 @@ public class Algorithm {
 	
 	
 	/**
-	 * suqare root for Z(p) elements
+	 * square root for Z(p) elements
 	 * @throws FFaplAlgebraicException 
 	 * 
 	 */
@@ -1456,12 +1456,10 @@ public class Algorithm {
 		byte[] digestResult = null;
 			try{
 				_digest = MessageDigest.getInstance("SHA-256");
-				_digest.update(inString.toString().getBytes("UTF-8"));
+				_digest.update(inString.toString().getBytes(UTF_8));
 				
 			} catch( NoSuchAlgorithmException e){
 				e.printStackTrace();
-			} catch (UnsupportedEncodingException e) {
-				_digest.update(inString.toString().getBytes());
 			} finally{
 				digestResult = _digest.digest();
 			}

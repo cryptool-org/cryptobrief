@@ -1,23 +1,22 @@
 <component name="ArtifactManager">
-  <artifact type="jar" build-on-make="true" name="sunset:jar">
-    <output-path>$PROJECT_DIR$/nsis_installer/sunset/</output-path>
-    <root id="archive" name="sunset.jar">
-      <element id="module-output" name="Sunset" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jaxb-runtime-2.3.0.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/stax-ex-1.7.8.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/xalan-2.7.0.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/commons-lang3-3.7-javadoc.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jaxb-api-2.3.0.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/FastInfoset-1.2.13.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jaxb-impl-2.3.0.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/xercesImpl-2.8.0.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/commons-lang3-3.7.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/txw2-2.3.0.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/activation-1.1.1.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/istack-commons-runtime-3.0.5.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/xom-1.2.10.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/xml-apis-1.3.03.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jaxb-core-2.3.0.jar" path-in-jar="/" />
-    </root>
-  </artifact>
+    <artifact type="jar" name="sunset:jar">
+        <output-path>$PROJECT_DIR$/nsis_installer/sunset/</output-path>
+        <root id="archive" name="sunset.jar">
+            <element id="module-output" name="Sunset"/>
+            <element id="extracted-dir" path="$PROJECT_DIR$/lib/activation-1.1.1.jar" path-in-jar="/"/>
+            <element id="extracted-dir" path="$PROJECT_DIR$/lib/commons-lang3-3.7.jar" path-in-jar="/"/>
+            <element id="extracted-dir" path="$PROJECT_DIR$/lib/FastInfoset-1.2.13.jar" path-in-jar="/"/>
+            <element id="extracted-dir" path="$PROJECT_DIR$/lib/istack-commons-runtime-3.0.5.jar" path-in-jar="/"/>
+            <element id="extracted-dir" path="$PROJECT_DIR$/lib/jaxb-api-2.3.0.jar" path-in-jar="/"/>
+            <element id="extracted-dir" path="$PROJECT_DIR$/lib/jaxb-core-2.3.0.jar" path-in-jar="/"/>
+            <element id="extracted-dir" path="$PROJECT_DIR$/lib/jaxb-impl-2.3.0.jar" path-in-jar="/"/>
+            <element id="extracted-dir" path="$PROJECT_DIR$/lib/jaxb-runtime-2.3.0.jar" path-in-jar="/"/>
+            <element id="extracted-dir" path="$PROJECT_DIR$/lib/stax-ex-1.7.8.jar" path-in-jar="/"/>
+            <element id="extracted-dir" path="$PROJECT_DIR$/lib/txw2-2.3.0.jar" path-in-jar="/"/>
+            <element id="extracted-dir" path="$PROJECT_DIR$/lib/xalan-2.7.0.jar" path-in-jar="/"/>
+            <element id="extracted-dir" path="$PROJECT_DIR$/lib/xercesImpl-2.8.0.jar" path-in-jar="/"/>
+            <element id="extracted-dir" path="$PROJECT_DIR$/lib/xml-apis-1.3.03.jar" path-in-jar="/"/>
+            <element id="extracted-dir" path="$PROJECT_DIR$/lib/xom-1.2.10.jar" path-in-jar="/"/>
+        </root>
+    </artifact>
 </component>
