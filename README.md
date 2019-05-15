@@ -60,11 +60,27 @@ Contributions by the following people so far is thankfully acknowledged:
 For questions and other inquiries, feel free to send an email to the repository maintainer [Stefan Rass](mailto:stefan.rass@aau.at?subject=Sunset-FFapl)
 
 # Installation Instructions
-The folder [nsis_installer](https://github.com/stefan-rass/sunset-ffapl/tree/master/nsis_installer) contains a Windows installer that can be downloaded and installed as it is. For all other platforms, feel free to copy the subfolder [nsis_installer/sunset](https://github.com/stefan-rass/sunset-ffapl/tree/master/nsis_installer/sunset) to any place on your computer and run the JAR-file in it.
+The folder [nsis_installer](https://github.com/stefan-rass/sunset-ffapl/tree/master/nsis_installer) contains a Windows installer that can be downloaded and installed as it is. For all other platforms, feel free to copy the subfolder [nsis_installer/sunset](https://github.com/stefan-rass/sunset-ffapl/tree/master/nsis_installer/sunset) to any place on your computer and run `sunset.jar` (requires Java 9 Runtime, for Java 8 use `sunset_java8.jar` instead).
 
-<span color="red">**Attention:**</span> Sunset/FFapl requires libraries that 
-will be deprecated as of Java 1.9. So, to run the system **either** use a JRE version 1.8, 
-**or** use the [portable version](https://github.com/stefan-rass/sunset-ffapl/tree/master/nsis_installer/PortableInstallation_for_Java9.zip) 
-in the [same folder as the nsis installer](https://github.com/stefan-rass/sunset-ffapl/tree/master/nsis_installer). To run the 
-program, simply extract the ZIP-file and run the JAR file in it on a **JRE version 1.9** (the jar 
-has the deprecated libraries packed into it, but will not run under Java 1.8).
+## Compiling from source
+Alternatively, the project can also be compiled from source. 
+This repository contains IDE project configurations for Eclipse and IntelliJ 
+(not on main branch yet). After a fresh Import, binaries (`sunset-ffapl/bin`) 
+should be rebuilt before trying to execute, as they are not updated as frequently 
+as the sources.
+
+Note that as of now, the [`master`](https://github.com/stefan-rass/sunset-ffapl) branch is built using Java 1.7 and 
+is **not** compatible with Java 9, whereas the [`feat/ecrand`](https://github.com/stefan-rass/sunset-ffapl/tree/feat/ecrand) branch is 
+built using Java 9 and is compatible with Java 1.8 as well as Java 10, yet no longer with Java 1.7.
+
+[`master`](https://github.com/stefan-rass/sunset-ffapl) branch:
+- [x] **Java 1.7 *(target bytecode version)***
+- [x] Java 1.8
+- [ ] Java 9
+- [ ] Java 10
+
+[`feat/ecrand`](https://github.com/stefan-rass/sunset-ffapl/tree/feat/ecrand) branch:
+- [ ] Java 1.7
+- [x] Java 1.8
+- [x] **Java 9 *(target bytecode version)***
+- [x] Java 10

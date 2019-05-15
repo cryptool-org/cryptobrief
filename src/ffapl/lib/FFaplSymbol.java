@@ -210,7 +210,7 @@ public class FFaplSymbol implements ISymbol {
 		boolean result = false;
 		
 		switch(this.getKind()){
-		//TODO überarbeiten für Parameter etc.
+		//TODO Ã¼berarbeiten fÃ¼r Parameter etc.
 			case ISymbol.PARAMETER:
 				//if(symbol.getKind() == ISymbol.PARAMETER){
 				//	result = symbol.getType().equals(this.getType());

@@ -2,54 +2,69 @@ package ffapl.java.interfaces;
 
 import ffapl.java.exception.FFaplAlgebraicException;
 
-public interface IAlgebraicOperations<A> {
+import java.math.BigInteger;
 
-	/**
-	 * Modulo the modulus
-	 * @param modulus
-	 * @return
-	 * @throws FFaplAlgebraicException
-	 */
-	public A mod(Object modulus) throws FFaplAlgebraicException;
-	
-	/**
-	 * Multiplies with a factor
-	 * @param factor
-	 * @return
-	 * @throws FFaplAlgebraicException
-	 */
-	public A mul(Object factor) throws FFaplAlgebraicException;
-	
-	/**
-	 * Divides with a divisor
-	 * @param divisor
-	 * @return
-	 * @throws FFaplAlgebraicException
-	 */
-	public A div(Object divisor) throws FFaplAlgebraicException;
-	
-	/**
-	 * Adds a summand
-	 * @param summand
-	 * @return
-	 * @throws FFaplAlgebraicException
-	 */
-	public A add(Object summand) throws FFaplAlgebraicException;
-	
-	/**
-	 * Subtracts subtrahend
-	 * @param subtrahend
-	 * @return
-	 * @throws FFaplAlgebraicException
-	 */
-	public A sub(Object subtrahend) throws FFaplAlgebraicException;
-	
-	/**
-	 * To the power of the exponent
-	 * @param exponent
-	 * @return
-	 * @throws FFaplAlgebraicException
-	 */
-	public A pow(Object exponent) throws FFaplAlgebraicException;
-	
+public interface IAlgebraicOperations<T extends IJavaType> extends IJavaType<T> {
+
+    /**
+     * Adds a summand
+     *
+     * @param summand summand
+     * @return sum
+     * @throws FFaplAlgebraicException
+     */
+    T addR(T summand) throws FFaplAlgebraicException;
+
+    /**
+     * Subtracts subtrahend
+     *
+     * @param subtrahend subtrahend
+     * @return difference
+     * @throws FFaplAlgebraicException
+     */
+    T subR(T subtrahend) throws FFaplAlgebraicException;
+
+    /**
+     * Multiplies with a factor
+     *
+     * @param factor factor
+     * @return product
+     * @throws FFaplAlgebraicException
+     */
+    T multR(T factor) throws FFaplAlgebraicException;
+
+    /**
+     * Multiplies with a scalar factor
+     *
+     * @param factor factor
+     * @return product
+     * @throws FFaplAlgebraicException
+     */
+    T scalarMultR(BigInteger factor) throws FFaplAlgebraicException;
+
+    /**
+     * Divides by a dividend
+     *
+     * @param divisor divisor
+     * @return quotient
+     * @throws FFaplAlgebraicException
+     */
+    T divR(T divisor) throws FFaplAlgebraicException;
+
+    /**
+     * Negates the value
+     *
+     * @return negation
+     * @throws FFaplAlgebraicException
+     */
+    T negateR() throws FFaplAlgebraicException;
+
+    /**
+     * Raises by a power
+     *
+     * @param exponent exponent
+     * @return power
+     * @throws FFaplAlgebraicException
+     */
+    T powR(BigInteger exponent) throws FFaplAlgebraicException;
 }

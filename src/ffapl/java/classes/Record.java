@@ -13,7 +13,7 @@ import ffapl.types.FFaplTypeCrossTable;
  * @version 1.0
  *
  */
-public class Record implements IJavaType {
+public class Record implements IJavaType<Record> {
 
 	
 	private HashMap<String, IJavaType> _record;

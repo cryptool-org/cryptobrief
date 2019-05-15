@@ -3,17 +3,19 @@
  */
 package ffapl.java.classes;
 
+import ffapl.FFaplInterpreter;
+import ffapl.java.exception.FFaplAlgebraicException;
+import ffapl.java.interfaces.IAlgebraicError;
+import ffapl.java.interfaces.IJavaType;
+import ffapl.java.math.Algorithm;
+
 import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import ffapl.FFaplInterpreter;
-import ffapl.java.exception.FFaplAlgebraicException;
-import ffapl.java.interfaces.IAlgebraicError;
-import ffapl.java.interfaces.IJavaType;
-import ffapl.java.math.Algorithm;
+import static java.math.BigInteger.*;
 
 /**
  * @author Alexander Ortner
@@ -93,7 +95,7 @@ public class PolynomialRC extends Polynomial {
 		
 		if(! this.isMonic()){
 			//leading coefficient
-			l = new PolynomialRC(this.leadingCoefficient(), BigInteger.ZERO, _characteristic, _thread);
+			l = new PolynomialRC(this.leadingCoefficient(), ZERO, _characteristic, _thread);
 			tmp =  PolynomialRC.divide(this, l);
 			result = tmp[0];
 			if(! tmp[1].isZero()){
@@ -176,7 +178,8 @@ public class PolynomialRC extends Polynomial {
 	
 	/**
 	 * Divides a polynomial of a residue class with this polynomial
-	 * @param polinomial
+	 * @param ply1
+	 * @param ply2
 	 * @throws FFaplAlgebraicException
 	 *         <CHARACTERISTIC_UNEQUAL> if characteristics of the two polynomials are unequal 
 	 */
@@ -197,11 +200,11 @@ public class PolynomialRC extends Polynomial {
 			c = ply1.characteristic();
 			r = (PolynomialRC) ply1.clone();
 			p = (PolynomialRC) ply1.clone();
-			p.setPolynomial(BigInteger.ZERO, BigInteger.ZERO);
+			p.setPolynomial(ZERO, ZERO);
 			lambda = ply2.leadingCoefficient();
 			n = ply2.degree();
 			try{
-				while(r.degree().compareTo(n) >= 0 && r.leadingCoefficient().compareTo(BigInteger.ZERO) > 0){
+				while(r.degree().compareTo(n) >= 0 && r.leadingCoefficient().compareTo(ZERO) > 0){
 					m = r.degree();
 					my = r.leadingCoefficient();
 					//is ~~ my/lambda X^(m-n)~~
@@ -251,7 +254,7 @@ public class PolynomialRC extends Polynomial {
 		            rc.modulus(), rc.classInfo()};
 			throw new FFaplAlgebraicException(arguments, IAlgebraicError.CHARACTERISTIC_UNEQUAL);
 		}
-		super.add(rc.value(), BigInteger.ZERO);
+		super.add(rc.value(), ZERO);
 	}
 	
 	/**
@@ -271,7 +274,7 @@ public class PolynomialRC extends Polynomial {
 	
 	/**
 	 * subtracts the specified residue class <Code> rc </Code> from the current Polynomial
-	 * @param ply
+	 * @param rc
 	 * @throws FFaplAlgebraicException
 	 *         <CHARACTERISTIC_UNEQUAL> if characteristics of the two polynomials are unequal
 	 */
@@ -282,7 +285,7 @@ public class PolynomialRC extends Polynomial {
 			throw new FFaplAlgebraicException(arguments, IAlgebraicError.CHARACTERISTIC_UNEQUAL);
 		}
 		
-		super.subtract(rc.value(), BigInteger.ZERO);
+		super.subtract(rc.value(), ZERO);
 	}
 	
 	/**
@@ -311,7 +314,7 @@ public class PolynomialRC extends Polynomial {
 		            rc.modulus(), rc.classInfo()};
 			throw new FFaplAlgebraicException(arguments, IAlgebraicError.CHARACTERISTIC_UNEQUAL);
 		}
-		super.multiply(rc.value(), BigInteger.ZERO);
+		super.multiply(rc.value(), ZERO);
 	}
 	
 	@Override
@@ -343,7 +346,7 @@ public class PolynomialRC extends Polynomial {
 	@Override
 	public void divide(BigInteger divisor) throws FFaplAlgebraicException{
 		ResidueClass rc = new ResidueClass(divisor, this._characteristic);
-		multiply(rc.inverse()._value, BigInteger.ZERO);
+		multiply(rc.inverse()._value, ZERO);
 	}
 	
 	@Override
@@ -366,10 +369,10 @@ public class PolynomialRC extends Polynomial {
 	@Override
 	public Polynomial pow(BigInteger exponent) throws FFaplAlgebraicException{
 		ResidueClass rc;
-		if(exponent.compareTo(BigInteger.ZERO) < 0){
-			if(this.degree().equals(BigInteger.ZERO)){
+		if(exponent.compareTo(ZERO) < 0){
+			if(this.degree().equals(ZERO)){
 				rc = new ResidueClass(leadingCoefficient(), _characteristic);
-				this.setPolynomial(rc.inverse().value(), BigInteger.ZERO);
+				this.setPolynomial(rc.inverse().value(), ZERO);
 			}else{
 				Object[] arguments = {exponent, 
 						 this.classInfo() + " -> " + this + 
@@ -388,7 +391,7 @@ public class PolynomialRC extends Polynomial {
 		PolynomialRC ply;
 		
 		if(val instanceof BigInteger){
-			ply = new PolynomialRC((BigInteger) val, BigInteger.ZERO, _characteristic, _thread);
+			ply = new PolynomialRC((BigInteger) val, ZERO, _characteristic, _thread);
 		}else if(val instanceof PolynomialRC){
 			ply = (PolynomialRC) val;
 			if(! this.characteristic().equals(ply.characteristic())){
@@ -404,7 +407,7 @@ public class PolynomialRC extends Polynomial {
 						((ResidueClass) val).modulus(), val.classInfo()};
 				throw new FFaplAlgebraicException(arguments, IAlgebraicError.CHARACTERISTIC_UNEQUAL);
 			}
-			ply = new PolynomialRC(((ResidueClass) val).value(), BigInteger.ZERO, _characteristic, _thread);
+			ply = new PolynomialRC(((ResidueClass) val).value(), ZERO, _characteristic, _thread);
 		}else{
 			String[] arguments = {"polynomial ring equals operation try to compare " + 
 					this.classInfo() + " with " + val.classInfo()};
@@ -430,7 +433,7 @@ public class PolynomialRC extends Polynomial {
 			c.setValue(_polynomialMap.get(e));
 			
 			//fix by Johannes Winkler to prevent 0^0
-			if (x.compareTo(BigInteger.ZERO) == 0 && e.compareTo(BigInteger.ZERO) == 0)
+			if (x.compareTo(ZERO) == 0 && e.compareTo(ZERO) == 0)
 			{
 				//nothing happens
 			}
@@ -456,7 +459,7 @@ public class PolynomialRC extends Polynomial {
 		for(Iterator<BigInteger> itr = keyset.iterator(); itr.hasNext(); ){
 			e = itr.next();
 			c = this._polynomialMap.get(e).mod(_characteristic);
-			if(!c.equals(BigInteger.ZERO)){
+			if(!c.equals(ZERO)){
 				this._polynomialMap.put(e, c);
 			}else{
 				this._polynomialMap.remove(e);
@@ -464,12 +467,19 @@ public class PolynomialRC extends Polynomial {
 		}
 		//super.postTask();
 	}
-	
+
 	@Override
-	public String toString(){
-		return super.toString();
+	public int hashCode() {
+		return this.toString().hashCode() ^ this.characteristic().hashCode();
 	}
-	
+
+	@Override
+	public boolean equals(Object f) {
+		return f instanceof PolynomialRC
+				&& plyequal((PolynomialRC) f)
+				&& this._characteristic.equals(((PolynomialRC) f)._characteristic);
+	}
+
 	@Override
 	public int typeID() {
 		return IJavaType.POLYNOMIALRC;
@@ -487,7 +497,75 @@ public class PolynomialRC extends Polynomial {
 		}
 		return false;
 	}
-	
-	
 
+	/**
+	 * Check for linear factors by searching for roots of the polynomial.
+	 *
+	 * @return true if the polynomial has linear factors
+	 */
+	public boolean hasLinearFactors() throws FFaplAlgebraicException {
+		BInteger current = new BInteger(ZERO, _thread);
+		BInteger one = new BInteger(ONE, _thread);
+
+		// for every a in [1,p-1] (p being the characteristic)
+		while (current.compareTo(this.characteristic()) <= 0) {
+			// check if f(a) = 0 (mod p)
+			// i.e. if the polynomial has a root caused by a linear factor
+			if (this.calculate(current).compareTo(ZERO) == 0)
+				return true;
+			current = current.addR(one);
+		}
+
+		return false;
+	}
+
+	public Matrix<ResidueClass> getQMatrix(PolynomialRC x, boolean subtractId, boolean useXToTheP, Thread _thread) throws FFaplAlgebraicException {
+
+		if (this.characteristic().compareTo(TWO) < 0 || degree().compareTo(TWO) < 0)
+			// cannot generate Q-Matrix with degree or characteristic less than 2
+			throw new FFaplAlgebraicException(new Object[0], IAlgebraicError.Q_MATRIX_DEGREE);
+
+		Matrix<ResidueClass> Q = new Matrix<>(degree().longValue(), this.degree().longValue(), new ResidueClass(ZERO, this.characteristic()));
+		ResidueClass one = new ResidueClass(ONE, this.characteristic());
+
+		if (!subtractId)
+			Q.set(1, 1, one);
+		// otherwise first row is zero
+		// (entry at 1,1 would be 1 but result will have identity matrix subtracted)
+
+		if (x == null) {
+			x = new PolynomialRC(ONE, ONE, this.characteristic(), _thread);
+			if (useXToTheP) {
+				x = (PolynomialRC) x.pow(this.characteristic());
+				x.mod(this);
+			}
+		}
+		PolynomialRC q = (PolynomialRC) x.clone();
+
+		// second row are the coefficients of x^p
+		x._polynomialMap.forEach((BigInteger e, BigInteger c)
+				-> Q.set(2, e.longValue() + 1, new ResidueClass(c, this.characteristic())));
+
+		// subtract identity matrix
+		if (subtractId)
+			Q.set(2, 2, Q.get(2, 2).subR(one));
+
+		// k-th row are the coefficients of x^(k-1)p
+		// (matrix indices start at 1)
+		for (long k = 3; k <= this.degree().longValue(); k++) {
+			q = (PolynomialRC) q.multR(x);
+			q.mod(this);
+
+			// variables in lambda function should be effectively final
+			long finalK = k;
+			q._polynomialMap.forEach((BigInteger e, BigInteger c)
+					-> Q.set(finalK, e.add(ONE).longValue(), new ResidueClass(c, this.characteristic())));
+
+			// subtract identity matrix
+			if (subtractId)
+				Q.set(k, k, Q.get(k, k).subR(one));
+		}
+
+		return Q;
+	}
 }

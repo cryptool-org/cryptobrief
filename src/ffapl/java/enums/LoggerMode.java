@@ -1,7 +1,7 @@
 package ffapl.java.enums;
 
 /**
- * Mode Enum für Logger 
+ * Mode Enum fÃ¼r Logger
  * @author Alexander Ortner
  * @version 1.0
  *
