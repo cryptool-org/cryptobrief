@@ -8,7 +8,11 @@ public class StringUtil {
 		
 	}
 	
-	public static boolean isBlank(String str) {
+	public static StringUtil getInstance() {
+		return instance;
+	}
+	
+	public boolean isBlank(String str) {
 		if (str == null)
 			return true;
 		

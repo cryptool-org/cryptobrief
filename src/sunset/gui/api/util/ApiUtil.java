@@ -116,7 +116,7 @@ public class ApiUtil {
 	private static String getUsageCode(Procedure entry) {
 		String result;
 		int i = 0;
-		if (StringUtil.isBlank(entry.getBody())) {
+		if (StringUtil.getInstance().isBlank(entry.getBody())) {
 			result = entry.getName() + "(";
 			for (Parameter param : entry.getParameterList().getParameter()) {
 				if (i > 0) {

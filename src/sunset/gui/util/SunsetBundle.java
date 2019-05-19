@@ -23,7 +23,7 @@ public class SunsetBundle {
 	
 	public String getProperty(String key, Locale locale){
 		String result = "";
-		if(!StringUtil.isBlank(key)){
+		if(!StringUtil.getInstance().isBlank(key)){
 			try{
 				result = ResourceBundle.getBundle(BASENAME, locale).getString(key);
 			}catch (Exception e) {
