@@ -11,7 +11,7 @@ import ffapl.types.FFaplTypeCrossTable;
  * @version 1.0
  *
  */
-public class JString implements IJavaType {
+public class JString implements IJavaType<JString> {
 
 	private String _value;
 	/**

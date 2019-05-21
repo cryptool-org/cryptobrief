@@ -89,7 +89,9 @@ public class ApiLogic {
 			
 			for (int i = 1; i < snippetStrings.length; i++) {	// first string is no snippet
 				Snippet snippet = getSnippetFromText(snippetStrings[i]);
-				snippetList.addSnippet(snippet);
+				
+				if (snippet != null)
+					snippetList.addSnippet(snippet);
 			}
 
 			SnippetCode snippetCode = new SnippetCode();
@@ -116,18 +118,27 @@ public class ApiLogic {
 		final String BODY_TAG_START = "<body>";
 		final String BODY_TAG_END = "</body>";
 		
-		String name, desc, body;
+		try {
+			String name, desc, body;
+			
+			name = text.substring(text.indexOf(NAME_TAG_START) + NAME_TAG_START.length(), 
+					text.indexOf(NAME_TAG_END));
+			
+			desc = text.substring(text.indexOf(DESC_TAG_START) + DESC_TAG_START.length(), 
+					text.indexOf(DESC_TAG_END));
+			
+			body = text.substring(text.indexOf(BODY_TAG_START) + BODY_TAG_START.length(), 
+					text.indexOf(BODY_TAG_END));
+			
+			body = body.replace("&#13;", "");	// eliminate carriage return code from body
+			
+			return new Snippet(name, desc, body);
+			
+		} catch (IndexOutOfBoundsException e) {
+			e.printStackTrace();
+		}
 		
-		name = text.substring(text.indexOf(NAME_TAG_START) + NAME_TAG_START.length(), 
-				text.indexOf(NAME_TAG_END));
-		
-		desc = text.substring(text.indexOf(DESC_TAG_START) + DESC_TAG_START.length(), 
-				text.indexOf(DESC_TAG_END));
-		
-		body = text.substring(text.indexOf(BODY_TAG_START) + BODY_TAG_START.length(), 
-				text.indexOf(BODY_TAG_END));
-		
-		return new Snippet(name, desc, body.replace("&#13;", ""));
+		return null;
 	}
 	
 	public void persistSnippetCode() throws IOException {
@@ -168,14 +179,13 @@ public class ApiLogic {
 
 	@SuppressWarnings("unchecked")
 	private <T> T getApiObject(String key, InputStream inputStream, Class<T> clazz) {
-		ObjectInputStream objectInputStream;
 		T apiObject = null;
 		
 		try {
 			apiObject = (T) apiCache.get(key);
 			
 			if (apiObject == null) {
-				objectInputStream = new ObjectInputStream(inputStream);
+				ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
 				apiObject = (T) objectInputStream.readObject();
 				objectInputStream.close();
 				apiCache.put(key, apiObject);

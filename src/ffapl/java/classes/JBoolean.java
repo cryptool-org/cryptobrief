@@ -11,7 +11,7 @@ import ffapl.types.FFaplTypeCrossTable;
  * @version 1.0
  *
  */
-public class JBoolean implements IJavaType  {
+public class JBoolean implements IJavaType<JBoolean>  {
 
 	private boolean _value;
 	

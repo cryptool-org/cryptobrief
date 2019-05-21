@@ -61,7 +61,7 @@ public class MouseListenerShowAPIDialog implements MouseListener {
 					}else if (e.getClickCount() > 1  && entry.isCustom()) {
 						_code.reInit((Snippet) entry.getEntry());
 						_code.setVisible(true);						
-					}else if(e.getModifiers() == InputEvent.BUTTON3_MASK && entry.isCustom()) {
+					}else if((e.getModifiersEx() & InputEvent.BUTTON3_DOWN_MASK) != 0 && entry.isCustom()) {
 						JPopupMenu popup = new JPopupMenu();
 						JMenuItem mItem = new JMenuItem(SunsetBundle.getInstance().getProperty("menuitem_delete"));
 						mItem.setIcon(new ImageIcon(getClass()
@@ -83,7 +83,7 @@ public class MouseListenerShowAPIDialog implements MouseListener {
 						
 					}
 				}else if(node instanceof MutableTreeNodeHead){
-					if(e.getModifiers() == InputEvent.BUTTON3_MASK) {
+					if((e.getModifiersEx() & InputEvent.BUTTON3_DOWN_MASK) != 0) {
 						JPopupMenu popup = new JPopupMenu();
 						JMenuItem mItem = new JMenuItem(SunsetBundle.getInstance().getProperty("menuitem_add"));
 						mItem.setIcon(new ImageIcon(getClass()

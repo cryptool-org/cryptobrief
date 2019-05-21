@@ -108,9 +108,36 @@ public interface IAlgebraicError {
     public static final int EC_BASEFIELD_ERROR = 1130;
 
     public static final int EC_GET_PARAMETER_ERROR = 1131;
-	
-    public static final int NOT_IMPLEMENTED = 9999;
-	/** 
+
+	/** Field element is not primitive **/
+	public static final int NOT_PRIMITIVE = 1201;
+
+	/** Q-Matrix cannot be computed for degree or characteristic less than two **/
+	public static final int Q_MATRIX_DEGREE = 1202;
+
+	/** Curve has no solutions **/
+	public static final int EC_NO_POINTS = 1203;
+
+	/** Could not find any solutions for curve **/
+	public static final int EC_NO_POINTS_FOUND = 1204;
+
+	/** Operation can take a long time with the given arguments **/
+	public static final int WARNING_OPERATION_SLOW = 1205;
+
+	/** Integer Factorization can take a lot of time for big arguments **/
+	public static final int WARNING_FACTORIZATION_SLOW = 1206;
+
+	/** Task cannot be performed on non square matrix **/
+	public static final int  MATRIX_NOT_SQUARE = 1207;
+
+	/** Singular matrix cannot be LUP decomposed **/
+	public static final int SINGULAR_MATRIX = 1208;
+
+	/** Random points not implemented yet **/
+	public static final int NOT_IMPLEMENTED = 9999;
+
+
+    /**
 	 * Return the compiler error number.
 	 * @return error number
 	 */

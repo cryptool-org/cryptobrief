@@ -4,7 +4,7 @@ public interface ILicense {
 
 		
 	public static String License_DE = 
-	    "<p><b>Sunset</b> is eine integrierte Entwicklungsumgebung für die Programmiersprache <b>FFapl</b>.</p>" +
+	    "<p><b>Sunset</b> is eine integrierte Entwicklungsumgebung fÃ¼r die Programmiersprache <b>FFapl</b>.</p>" +
 	    "<p>Konzeption und Implementierung: Alexander O. Ortner (2012)</p>" +
 		"<p>Die Software ist lizensiert unter <a href=\"https://www.gnu.org/licenses/gpl-3.0.txt\">GPL Version 3</a>.</p>";
 
