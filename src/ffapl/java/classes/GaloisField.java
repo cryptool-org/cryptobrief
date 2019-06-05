@@ -92,6 +92,14 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 	}
 
 	/**
+	 * retrieves the value of this field element (as a copy)
+	 * @return
+	 */
+	public PolynomialRC getValue() {
+		return (PolynomialRC) _value.clone();
+	}
+
+	/**
 	 * Returns the characteristic of the GF
 	 * @return
 	 */
