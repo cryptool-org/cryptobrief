@@ -9,8 +9,8 @@ import java.io.IOException;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import sunset.gui.api.jaxb.ApiEntry;
-import sunset.gui.api.jaxb.Snippet;
+import sunset.gui.api.spec.ApiEntry;
+import sunset.gui.api.spec.Snippet;
 import sunset.gui.api.util.ApiUtil;
 
 /**

@@ -8,8 +8,8 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 
-import sunset.gui.api.jaxb.Parameter;
-import sunset.gui.api.jaxb.ParameterList;
+import sunset.gui.api.spec.Parameter;
+import sunset.gui.api.spec.ParameterList;
 import sunset.gui.util.SunsetBundle;
 
 public class FFaplTableModel extends AbstractTableModel {

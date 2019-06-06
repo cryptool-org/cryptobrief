@@ -97,9 +97,9 @@ public class GUIPropertiesLogic {
 				myInputStream = new FileInputStream(file);
 				properties.load(myInputStream);
 				myInputStream.close();
-			}else{
+			} else {
 				//load initial install Data
-				file = new File(IProperties.PROPERTYFILEPATHINSTALL);
+				file = new File(IProperties.PROPERTYFILE_PATH_INSTALL);
 				if (file.exists()) {
 					myInputStream = new FileInputStream(file);
 					properties.load(myInputStream);

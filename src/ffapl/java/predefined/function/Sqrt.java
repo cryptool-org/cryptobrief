@@ -48,7 +48,6 @@ public class Sqrt implements IPredefinedProcFunc {
 			valueInt = ((BigInteger)a).sqrt();
 
 			resultInt = new BInteger(valueInt, null);
-			System.out.println("Quadratwurzel = " + valueInt.sqrt());
 			interpreter.pushStack(resultInt);
 			break;
 		}

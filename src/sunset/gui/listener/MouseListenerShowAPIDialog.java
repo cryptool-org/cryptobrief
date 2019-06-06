@@ -15,7 +15,7 @@ import sunset.gui.FFaplJFrame;
 import sunset.gui.api.IMutableTreeNodeAPI;
 import sunset.gui.api.MutableTreeNodeApiEntry;
 import sunset.gui.api.MutableTreeNodeHead;
-import sunset.gui.api.jaxb.Snippet;
+import sunset.gui.api.spec.Snippet;
 import sunset.gui.dialog.JDialogAPI;
 import sunset.gui.dialog.JDialogAPICode;
 import sunset.gui.interfaces.IProperties;

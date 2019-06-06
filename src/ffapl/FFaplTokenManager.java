@@ -11,7 +11,6 @@ import ffapl.visitor.*;
 import ffapl.types.*;
 import ffapl.java.logging.*;
 import ffapl.java.exception.*;
-import ffapl.xml.*;
 
 /** Token Manager. */
 public class FFaplTokenManager implements FFaplConstants

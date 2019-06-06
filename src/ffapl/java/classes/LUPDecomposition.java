@@ -1,6 +1,6 @@
 package ffapl.java.classes;
 
-import com.sun.istack.NotNull;
+//import com.sun.istack.NotNull;
 import ffapl.java.exception.FFaplAlgebraicException;
 import ffapl.java.interfaces.IAlgebraicError;
 
@@ -53,7 +53,7 @@ public class LUPDecomposition {
      *
      * @param A nxn matrix to decompose
      */
-    public LUPDecomposition(@NotNull Matrix<ResidueClass> A) throws FFaplAlgebraicException {
+    public LUPDecomposition(Matrix<ResidueClass> A) throws FFaplAlgebraicException {
         if (!A.isSquareMatrix())
             throw new FFaplAlgebraicException(new Object[0], IAlgebraicError.MATRIX_NOT_SQUARE);
 

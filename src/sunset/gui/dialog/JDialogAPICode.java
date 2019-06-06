@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Window;
+import java.io.IOException;
 import java.net.MalformedURLException;
 
 import javax.swing.JButton;
@@ -14,13 +15,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
-import javax.xml.bind.JAXBException;
-
-import org.apache.commons.lang3.StringUtils;
 
 import sunset.gui.FFaplJFrame;
 import sunset.gui.api.MutableTreeNodeApiEntry;
-import sunset.gui.api.jaxb.Snippet;
+import sunset.gui.api.spec.Snippet;
 import sunset.gui.api.table.Java2sAutoTextField;
 import sunset.gui.editor.FFaplCodeTextPane;
 import sunset.gui.lib.FFaplFileFilter;
@@ -28,6 +26,7 @@ import sunset.gui.listener.ActionListenerApplyApiEntry;
 import sunset.gui.listener.ActionListenerCloseWindow;
 import sunset.gui.listener.ActionListenerSaveApiEntry;
 import sunset.gui.logic.ApiLogic;
+import sunset.gui.util.StringUtil;
 import sunset.gui.util.TranslateGUIElements;
 
 @SuppressWarnings("serial")
@@ -234,11 +233,11 @@ public class JDialogAPICode extends FFaplJDialog {
 		TranslateGUIElements.translateDialog(this);
 	}
 
-	public void saveApiEntry() throws MalformedURLException, JAXBException {
+	public void saveApiEntry() throws IOException {
 		snippet.setBody(jTextPane_Code.getText());
 		snippet.setName(jTextbox_name.getText());
 		snippet.setDescription(jTextArea_description.getText());
-		if(StringUtils.isNotBlank(snippet.getName())){
+		if(!StringUtil.isBlank(snippet.getName())){
 			ApiLogic.getInstance().persistSnippetCode(snippet);
 			this.frame.initLanguage();
 		}
