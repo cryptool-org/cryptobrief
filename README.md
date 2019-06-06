@@ -56,6 +56,8 @@ Contributions by the following people so far is thankfully acknowledged:
 * Johannes Winkler: elliptic curve support (including pairings)
 * Volker Bugl: I/O support and IDE additions
 * Markus Wiltsche: API extensions
+* Max-Julian Jakobitsch: Implemented random points on elliptic curves over fields of degree 2
+* Manuel Langer: fixed compatibility issues with Java 9 (removal of deprecated classes like JAXB)
 
 For questions and other inquiries, feel free to send an email to the repository maintainer [Stefan Rass](mailto:stefan.rass@aau.at?subject=Sunset-FFapl)
 
