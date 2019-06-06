@@ -7,24 +7,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a3f1ca7e-f5e6-4b44-8f9d-10b29e8cfeae" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/artifacts/sunset_jar.xml" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/artifacts/Sunset_jar.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.settings/org.eclipse.jdt.core.prefs" beforeDir="false" afterPath="$PROJECT_DIR$/.settings/org.eclipse.jdt.core.prefs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/META-INF/MANIFEST.MF" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/sunset/gui/dialog/JDialogAbout.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/sunset/gui/dialog/JDialogAbout.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/sunset/gui/interfaces/IProperties.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/sunset/gui/interfaces/IProperties.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nsis_installer/PortableInstallation_for_Java8.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/nsis_installer/PortableInstallation_for_Java9.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/nsis_installer/Sunset_2.0.0_for_JRE1.8.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/nsis_installer/Sunset_2.0.0_for_JRE1.9.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/nsis_installer/sunset/sunset_java10.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/nsis_installer/sunset/sunset_java8.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/nsis_installer/sunset/sunset_jre8.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/nsis_installer/sunset/sunset_jre9.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/nsis_installer/sunset_setup_2.0_for_Java8.nsi" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/nsis_installer/sunset_setup_2.0_for_Java9.nsi" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/META-INF/MANIFEST.MF" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/sunset/gui/interfaces/IProperties.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/sunset/gui/interfaces/IProperties.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/sunset/gui/dialog/JDialogCredits.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/sunset/gui/dialog/JDialogCredits.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/sunset/gui/dialog/JDialogCredits.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/sunset/gui/dialog/JDialogCredits.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/classes/" />
     <ignored path="$PROJECT_DIR$/bin/" />
@@ -39,15 +25,6 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/.classpath">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="5" column="51" selection-start-line="5" selection-start-column="51" selection-end-line="5" selection-end-column="51" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ffapl/java/classes/Matrix.java">
           <provider selected="true" editor-type-id="text-editor" />
@@ -83,11 +60,20 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ffapl/java/predefined/function/Sqrt.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="250">
-              <caret line="53" selection-start-line="53" selection-end-line="53" />
+            <state relative-caret-position="267">
+              <caret line="54" column="33" selection-start-line="54" selection-start-column="33" selection-end-line="54" selection-end-column="33" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/sunset/gui/dialog/JDialogCredits.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="391">
+              <caret line="174" selection-start-line="174" selection-end-line="174" />
             </state>
           </provider>
         </entry>
@@ -147,6 +133,7 @@
         <option value="$PROJECT_DIR$/src/ffapl/java/classes/LUPDecomposition.java" />
         <option value="$PROJECT_DIR$/src/ffapl/java/predefined/function/ReadFunctions.java" />
         <option value="$PROJECT_DIR$/src/ffapl/java/predefined/function/Sqrt.java" />
+        <option value="$PROJECT_DIR$/src/sunset/gui/dialog/JDialogCredits.java" />
       </list>
     </option>
   </component>
@@ -162,12 +149,36 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
               <item name="Sunset/FFapl" type="b2602c69:ProjectViewProjectNode" />
               <item name="sunset-ffapl" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Sunset/FFapl" type="b2602c69:ProjectViewProjectNode" />
+              <item name="sunset-ffapl" type="462c0819:PsiDirectoryNode" />
+              <item name="bin" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Sunset/FFapl" type="b2602c69:ProjectViewProjectNode" />
+              <item name="sunset-ffapl" type="462c0819:PsiDirectoryNode" />
+              <item name="classes" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Sunset/FFapl" type="b2602c69:ProjectViewProjectNode" />
+              <item name="sunset-ffapl" type="462c0819:PsiDirectoryNode" />
+              <item name="classes" type="462c0819:PsiDirectoryNode" />
+              <item name="artifacts" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Sunset/FFapl" type="b2602c69:ProjectViewProjectNode" />
+              <item name="sunset-ffapl" type="462c0819:PsiDirectoryNode" />
+              <item name="classes" type="462c0819:PsiDirectoryNode" />
+              <item name="artifacts" type="462c0819:PsiDirectoryNode" />
+              <item name="Sunset_jar" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Sunset/FFapl" type="b2602c69:ProjectViewProjectNode" />
@@ -189,38 +200,28 @@
               <item name="Sunset/FFapl" type="b2602c69:ProjectViewProjectNode" />
               <item name="sunset-ffapl" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="ffapl" type="462c0819:PsiDirectoryNode" />
+              <item name="sunset" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Sunset/FFapl" type="b2602c69:ProjectViewProjectNode" />
               <item name="sunset-ffapl" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="ffapl" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="sunset" type="462c0819:PsiDirectoryNode" />
+              <item name="gui" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Sunset/FFapl" type="b2602c69:ProjectViewProjectNode" />
               <item name="sunset-ffapl" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="ffapl" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="function" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Sunset/FFapl" type="b2602c69:ProjectViewProjectNode" />
-              <item name="sunset-ffapl" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="ffapl" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="function" type="462c0819:PsiDirectoryNode" />
-              <item name="Sqrt" type="1a9f42e2:ClassTreeNode" />
+              <item name="sunset" type="462c0819:PsiDirectoryNode" />
+              <item name="gui" type="462c0819:PsiDirectoryNode" />
+              <item name="dialog" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
       <pane id="Scope" />
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -289,10 +290,9 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
-    <editor active="true" />
+    <frame x="-7" y="-7" width="1550" height="934" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2932886" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.29731545" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -301,13 +301,13 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32991013" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4986577" weight="0.32796487" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49798658" weight="0.32734275" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39824304" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.329429" />
       <window_info anchor="bottom" id="Terminal" order="7" weight="0.329429" />
-      <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.5013423" side_tool="true" visible="true" weight="0.32796487" />
+      <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.50201344" side_tool="true" visible="true" weight="0.32734275" />
       <window_info anchor="bottom" id="Version Control" order="9" />
       <window_info anchor="bottom" id="Messages" order="10" sideWeight="0.49798658" weight="0.32796487" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
@@ -461,8 +461,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/ffapl/java/predefined/function/Sqrt.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="250">
-          <caret line="53" selection-start-line="53" selection-end-line="53" />
+        <state relative-caret-position="267">
+          <caret line="54" column="33" selection-start-line="54" selection-start-column="33" selection-end-line="54" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/sunset/gui/dialog/JDialogCredits.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="174" selection-start-line="174" selection-end-line="174" />
         </state>
       </provider>
     </entry>
@@ -477,6 +484,7 @@
             <option name="proportions">
               <list>
                 <option value="0.2" />
+                <option value="0.5" />
               </list>
             </option>
           </splitter-proportions>
