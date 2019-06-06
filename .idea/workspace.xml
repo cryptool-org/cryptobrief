@@ -2,12 +2,29 @@
 <project version="4">
   <component name="ArtifactsWorkspaceSettings">
     <artifacts-to-build>
-      <artifact name="sunset:jar" />
+      <artifact name="Sunset:jar" />
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a3f1ca7e-f5e6-4b44-8f9d-10b29e8cfeae" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/bin/ffapl/java/predefined/function/Sqrt.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/ffapl/java/predefined/function/Sqrt.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/sunset_jar.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.settings/org.eclipse.jdt.core.prefs" beforeDir="false" afterPath="$PROJECT_DIR$/.settings/org.eclipse.jdt.core.prefs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/META-INF/MANIFEST.MF" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/sunset/gui/dialog/JDialogAbout.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/sunset/gui/dialog/JDialogAbout.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/sunset/gui/interfaces/IProperties.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/sunset/gui/interfaces/IProperties.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nsis_installer/PortableInstallation_for_Java8.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nsis_installer/PortableInstallation_for_Java9.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nsis_installer/Sunset_2.0.0_for_JRE1.8.exe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nsis_installer/Sunset_2.0.0_for_JRE1.9.exe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nsis_installer/sunset/sunset_java10.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nsis_installer/sunset/sunset_java8.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nsis_installer/sunset/sunset_jre8.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nsis_installer/sunset/sunset_jre9.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nsis_installer/sunset_setup_2.0_for_Java8.nsi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nsis_installer/sunset_setup_2.0_for_Java9.nsi" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/META-INF/MANIFEST.MF" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/sunset/gui/interfaces/IProperties.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/sunset/gui/interfaces/IProperties.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/classes/" />
     <ignored path="$PROJECT_DIR$/bin/" />
@@ -33,15 +50,13 @@
       </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ffapl/java/classes/Matrix.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-918" />
-          </provider>
+          <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ffapl/java/predefined/function/ReadFunctions.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="194">
+            <state relative-caret-position="884">
               <caret line="86" column="30" selection-start-line="86" selection-start-column="30" selection-end-line="86" selection-end-column="30" />
             </state>
           </provider>
@@ -50,7 +65,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ffapl/java/classes/LUPDecomposition.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="748">
+            <state relative-caret-position="833">
               <caret line="55" column="29" selection-start-line="55" selection-start-column="29" selection-end-line="55" selection-end-column="29" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -71,8 +86,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/ffapl/java/predefined/function/Sqrt.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="289">
-              <caret line="49" column="53" selection-start-line="49" selection-start-column="53" selection-end-line="49" selection-end-column="53" />
+            <state relative-caret-position="250">
+              <caret line="53" selection-start-line="53" selection-end-line="53" />
             </state>
           </provider>
         </entry>
@@ -147,13 +162,23 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
               <item name="Sunset/FFapl" type="b2602c69:ProjectViewProjectNode" />
               <item name="sunset-ffapl" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Sunset/FFapl" type="b2602c69:ProjectViewProjectNode" />
+              <item name="sunset-ffapl" type="462c0819:PsiDirectoryNode" />
+              <item name="nsis_installer" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Sunset/FFapl" type="b2602c69:ProjectViewProjectNode" />
+              <item name="sunset-ffapl" type="462c0819:PsiDirectoryNode" />
+              <item name="nsis_installer" type="462c0819:PsiDirectoryNode" />
+              <item name="sunset" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Sunset/FFapl" type="b2602c69:ProjectViewProjectNode" />
@@ -181,17 +206,31 @@
               <item name="java" type="462c0819:PsiDirectoryNode" />
               <item name="function" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="Sunset/FFapl" type="b2602c69:ProjectViewProjectNode" />
+              <item name="sunset-ffapl" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="ffapl" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="function" type="462c0819:PsiDirectoryNode" />
+              <item name="Sqrt" type="1a9f42e2:ClassTreeNode" />
+            </path>
           </expand>
           <select />
         </subPane>
       </pane>
       <pane id="Scope" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="GenerateAntBuildDialog.backupFiles" value="true" />
+    <property name="GenerateAntBuildDialog.enableUiFormCompile" value="true" />
+    <property name="GenerateAntBuildDialog.forceTargetJdk" value="true" />
+    <property name="GenerateAntBuildDialog.outputFileNameProperty" value="sunset/ffapl" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="project.structure.last.edited" value="Project" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src" />
+    <property name="project.structure.last.edited" value="Artifacts" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
   </component>
@@ -240,10 +279,20 @@
     </task>
     <servers />
   </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.28926176" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2932886" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -252,15 +301,15 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32991013" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.32796487" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4986577" weight="0.32796487" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39824304" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Terminal" order="7" />
-      <window_info anchor="bottom" id="Event Log" order="8" side_tool="true" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.329429" />
+      <window_info anchor="bottom" id="Terminal" order="7" weight="0.329429" />
+      <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.5013423" side_tool="true" visible="true" weight="0.32796487" />
       <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info anchor="bottom" id="Messages" order="10" weight="0.32796487" />
+      <window_info anchor="bottom" id="Messages" order="10" sideWeight="0.49798658" weight="0.32796487" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -344,6 +393,48 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/sunset/gui/util/WinRegistry.java" />
+    <entry file="jar://C:/Program Files/Java/jdk-11.0.2/lib/src.zip!/java.base/java/lang/Thread.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="92">
+          <caret line="983" column="16" selection-start-line="983" selection-start-column="16" selection-end-line="983" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.classpath">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" column="51" selection-start-line="5" selection-start-column="51" selection-end-line="5" selection-end-column="51" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ffapl/java/classes/Matrix.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ffapl/java/predefined/function/ReadFunctions.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="884">
+          <caret line="86" column="30" selection-start-line="86" selection-start-column="30" selection-end-line="86" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ffapl/java/classes/LUPDecomposition.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="833">
+          <caret line="55" column="29" selection-start-line="55" selection-start-column="29" selection-end-line="55" selection-end-column="29" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ffapl/java/exception/FFaplAlgebraicException.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="357">
+          <caret line="26" column="65" selection-start-line="26" selection-start-column="65" selection-end-line="26" selection-end-column="65" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/ffapl/java/interfaces/IAlgebraicError.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1887">
@@ -368,60 +459,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/sunset/gui/util/WinRegistry.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="3" lean-forward="true" selection-start-line="2" selection-end-line="3" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ffapl/java/classes/LUPDecomposition.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="748">
-          <caret line="55" column="29" selection-start-line="55" selection-start-column="29" selection-end-line="55" selection-end-column="29" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.classpath">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="5" column="51" selection-start-line="5" selection-start-column="51" selection-end-line="5" selection-end-column="51" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ffapl/java/classes/Matrix.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-918" />
-      </provider>
-    </entry>
-    <entry file="jar://C:/Program Files/Java/jdk-11.0.2/lib/src.zip!/java.base/java/lang/Thread.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="92">
-          <caret line="983" column="16" selection-start-line="983" selection-start-column="16" selection-end-line="983" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ffapl/java/predefined/function/ReadFunctions.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="194">
-          <caret line="86" column="30" selection-start-line="86" selection-start-column="30" selection-end-line="86" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ffapl/java/exception/FFaplAlgebraicException.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="26" column="65" selection-start-line="26" selection-start-column="65" selection-end-line="26" selection-end-column="65" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/ffapl/java/predefined/function/Sqrt.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="49" column="53" selection-start-line="49" selection-start-column="53" selection-end-line="49" selection-end-column="53" />
+        <state relative-caret-position="250">
+          <caret line="53" selection-start-line="53" selection-end-line="53" />
         </state>
       </provider>
     </entry>
@@ -431,6 +472,7 @@
       <state key="ArtifactsStructureConfigurable.UI">
         <settings>
           <artifact-editor />
+          <last-edited>Sunset:jar</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
@@ -442,6 +484,7 @@
       </state>
       <state key="FacetStructureConfigurable.UI">
         <settings>
+          <last-edited>No facets are configured</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
@@ -475,6 +518,7 @@
       </state>
       <state key="ModuleStructureConfigurable.UI">
         <settings>
+          <last-edited>Sunset</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
@@ -486,6 +530,7 @@
       </state>
       <state key="ProjectLibrariesConfigurable.UI">
         <settings>
+          <last-edited>com.io7m.xom:xom:1.2.10</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>

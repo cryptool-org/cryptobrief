@@ -26,7 +26,7 @@ public class IProperties {
 	public final static String GUIFontFamily = "Sans-Serif";
 	public final static String IMAGEPATH = "sunset/gui/images/";
 	public final static String APPTITLE = "FFapl {0} Sunset";
-	public final static String APPVERSION = "2.0";
+	public final static String APPVERSION = "2.1";
 	public final static String SHOW_API = "SHOW.API";
 	public final static String GUI_WIDTH = "GUI.WIDTH";
 	public final static String GUI_HEIGHT = "GUI.HEIGHT";
