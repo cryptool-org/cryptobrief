@@ -237,7 +237,7 @@ public class JDialogAPICode extends FFaplJDialog {
 		snippet.setBody(jTextPane_Code.getText());
 		snippet.setName(jTextbox_name.getText());
 		snippet.setDescription(jTextArea_description.getText());
-		if(!StringUtil.isBlank(snippet.getName())){
+		if(!StringUtil.getInstance().isBlank(snippet.getName())){
 			ApiLogic.getInstance().persistSnippetCode(snippet);
 			this.frame.initLanguage();
 		}

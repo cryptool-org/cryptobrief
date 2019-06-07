@@ -7,8 +7,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 import java.util.Properties;
 
+import ffapl.utils.FFaplProperties;
 import sunset.gui.interfaces.IProperties;
 
 public class GUIPropertiesLogic {
@@ -105,6 +107,11 @@ public class GUIPropertiesLogic {
 					properties.load(myInputStream);
 					myInputStream.close();
 				}
+			}
+			
+			if (properties.containsKey(IProperties.LANGUAGE)) {
+				String language = properties.getProperty(IProperties.LANGUAGE);
+				FFaplProperties.getInstance().setLocale(new Locale(language));
 			}
 		} catch (FileNotFoundException e) {
 			System.out.println("FileNotFoundException. Load default properties.");

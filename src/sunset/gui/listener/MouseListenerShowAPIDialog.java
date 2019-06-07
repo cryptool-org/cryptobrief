@@ -45,7 +45,7 @@ public class MouseListenerShowAPIDialog implements MouseListener {
 	}
 
 	@Override
-	public void mouseClicked(MouseEvent e) {
+	public void mousePressed(MouseEvent e) {
 		JTree tree;
 		Object node;
 		if (e.getSource() instanceof JTree) {
@@ -112,7 +112,7 @@ public class MouseListenerShowAPIDialog implements MouseListener {
 	}
 
 	@Override
-	public void mousePressed(MouseEvent arg0) {
+	public void mouseClicked(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 
 	}

@@ -1108,6 +1108,7 @@ public class FFaplJFrame extends javax.swing.JFrame {
 		DefaultTreeCellRenderer renderer = new APITreeCellRenderer();
 		if (jTree_API != null) {
 			jTree_API.removeAll();
+			jTree_API.updateUI();
 		} else {
 			jTree_API = new JTree();
 			new APITreeDragSource(jTree_API);
