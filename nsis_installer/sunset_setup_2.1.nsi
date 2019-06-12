@@ -18,6 +18,7 @@ BrandingText "Sunset - Install System V1.0"
   Var JAVA_VER_STR
   Var JAVA_INSTALLATION_MSG
   Var JAVA_EXE
+  Var JAVA_REG_PATH
 
 
 
@@ -26,7 +27,7 @@ BrandingText "Sunset - Install System V1.0"
 !define VERSION 2.1.0
 !define PRODUCT_VERSION 2.1.0.0
 !define COMPANY "Alpen-Adria Universität Klagenfurt"
-!define COPYRIGHT "Copyright 2013-2018, Alpen-Adria Universität Klagenfurt"
+!define COPYRIGHT "Copyright 2013-2019, Alpen-Adria Universität Klagenfurt"
 !define FILEDESCRIPTION "IDE für FFapl-Entwickler"
 
 
@@ -53,13 +54,13 @@ BrandingText "Sunset - Install System V1.0"
 !define MUI_LANGDLL_REGISTRY_KEY ${REGKEY}
 !define MUI_LANGDLL_REGISTRY_VALUENAME InstallerLanguage
 !define SUNSET_PROPERTIES "sunset.properties"
-!define REQ_JAVA_VERSION "18"
-!define STR_JAVA_VERSION "1.8"
+!define REQ_JAVA_VERSION "9"
 
 # Included files
 !include MultiUser.nsh
 !include Sections.nsh
 !include MUI2.nsh
+!include x64.nsh
 
 
 # Reserved Files
@@ -278,6 +279,7 @@ ExecShell "Open" "$SMPROGRAMS\$StartMenuGroup\Sunset.lnk"
 FunctionEnd
 
 
+
 ; ispired by
 ;--------------------------------
 ;AUTHOR: Ashwin Jayaprakash
@@ -302,45 +304,73 @@ Function LocateJVM
     ;Check for Java version and location
     Push $0
     Push $1
+	Push $2
  
+	${If} ${RunningX64}
+		SetRegView 64
+	${Else}
+		SetRegView 32
+	${EndIf}      
     
-    
-    ReadRegStr $JAVA_VER HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" CurrentVersion
-    StrCmp "" "$JAVA_VER" JavaNotPresent CheckJavaVer
+	StrCpy $JAVA_REG_PATH "SOFTWARE\JavaSoft\JDK"
+    ReadRegStr $JAVA_VER HKLM "SOFTWARE\JavaSoft\JDK" CurrentVersion
+    StrCmp "" "$JAVA_VER" JDKNotPresent CheckJavaVer
+	
+	JDKNotPresent:
+	StrCpy $JAVA_REG_PATH "SOFTWARE\JavaSoft\JRE"
+	ReadRegStr $JAVA_VER HKLM "SOFTWARE\JavaSoft\JRE" CurrentVersion
+	StrCmp "" "$JAVA_VER" JRENotPresent CheckJavaVer
+	
+	JRENotPresent:
+	StrCpy $JAVA_REG_PATH "SOFTWARE\JavaSoft\Java Runtime Environment"
+	ReadRegStr $JAVA_VER HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" CurrentVersion
+	StrCmp "" "$JAVA_VER" JavaNotPresent CheckJavaVer
  
     JavaNotPresent:
-        #StrCpy $JAVA_INSTALLATION_MSG "Java Runtime Environment is not installed on your computer. You need version ${STR_JAVA_VERSION} or newer to run this program."
-        StrCpy $JAVA_INSTALLATION_MSG "$(NOTINSTALLED_1) ${STR_JAVA_VERSION} $(NOTINSTALLED_2)"
+        #StrCpy $JAVA_INSTALLATION_MSG "Java Runtime Environment is not installed on your computer. You need version ${REQ_JAVA_VERSION} or newer to run this program."
+        StrCpy $JAVA_INSTALLATION_MSG "$(NOTINSTALLED_1) ${REQ_JAVA_VERSION} $(NOTINSTALLED_2)"
         #MessageBox MB_OK $JAVA_INSTALLATION_MSG
         Goto Done
  
+	# Java version could be: 1.*, 9.*, 10.*, ...
     CheckJavaVer:
-        ReadRegStr $0 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment\$JAVA_VER" JavaHome
+        ReadRegStr $0 HKLM "$JAVA_REG_PATH\$JAVA_VER" JavaHome
         GetFullPathName /SHORT $JAVA_HOME "$0"
         StrCpy $0 $JAVA_VER 1 0
-        StrCpy $1 $JAVA_VER 1 2
-        StrCpy $JAVA_VER "$0$1"
-        StrCpy $JAVA_VER_STR "$0.$1"
+        StrCpy $1 $JAVA_VER 1 1
+		StrCmp $1 "." VersionBeforeJava10
+		StrCpy $JAVA_VER "$0$1"	# Version 10 or higher
+        StrCpy $JAVA_VER_STR $0$1
         IntCmp ${REQ_JAVA_VERSION} $JAVA_VER FoundCorrectJavaVer FoundCorrectJavaVer JavaVerNotCorrect
  
+	VersionBeforeJava10: # Version 1.* or 9.*
+		StrCmp $0 "1" OldVersionStyle
+		StrCpy $JAVA_VER $0 
+		StrCpy $JAVA_VER_STR $0
+        IntCmp ${REQ_JAVA_VERSION} $JAVA_VER FoundCorrectJavaVer FoundCorrectJavaVer JavaVerNotCorrect
+		
+	OldVersionStyle:	# Version 1.*
+		StrCpy $2 $JAVA_VER 1 2
+		StrCpy $JAVA_VER $2
+		StrCpy $JAVA_VER_STR "$0.$2"
+        IntCmp ${REQ_JAVA_VERSION} $JAVA_VER FoundCorrectJavaVer FoundCorrectJavaVer JavaVerNotCorrect
+		
+		
     FoundCorrectJavaVer:
         IfFileExists "$JAVA_HOME\bin\javaw.exe" 0 JavaNotPresent
         #MessageBox MB_OK "Found Java: $JAVA_VER at $JAVA_HOME"
         Goto Done
  
     JavaVerNotCorrect:
-        #StrCpy $JAVA_INSTALLATION_MSG "The version of Java Runtime Environment installed on your computer is $JAVA_VER_STR. Version ${STR_JAVA_VERSION} or newer is required to run this program."
-        StrCpy $JAVA_INSTALLATION_MSG "$(WRONGVERSION_1) $JAVA_VER_STR $(WRONGVERSION_2) ${STR_JAVA_VERSION} $(WRONGVERSION_3)"
+        #StrCpy $JAVA_INSTALLATION_MSG "The version of Java Runtime Environment installed on your computer is $JAVA_VER_STR. Version ${REQ_JAVA_VERSION} or newer is required to run this program."
+        StrCpy $JAVA_INSTALLATION_MSG "$(WRONGVERSION_1) $JAVA_VER_STR $(WRONGVERSION_2) ${REQ_JAVA_VERSION} $(WRONGVERSION_3)"
         
         
     Done:
+		Pop $2
         Pop $1
         Pop $0
 FunctionEnd
-
-
-
-
 
 
 
