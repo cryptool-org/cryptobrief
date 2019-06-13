@@ -26,11 +26,10 @@ public class ApiLogic {
 	
 	private static final String APISPECFILE = "FFaplAPISpec.bin";
 	private static final String SAMPLESFILE = "FFaplSampleCode.bin";
-	private static final String DEFAULTSNIPPETSFILE = "FFaplSnippets.bin";
-	private static final String CUSTOMSNIPPETSFILE = "customCode.bin";
-	private static final String SNIPPETS_XML = "customCode.xml";	// for backwards compatibility
+	private static final String SNIPPETSFILE = "customCode.bin";
+	private static final String SNIPPETS_XML = "customCode.xml";
 
-	private static String customCodeFilePath = IProperties.getUserHomePath() + CUSTOMSNIPPETSFILE;
+	private static String customCodeFilePath = IProperties.getUserHomePath() + SNIPPETSFILE;
 	private static String customCodeFilePath_XML = IProperties.getUserHomePath() + SNIPPETS_XML;
 	
 	public static ApiLogic getInstance() {
@@ -73,35 +72,22 @@ public class ApiLogic {
 			fileXML.delete();
 		}
 		
-		SnippetCode snippetCode = null;
-		
 		if (fileBin.exists()) {
 			try {
 				FileInputStream fileInputStream = new FileInputStream(fileBin); 
 				
-				snippetCode = getApiObject(CUSTOMSNIPPETSFILE, fileInputStream, SnippetCode.class);
+				return getApiObject(SNIPPETSFILE, fileInputStream, SnippetCode.class);
 				
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
 		}
 		
-		if (snippetCode == null) {
-			snippetCode = new SnippetCode();
-			snippetCode.setSnippetList(new SnippetList());
-			apiCache.put(CUSTOMSNIPPETSFILE, snippetCode);
-		}
+		SnippetCode custom = new SnippetCode();
+		custom.setSnippetList(new SnippetList());
+		apiCache.put(SNIPPETSFILE, custom);
 		
-		SnippetCode snippetCodeDefault = getInternalApiObject(DEFAULTSNIPPETSFILE, SnippetCode.class);
-		
-		if (snippetCodeDefault != null) {
-			for (Snippet snippet : snippetCodeDefault.getSnippetList().getSnippet()) {
-				if (!snippetCode.getSnippetList().getSnippet().contains(snippet))
-					snippetCode.getSnippetList().addSnippet(snippet);
-			}
-		}
-		
-		return snippetCode;
+		return custom;
 	}
 	
 	/*
@@ -183,7 +169,7 @@ public class ApiLogic {
 	 * serializes the SnippetCode Object from the API cache into the binary file
 	 */
 	public void persistSnippetCode() throws IOException {
-		SnippetCode snippetCode = (SnippetCode) apiCache.get(CUSTOMSNIPPETSFILE);
+		SnippetCode snippetCode = (SnippetCode) apiCache.get(SNIPPETSFILE);
 		
 		if(snippetCode != null) {
 			File file = new File(customCodeFilePath);
@@ -200,7 +186,7 @@ public class ApiLogic {
 	 * @throws IOException if Java Serialization fails
 	 */
 	public void persistSnippetCode(Snippet snippet) throws IOException {
-		SnippetCode snippetCode = (SnippetCode) apiCache.get(CUSTOMSNIPPETSFILE);
+		SnippetCode snippetCode = (SnippetCode) apiCache.get(SNIPPETSFILE);
 		
 		if(snippetCode != null) {
 			if(!snippetCode.getSnippetList().getSnippet().contains(snippet)) {
@@ -216,7 +202,7 @@ public class ApiLogic {
 	 * @throws IOException if Java Serialization fails
 	 */
 	public void deleteSnippetCode(Snippet snippet) throws IOException {
-		SnippetCode snippetCode = (SnippetCode) apiCache.get(CUSTOMSNIPPETSFILE);
+		SnippetCode snippetCode = (SnippetCode) apiCache.get(SNIPPETSFILE);
 		
 		if(snippetCode != null){
 			if(snippetCode.getSnippetList().getSnippet().contains(snippet)) {
