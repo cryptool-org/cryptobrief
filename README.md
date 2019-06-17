@@ -70,3 +70,11 @@ This repository contains IDE project configurations for Eclipse and IntelliJ
 (not on main branch yet). After a fresh Import, binaries (`sunset-ffapl/bin`) 
 should be rebuilt before trying to execute, as they are not updated as frequently 
 as the sources.
+
+## Editing the GUI's API
+When adding or changing features of the language, please make sure to update 
+Sunset's API listing (right part of the editor window) accordingly. There is a 
+convenient editor available for that purpose that comes 
+with a user manual and also provides consistency checks to avoid errors.
+
+Check out the [FFapl API Editor project on github](https://github.com/manlanger/FFaplAPIEditor)
