@@ -1,5 +1,13 @@
+# Java
+*.class
 
-*.class
-*.class
-*.class
-*.class
+# Eclipse IDE
+bin/
+.settings/
+
+# JetBrains IDE
+out/
+.idea/
+*.iws
+*.iml
+*.ipr

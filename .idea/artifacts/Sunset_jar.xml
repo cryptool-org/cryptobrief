@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="Sunset:jar">
-    <output-path>$PROJECT_DIR$/classes/artifacts/Sunset_jar</output-path>
-    <root id="archive" name="Sunset.jar">
-      <element id="module-output" name="Sunset" />
-    </root>
-  </artifact>
-</component>
