@@ -1,0 +1,6 @@
+program calculate{
+X: RandomGenerator(1:10);
+a: Z(23);
+a := 2^X;
+println(a);
+}

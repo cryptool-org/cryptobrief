@@ -12,6 +12,7 @@ import ffapl.visitor.*;
 import ffapl.types.*;
 import ffapl.java.logging.*;
 import ffapl.java.exception.*;
+import java.nio.charset.Charset;
 
 /**
  * @author Alexander Ortner
@@ -45,7 +46,7 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants, FF
    */
   public FFaplInterpreter(FFaplLogger logger, InputStream stream)
   {
-  this(stream);
+  this(stream, Charset.forName("UTF-8"));
   _logger = logger;
   _interrupted = false;
 
