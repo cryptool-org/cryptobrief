@@ -12,7 +12,7 @@ import javax.swing.text.html.StyleSheet;
 
 import sunset.gui.FFaplJFrame;
 import sunset.gui.api.MutableTreeNodeApiEntry;
-import sunset.gui.api.jaxb.Snippet;
+import sunset.gui.api.spec.Snippet;
 import sunset.gui.interfaces.IAbout;
 import sunset.gui.listener.ActionListenerCloseWindow;
 import sunset.gui.listener.ActionListenerEditApiEntry;

@@ -5,9 +5,8 @@ import java.awt.Component;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import org.apache.commons.lang3.StringUtils;
-
-import sunset.gui.api.jaxb.Parameter;
+import sunset.gui.api.spec.Parameter;
+import sunset.gui.util.StringUtil;
 
 public class FFaplTableRenderer extends DefaultTableCellRenderer {
 
@@ -23,14 +22,14 @@ public class FFaplTableRenderer extends DefaultTableCellRenderer {
 				hasFocus, row, column);
 		if(row == (table.getModel().getRowCount() - 1) && column == 0){
 			String cellVal = (String) table.getModel().getValueAt(row, column);
-			if(StringUtils.isNotBlank(cellVal)){
+			if(!StringUtil.getInstance().isBlank(cellVal)){
 				((FFaplTableModel) table.getModel()).addParameter(new Parameter());
 				table.repaint();
 			}
 		}else if(row < (table.getModel().getRowCount() - 1)){
 			String cellVal1 = (String) table.getModel().getValueAt(row, 0);
 			//String cellVal2 = (String) table.getModel().getValueAt(row, 1);
-			if(StringUtils.isBlank(cellVal1)){
+			if(StringUtil.getInstance().isBlank(cellVal1)){
 				((FFaplTableModel) table.getModel()).removeRow(row);
 				table.repaint();
 			}

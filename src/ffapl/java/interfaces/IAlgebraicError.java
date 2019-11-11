@@ -109,6 +109,8 @@ public interface IAlgebraicError {
 
     public static final int EC_GET_PARAMETER_ERROR = 1131;
 
+	public static final int SQRT_COMPOSITE_MODULUS = 1133;
+
 	/** Field element is not primitive **/
 	public static final int NOT_PRIMITIVE = 1201;
 

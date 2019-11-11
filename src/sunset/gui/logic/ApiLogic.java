@@ -3,25 +3,20 @@ package sunset.gui.logic;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collections;
-import java.util.Enumeration;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-
-import sunset.gui.api.jaxb.ApiSpecification;
-import sunset.gui.api.jaxb.ObjectFactory;
-import sunset.gui.api.jaxb.SampleCode;
-import sunset.gui.api.jaxb.Snippet;
-import sunset.gui.api.jaxb.SnippetCode;
-import sunset.gui.api.xml.XmlLoader;
+import sunset.gui.api.binary.BinaryFileLocator;
+import sunset.gui.api.spec.ApiSpecification;
+import sunset.gui.api.spec.SampleCode;
+import sunset.gui.api.spec.Snippet;
+import sunset.gui.api.spec.SnippetCode;
+import sunset.gui.api.spec.SnippetList;
 import sunset.gui.interfaces.IProperties;
 
 public class ApiLogic {
@@ -29,118 +24,235 @@ public class ApiLogic {
 	private static ApiLogic instance = new ApiLogic();
 	private static HashMap<String, Object> apiCache = new HashMap<String, Object>();
 	
-	private static String customCodeFilePath = IProperties.getUserHomePath() + "customCode.xml";
+	private static final String APISPECFILE = "FFaplAPISpec.bin";
+	private static final String SAMPLESFILE = "FFaplSampleCode.bin";
+	private static final String SNIPPETSFILE = "customCode.bin";
+	private static final String SNIPPETS_XML = "customCode.xml";
 
+	private static String customCodeFilePath = IProperties.getUserHomePath() + SNIPPETSFILE;
+	private static String customCodeFilePath_XML = IProperties.getUserHomePath() + SNIPPETS_XML;
+	
 	public static ApiLogic getInstance() {
 		return instance;
 	}
 
+	/*
+	 * Constructor is private because Singleton pattern is used 
+	 */
 	private ApiLogic() {
 
 	}
 
+	/*
+	 * @return deserialized Object of class ApiSpecification
+	 */
 	public ApiSpecification getApiSpecification() {
-		ApiSpecification spec = getInternalApiObject("api.xml", ApiSpecification.class);
-		return spec;
+		return getInternalApiObject(APISPECFILE, ApiSpecification.class);
 	}
 	
+	/*
+	 * @return deserialized Object of class SampleCode
+	 */
 	public SampleCode getSamples() {
-		return getInternalApiObject("samples.xml", SampleCode.class);
+		return getInternalApiObject(SAMPLESFILE, SampleCode.class);
 	}
 	
+	/*
+	 * @return deserialized Object of class SnippetCode
+	 * converts XML file into binary file and then deserializes the binary file
+	 */
 	public SnippetCode getSnippetCode() {
-		File file = new File(customCodeFilePath);
-		if(file.exists()){
+		File fileXML = new File(customCodeFilePath_XML);
+		File fileBin = new File(customCodeFilePath);
+		
+		// if customCode.XML file exists, convert it to binary file and delete it afterwards
+		if(fileXML.exists()) {
+			convertXMLtoBin(fileXML, fileBin);
+			
+			fileXML.delete();
+		}
+		
+		if (fileBin.exists()) {
 			try {
-				return getApiObject(file.toURI().toURL().getPath(), new FileInputStream(file), SnippetCode.class);
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
+				FileInputStream fileInputStream = new FileInputStream(fileBin); 
+				
+				return getApiObject(SNIPPETSFILE, fileInputStream, SnippetCode.class);
+				
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
 		}
 		
-		SnippetCode custom = null;
-		try {
-			custom = new ObjectFactory().createSnippetCode();
-			custom.setSnippetList(new ObjectFactory().createSnippetList());
-			apiCache.put(file.toURI().toURL().getPath(), custom);
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
+		SnippetCode custom = new SnippetCode();
+		custom.setSnippetList(new SnippetList());
+		apiCache.put(SNIPPETSFILE, custom);
+		
 		return custom;
 	}
 	
-	public void persistSnippetCode() throws MalformedURLException, JAXBException{
-		File file = new File(customCodeFilePath);
-		SnippetCode snippetCode = (SnippetCode) apiCache.get(file.toURI().toURL().getPath());
-		if(snippetCode != null){
-			JAXBContext jc;
-			Marshaller m;
-			jc = JAXBContext.newInstance("sunset.gui.api.jaxb");
-			m = jc.createMarshaller();
-			m.marshal(snippetCode, file);
-		}				
+	/*
+	 * @param fileXML the XML file which needs to be converted
+	 * @param fileBin the binary file which is the result of the conversion
+	 * reads the XML file, parses the content and creates an object of type SnippetCode which is serialized into the binary file
+	 */
+	private void convertXMLtoBin(File fileXML, File fileBin) {
+		try {
+			FileReader fileReader = new FileReader(fileXML);
+			char[] buffer = new char[(int) fileXML.length()];
+			
+			fileReader.read(buffer);
+			fileReader.close();
+			
+			String[] snippetStrings = String.valueOf(buffer).split("<snippet>");
+			SnippetList snippetList = new SnippetList();
+			
+			for (int i = 1; i < snippetStrings.length; i++) {	// first string is no snippet
+				Snippet snippet = getSnippetFromText(snippetStrings[i]);
+				
+				if (snippet != null)
+					snippetList.addSnippet(snippet);
+			}
+
+			SnippetCode snippetCode = new SnippetCode();
+			snippetCode.setSnippetList(snippetList);
+			
+			FileOutputStream fileOutputStream = new FileOutputStream(fileBin);
+			ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+			objectOutputStream.writeObject(snippetCode);
+			objectOutputStream.flush();
+			objectOutputStream.close();
+			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
-	public void persistSnippetCode(Snippet snippet) throws MalformedURLException, JAXBException{
-		File file = new File(customCodeFilePath);
-		SnippetCode snippetCode = (SnippetCode) apiCache.get(file.toURI().toURL().getPath());
-		if(snippetCode != null){
-			if(!snippetCode.getSnippetList().getSnippet().contains(snippet)){
+	/*
+	 * @param text the code snippet text which needs to be parsed
+	 * @returns the parsed Snippet object
+	 */
+	private Snippet getSnippetFromText(String text) {
+		final String NAME_TAG_START = "<name>";
+		final String NAME_TAG_END = "</name>";
+		final String DESC_TAG_START = "<description>";
+		final String DESC_TAG_END = "</description>";
+		final String BODY_TAG_START = "<body>";
+		final String BODY_TAG_END = "</body>";
+		
+		try {
+			String name, desc, body;
+			
+			name = text.substring(text.indexOf(NAME_TAG_START) + NAME_TAG_START.length(), 
+					text.indexOf(NAME_TAG_END));
+			
+			desc = text.substring(text.indexOf(DESC_TAG_START) + DESC_TAG_START.length(), 
+					text.indexOf(DESC_TAG_END));
+			
+			body = text.substring(text.indexOf(BODY_TAG_START) + BODY_TAG_START.length(), 
+					text.indexOf(BODY_TAG_END));
+			
+			body = body.replace("&#13;", "");	// eliminate carriage return code from body
+			
+			return new Snippet(name, desc, body);
+			
+		} catch (IndexOutOfBoundsException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	/*
+	 * @throws IOException if Java Serialization fails
+	 * serializes the SnippetCode Object from the API cache into the binary file
+	 */
+	public void persistSnippetCode() throws IOException {
+		SnippetCode snippetCode = (SnippetCode) apiCache.get(SNIPPETSFILE);
+		
+		if(snippetCode != null) {
+			File file = new File(customCodeFilePath);
+			FileOutputStream fileOutputStream = new FileOutputStream(file);
+			ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+			objectOutputStream.writeObject(snippetCode);
+			objectOutputStream.flush();
+			objectOutputStream.close();
+		}
+	}
+	
+	/*
+	 * @param snippet the snippet which needs to be persisted
+	 * @throws IOException if Java Serialization fails
+	 */
+	public void persistSnippetCode(Snippet snippet) throws IOException {
+		SnippetCode snippetCode = (SnippetCode) apiCache.get(SNIPPETSFILE);
+		
+		if(snippetCode != null) {
+			if(!snippetCode.getSnippetList().getSnippet().contains(snippet)) {
 				snippetCode.getSnippetList().getSnippet().add(snippet);
 			}
 		}
+		
 		persistSnippetCode();
 	}
 
+	/*
+	 * @param snippet the snippet which needs to be deleted
+	 * @throws IOException if Java Serialization fails
+	 */
+	public void deleteSnippetCode(Snippet snippet) throws IOException {
+		SnippetCode snippetCode = (SnippetCode) apiCache.get(SNIPPETSFILE);
+		
+		if(snippetCode != null){
+			if(snippetCode.getSnippetList().getSnippet().contains(snippet)) {
+				snippetCode.getSnippetList().getSnippet().remove(snippet);
+				persistSnippetCode();	
+			}
+		}	
+	}
+
+	/*
+	 * @param key the filename which of the according API object
+	 * @param inputStream the InputStream for the specified file
+	 * @param clazz the Class type T which should be returned
+	 * @returns an Object of type T
+	 * if API Object specified by the key does not exist in the API cache the object is deserialized using the inputStream and the spezified class type T
+	 */
 	@SuppressWarnings("unchecked")
 	private <T> T getApiObject(String key, InputStream inputStream, Class<T> clazz) {
-		JAXBContext jc;
-		Unmarshaller u;
 		T apiObject = null;
 		
 		try {
 			apiObject = (T) apiCache.get(key);
+			
 			if (apiObject == null) {
-				jc = JAXBContext.newInstance("sunset.gui.api.jaxb");
-				u = jc.createUnmarshaller();
-				apiObject = (T) u.unmarshal(inputStream);
+				ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+				apiObject = (T) objectInputStream.readObject();
+				objectInputStream.close();
 				apiCache.put(key, apiObject);
-			}else{
-				inputStream.close();
 			}
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
+		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
+			
 		} catch (IOException e) {
+			e.printStackTrace();
 		}
+		
 		return apiObject;
 	}
 
+	/*
+	 * @param fileName the file name which should be used for deserializations
+	 * @param clazz the Class type T which should be returned
+	 * @returns an object of Class T
+	 */
 	private <T> T getInternalApiObject(String fileName, Class<T> clazz) {
 		T apiObject = null;
-		ClassLoader classLoader = Thread.currentThread()
-				.getContextClassLoader();
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		assert classLoader != null;
 
-		apiObject = getApiObject(fileName, XmlLoader.getInstance().getResource(fileName), clazz);
+		apiObject = getApiObject(fileName, BinaryFileLocator.getInstance().getResource(fileName), clazz);
 		return apiObject;
 	}
-
-	public void delete(Snippet snippet) throws MalformedURLException, JAXBException {
-		File file = new File(customCodeFilePath);
-		SnippetCode snippetCode = (SnippetCode) apiCache.get(file.toURI().toURL().getPath());
-		if(snippetCode != null){
-			if(snippetCode.getSnippetList().getSnippet().contains(snippet)){
-				snippetCode.getSnippetList().getSnippet().remove(snippet);
-				persistSnippetCode();	
-			}
-		}
-			
-	}
-
-	
-
-	
 }

@@ -8,8 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 
-import javax.xml.bind.JAXBException;
-
 import sunset.gui.dialog.JDialogAPICode;
 
 /**
@@ -35,10 +33,7 @@ public class ActionListenerSaveApiEntry implements ActionListener {
 		try {
 			_dialog.saveApiEntry();
 			_dialog.dispose();
-		} catch (MalformedURLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (JAXBException e1) {
+		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}

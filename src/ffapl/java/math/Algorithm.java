@@ -512,7 +512,8 @@ public class Algorithm {
 		BigInteger alpha;
 		BigInteger result;
 		Prime p;
-		
+		Thread thrd = f.getThread();
+
 		f = (PolynomialRC) f.clone();
 		g = (PolynomialRC) g.clone();
 		
@@ -524,7 +525,7 @@ public class Algorithm {
 			return ZERO;
 		}
 		
-		p = new Prime(g.characteristic(), null);
+		p = new Prime(g.characteristic(), thrd);
 		f.mod(g);
 		alpha = f.leadingCoefficient();
 		if (f.degree().intValue() == 0) //int value range problem
@@ -558,13 +559,14 @@ public class Algorithm {
 		g = a.clone();
 		b = a.clone();
 		h = a.clone();
-		
+		Thread thrd = a.getThread();
+
 		BigInteger t,q,s,e,p;
 		PolynomialRC aux1, aux2;
-		aux1 = new PolynomialRC(a.characteristic(),null);
-		aux2 = new PolynomialRC(a.characteristic(),null);
+		aux1 = new PolynomialRC(a.characteristic(), thrd);
+		aux2 = new PolynomialRC(a.characteristic(), thrd);
 		
-		b.setValue(new Polynomial(ONE, ZERO,null));
+		b.setValue(new Polynomial(ONE, ZERO,a.getThread()));
 		p = a.characteristic();
 		if (p.equals(new BigInteger("2")))
 		{
@@ -574,13 +576,8 @@ public class Algorithm {
 		else
 		{
 			q = p.pow(a.irrPolynomial().degree().intValue()); //int value range problem
-			aux1 = Algorithm.getRandomPolynomial(new BInteger(a.irrPolynomial().degree().subtract(ONE),null), new BInteger(p,null), true);
-			aux2 = a.irrPolynomial();
-			
-			while (legendreSymbol(aux1,aux2).equals(ONE))
-			{
-				aux1 = Algorithm.getRandomPolynomial(new BInteger(a.irrPolynomial().degree().subtract(ONE),null), new BInteger(p,null), true);
-			}
+			aux1 = Algorithm.getRandomPolynomial(new BInteger(a.irrPolynomial().degree().subtract(ONE), thrd), new BInteger(p, thrd), true);
+
 			g.setValue(aux1);
 			t = q.subtract(ONE);
 			s = ZERO;
@@ -600,7 +597,7 @@ public class Algorithm {
 				aux3.multiply(aux4);
 				aux3.pow(q.subtract(ONE).divide(new BigInteger("2").pow(i)));
 				
-				aux4.setValue(new Polynomial(1,0,null));
+				aux4.setValue(new Polynomial(1,0,thrd));
 				
 				if (!aux3.equals(aux4))
 				{
@@ -644,6 +641,11 @@ public class Algorithm {
 		}
 		
 		BigInteger b;
+		if (!modulus.isProbablePrime(20)) {
+			// modulus is a composite; throw exception to advise user to do a factorization first
+			Object[] arguments ={"Modulus ", modulus.toString(), " is (probably) composite; sqrt is implemented only for finite fields"};
+			throw new FFaplAlgebraicException(arguments,IAlgebraicError.SQRT_COMPOSITE_MODULUS);
+		}
 		PolynomialRC f = new PolynomialRC(modulus,null);
 		PolynomialRC r = new PolynomialRC(modulus,null);
 		RNG_Placebo X = new RNG_Placebo(ZERO,modulus.subtract(ONE), null);
@@ -674,7 +676,7 @@ public class Algorithm {
 		
 		if (checkForError && !result.modPow(new BigInteger("2"), modulus).equals(a))
 		{
-			Object[] arguments ={"Error in PolynomialRC monic function"};
+			Object[] arguments = {"Error in PolynomialRC monic function"};
 			throw new FFaplAlgebraicException(arguments,IAlgebraicError.SQUARE_ROOT_DOES_NOT_EXIST);
 		}
 		

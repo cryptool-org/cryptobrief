@@ -5,14 +5,11 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Window;
-import java.awt.print.PrinterException;
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.nio.channels.OverlappingFileLockException;
+import java.nio.file.StandardOpenOption;
 import java.text.MessageFormat;
 import java.util.Vector;
 
@@ -25,14 +22,15 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.text.Element;
+
+import com.sun.nio.file.ExtendedOpenOption;
+
 import sunset.gui.FFaplJFrame;
 
 import sunset.gui.editor.FFaplCodeTextPane;
 import sunset.gui.interfaces.IProperties;
 import sunset.gui.lib.FFaplFileFilter;
 import sunset.gui.lib.FFaplUndoManager;
-import sunset.gui.listener.ActionListenerCloseTab;
-import sunset.gui.listener.ActionListenerInputField;
 import sunset.gui.listener.AdjustmentListenerLineNumber;
 import sunset.gui.listener.AdjustmentListenerScrollPaneVertical;
 import sunset.gui.listener.CaretListenerColumnPosition;
@@ -41,7 +39,6 @@ import sunset.gui.listener.DocumentListenerLineNumber;
 import sunset.gui.listener.DocumentListenerSaveStatus;
 import sunset.gui.listener.DocumentListenerUndoManager;
 import sunset.gui.logic.GUIPropertiesLogic;
-import sunset.gui.tabbedpane.JTabbedPaneCode;
 import sunset.gui.util.SunsetBundle;
 
 @SuppressWarnings("serial")
@@ -57,7 +54,6 @@ public class JPanelCode extends javax.swing.JPanel {
 	private JScrollPane jScrollPane_LineNumber;
 	private File _file;
 	private FileChannel _fileChannel;
-	private FileLock _fileLock;
 	private JTabbedPane _owner;
 	private Window _window;
 	private JPanelTabTitle _tabtitle;
@@ -208,36 +204,25 @@ public class JPanelCode extends javax.swing.JPanel {
 		_file = file;
 		
 		ByteBuffer bytebuffer;
-		boolean isLocked = false;
 		
 		if(_file != null ){
 			if(_file.canRead()){
 				try {
-					_fileChannel = new RandomAccessFile(file, "rw").getChannel();
-					try {
-				        _fileLock = _fileChannel.tryLock();
-				    } catch (OverlappingFileLockException e) {
-				        isLocked = true;
-				    }
-				   if(!isLocked){//file is locked for us
-					   
-						bytebuffer = ByteBuffer.allocate((int) _file.length());
-						_fileChannel.read(bytebuffer);
-				    	jTextPane_Code.setText(new String(bytebuffer.array()));
-				    	((FFaplCodeTextPane)jTextPane_Code).getManager().discardAllEdits();
-				    	jTextPane_Code.getCaret().setDot(0);
-				    	jTextPane_LineNumber.getCaret().setDot(0);
-				    	//jScrollPane_LineNumber.getVerticalScrollBar().setValue(0);
-				    	
-				   }else{
-					   System.out.println("File is Locked");
-					   return false;
-				   }
+					_fileChannel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.READ, 
+							StandardOpenOption.WRITE, ExtendedOpenOption.NOSHARE_WRITE, ExtendedOpenOption.NOSHARE_DELETE);
+					bytebuffer = ByteBuffer.allocate((int) _file.length());
+					_fileChannel.read(bytebuffer);
+				    jTextPane_Code.setText(new String(bytebuffer.array()));
+				    ((FFaplCodeTextPane)jTextPane_Code).getManager().discardAllEdits();
+				    jTextPane_Code.getCaret().setDot(0);
+				    jTextPane_LineNumber.getCaret().setDot(0);
+				    //jScrollPane_LineNumber.getVerticalScrollBar().setValue(0);
 				} catch (IOException e) {
+					 filename = _file.getName();
 					 releaseFile();
 					 title = SunsetBundle.getInstance().getProperty("file_locked_title");
 					 msg = SunsetBundle.getInstance().getProperty("file_locked");
-					 filename = _file.getName();
+					 
 					 if(title == null){
 							title = "File Locked!";
 						}
@@ -374,7 +359,6 @@ public class JPanelCode extends javax.swing.JPanel {
 		int returnVal;
 		String dir;
 		JFileChooser fileChooser;
-		boolean isLocked = false;
 		boolean saved = false;
 		File file;
 		String filename = "";
@@ -437,17 +421,13 @@ public class JPanelCode extends javax.swing.JPanel {
 			GUIPropertiesLogic.getInstance().setProperty(IProperties.LASTDIRSAVE, _file.getAbsolutePath());
 			
 			try {
-				_fileChannel = new RandomAccessFile(_file, "rw").getChannel();
-			
-				try {
-			        _fileLock = _fileChannel.tryLock();
-			    } catch (OverlappingFileLockException e) {
-			        isLocked = true;
-			    }
-			   if(!isLocked){//file is locked for us
-					saved = save();
-			   }else{
-				   //System.out.println("File is Locked");
+				_fileChannel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.READ, 
+					StandardOpenOption.WRITE, ExtendedOpenOption.NOSHARE_WRITE, ExtendedOpenOption.NOSHARE_DELETE);
+				
+				((FFaplCodeTextPane)jTextPane_Code).inputSaved(false);
+				saved = save();
+			} catch (IOException e) {
+				//System.out.println("File is Locked");
 				   title = SunsetBundle.getInstance().getProperty("warning_title");
 				   msg = SunsetBundle.getInstance().getProperty("info_cannotoverride"); 
 				   if(title == null){
@@ -462,9 +442,6 @@ public class JPanelCode extends javax.swing.JPanel {
 					JOptionPane.showMessageDialog(this, msg, title, JOptionPane.WARNING_MESSAGE);
 				   
 				   saved = false;
-			   }
-			} catch (IOException e) {
-				saved = false;
 			}
 			
 		}
@@ -509,18 +486,15 @@ public class JPanelCode extends javax.swing.JPanel {
 	 * @return
 	 */
 	private boolean releaseFile(){
-		if(_fileLock != null){
-			try {
-				_fileLock.release();
+		try {
+			if (_fileChannel != null)
 				_fileChannel.close();
-				_file = null;
-				_fileLock = null;
-				_fileChannel = null;
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return false;
-			}
+			_file = null;
+			_fileChannel = null;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
 		}
 		return true;
 	}

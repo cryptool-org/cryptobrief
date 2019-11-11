@@ -3,8 +3,6 @@ package sunset.gui.util;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import org.apache.commons.lang3.StringUtils;
-
 import sunset.gui.enums.Language;
 
 public class SunsetBundle {
@@ -25,7 +23,7 @@ public class SunsetBundle {
 	
 	public String getProperty(String key, Locale locale){
 		String result = "";
-		if(StringUtils.isNotBlank(key)){
+		if(!StringUtil.getInstance().isBlank(key)){
 			try{
 				result = ResourceBundle.getBundle(BASENAME, locale).getString(key);
 			}catch (Exception e) {

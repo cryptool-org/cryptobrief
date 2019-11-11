@@ -6,16 +6,16 @@ package sunset.gui.listener;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.text.MessageFormat;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
-import javax.xml.bind.JAXBException;
 
 import sunset.gui.FFaplJFrame;
-import sunset.gui.api.jaxb.ApiEntry;
-import sunset.gui.api.jaxb.Snippet;
+import sunset.gui.api.spec.ApiEntry;
+import sunset.gui.api.spec.Snippet;
 import sunset.gui.dialog.JDialogAPI;
 import sunset.gui.dialog.JDialogAPICode;
 import sunset.gui.logic.ApiLogic;
@@ -52,13 +52,10 @@ public class ActionListenerDeleteApiEntry implements ActionListener {
 			msg = MessageFormat.format(msg, "'" + snippet.getName() + "'");
 			Integer answer = JOptionPane.showConfirmDialog(_dialog, msg, title, JOptionPane.YES_NO_OPTION);
 			if(answer == JOptionPane.YES_OPTION){
-				ApiLogic.getInstance().delete(this.snippet);
+				ApiLogic.getInstance().deleteSnippetCode(this.snippet);
 				_dialog.initLanguage();
 			}
-		} catch (MalformedURLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (JAXBException e1) {
+		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}

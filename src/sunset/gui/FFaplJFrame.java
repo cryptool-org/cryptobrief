@@ -1,6 +1,7 @@
 package sunset.gui;
 
 import java.awt.BorderLayout;
+
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Frame;
@@ -8,9 +9,7 @@ import java.awt.Image;
 import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.io.File;
 import java.io.*;
-import java.io.Reader;
 import java.lang.management.ManagementFactory;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -44,7 +43,6 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
-import javax.xml.bind.JAXBException;
 
 import ffapl.FFaplInterpreter;
 import ffapl.java.logging.FFaplConsoleHandler;
@@ -52,9 +50,9 @@ import ffapl.java.logging.FFaplLogger;
 
 import sunset.gui.api.APITreeCellRenderer;
 import sunset.gui.api.MutableTreeNodeHead;
-import sunset.gui.api.jaxb.ApiSpecification;
-import sunset.gui.api.jaxb.SampleCode;
-import sunset.gui.api.jaxb.SnippetCode;
+import sunset.gui.api.spec.ApiSpecification;
+import sunset.gui.api.spec.SampleCode;
+import sunset.gui.api.spec.SnippetCode;
 import sunset.gui.api.util.ApiUtil;
 import sunset.gui.dnd.APITreeDragSource;
 import sunset.gui.dnd.DropTargetListenerFile;
@@ -296,7 +294,6 @@ public class FFaplJFrame extends javax.swing.JFrame {
 	/**
 	 * Initiates the Language of the GUI
 	 * 
-	 * @throws JAXBException
 	 */
 	public void initLanguage() {
 		// translate Menubar MenusBar
@@ -1111,6 +1108,7 @@ public class FFaplJFrame extends javax.swing.JFrame {
 		DefaultTreeCellRenderer renderer = new APITreeCellRenderer();
 		if (jTree_API != null) {
 			jTree_API.removeAll();
+			jTree_API.updateUI();
 		} else {
 			jTree_API = new JTree();
 			new APITreeDragSource(jTree_API);
@@ -1152,8 +1150,9 @@ public class FFaplJFrame extends javax.swing.JFrame {
 		rootAPI = new DefaultMutableTreeNode(SunsetBundle.getInstance().getProperty("apitree_specification"));
 		root.insert(rootAPI, root.getChildCount());
 		node = new DefaultMutableTreeNode(types);
-
+		
 		ApiSpecification api = ApiLogic.getInstance().getApiSpecification();
+		
 		if (api != null) {
 			rootAPI.insert(node, rootAPI.getChildCount());
 			i = 0;
@@ -1171,6 +1170,7 @@ public class FFaplJFrame extends javax.swing.JFrame {
 		}		
 
 		SampleCode sampleCodes = ApiLogic.getInstance().getSamples();
+		
 		if (sampleCodes != null) {
 			rootExample = new DefaultMutableTreeNode(samples);
 			root.insert(rootExample, root.getChildCount());
@@ -1189,6 +1189,7 @@ public class FFaplJFrame extends javax.swing.JFrame {
 		rootSnippets = new DefaultMutableTreeNode(SunsetBundle.getInstance().getProperty("snippet_label"));
 
 		SnippetCode snippetCodes = ApiLogic.getInstance().getSnippetCode();
+		
 		if (snippetCodes != null) {
 			rootSnippets = new MutableTreeNodeHead(custom);
 			root.insert(rootSnippets, root.getChildCount());
