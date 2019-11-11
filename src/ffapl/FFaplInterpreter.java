@@ -51,6 +51,10 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants, FF
 
   }
 
+  public FFaplLogger getLogger(){
+        return _logger;
+  }
+
   /**
   * Start to parse and interpret the code
   */
@@ -3037,6 +3041,62 @@ t7 = new FFaplNodeToken(t1);
     finally { jj_save(11, xla); }
   }
 
+  private boolean jj_3R_38()
+ {
+    if (jj_scan_token(ECRANDOMSUB)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_41()
+ {
+    if (!jj_rescan) trace_call("PowExpr(LOOKING AHEAD...)");
+    if (jj_3R_46()) { if (!jj_rescan) trace_return("PowExpr(LOOKAHEAD FAILED)"); return true; }
+    { if (!jj_rescan) trace_return("PowExpr(LOOKAHEAD SUCCEEDED)"); return false; }
+  }
+
+  private boolean jj_3R_59()
+ {
+    if (!jj_rescan) trace_call("EqualExpr(LOOKING AHEAD...)");
+    if (jj_3R_62()) { if (!jj_rescan) trace_return("EqualExpr(LOOKAHEAD FAILED)"); return true; }
+    { if (!jj_rescan) trace_return("EqualExpr(LOOKAHEAD SUCCEEDED)"); return false; }
+  }
+
+  private boolean jj_3_3()
+ {
+    if (jj_3R_29()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_50()
+ {
+    if (!jj_rescan) trace_call("PrimaryExpr(LOOKING AHEAD...)");
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_54()) {
+    jj_scanpos = xsp;
+    if (jj_3R_55()) {
+    jj_scanpos = xsp;
+    if (jj_3_4()) {
+    jj_scanpos = xsp;
+    if (jj_3R_56()) {
+    jj_scanpos = xsp;
+    if (jj_3R_57()) {
+    jj_scanpos = xsp;
+    if (jj_3R_58()) { if (!jj_rescan) trace_return("PrimaryExpr(LOOKAHEAD FAILED)"); return true; }
+    }
+    }
+    }
+    }
+    }
+    { if (!jj_rescan) trace_return("PrimaryExpr(LOOKAHEAD SUCCEEDED)"); return false; }
+  }
+
+  private boolean jj_3R_54()
+ {
+    if (jj_3R_60()) return true;
+    return false;
+  }
+
   private boolean jj_3R_55()
  {
     if (jj_scan_token(BRACE_LEFT)) return true;
@@ -3436,62 +3496,6 @@ t7 = new FFaplNodeToken(t1);
   private boolean jj_3_8()
  {
     if (jj_3R_33()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_38()
- {
-    if (jj_scan_token(ECRANDOMSUB)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_41()
- {
-    if (!jj_rescan) trace_call("PowExpr(LOOKING AHEAD...)");
-    if (jj_3R_46()) { if (!jj_rescan) trace_return("PowExpr(LOOKAHEAD FAILED)"); return true; }
-    { if (!jj_rescan) trace_return("PowExpr(LOOKAHEAD SUCCEEDED)"); return false; }
-  }
-
-  private boolean jj_3R_59()
- {
-    if (!jj_rescan) trace_call("EqualExpr(LOOKING AHEAD...)");
-    if (jj_3R_62()) { if (!jj_rescan) trace_return("EqualExpr(LOOKAHEAD FAILED)"); return true; }
-    { if (!jj_rescan) trace_return("EqualExpr(LOOKAHEAD SUCCEEDED)"); return false; }
-  }
-
-  private boolean jj_3_3()
- {
-    if (jj_3R_29()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_50()
- {
-    if (!jj_rescan) trace_call("PrimaryExpr(LOOKING AHEAD...)");
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_54()) {
-    jj_scanpos = xsp;
-    if (jj_3R_55()) {
-    jj_scanpos = xsp;
-    if (jj_3_4()) {
-    jj_scanpos = xsp;
-    if (jj_3R_56()) {
-    jj_scanpos = xsp;
-    if (jj_3R_57()) {
-    jj_scanpos = xsp;
-    if (jj_3R_58()) { if (!jj_rescan) trace_return("PrimaryExpr(LOOKAHEAD FAILED)"); return true; }
-    }
-    }
-    }
-    }
-    }
-    { if (!jj_rescan) trace_return("PrimaryExpr(LOOKAHEAD SUCCEEDED)"); return false; }
-  }
-
-  private boolean jj_3R_54()
- {
-    if (jj_3R_60()) return true;
     return false;
   }
 

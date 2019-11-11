@@ -58,6 +58,10 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants
 		_interrupted = false;
 		
   }
+  
+  public FFaplLogger getLogger(){
+        return _logger;
+  }
      
   /**
   * Start to parse and interpret the code
