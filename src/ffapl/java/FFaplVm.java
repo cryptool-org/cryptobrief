@@ -15,7 +15,9 @@ import ffapl.java.classes.JString;
 import ffapl.java.classes.Polynomial;
 import ffapl.java.classes.PolynomialRC;
 import ffapl.java.classes.Prime;
+import ffapl.java.classes.RNG_Placebo;
 import ffapl.java.classes.ResidueClass;
+import ffapl.java.classes.TRNG_Placebo;
 import ffapl.java.exception.FFaplAlgebraicException;
 import ffapl.java.interfaces.IAlgebraicError;
 import ffapl.java.interfaces.IJavaType;
@@ -91,7 +93,7 @@ public class FFaplVm implements IVm {
 		//System.out.println(this);
 		//System.out.println(type);
 		if(initvalue(symbol.getType().typeID())){
-			this._procedureStack.add(this._expressionStack.pop());
+			this._procedureStack.add(popStack());
 		}else{
 			this._procedureStack.add(null);
 		}
@@ -139,7 +141,7 @@ public class FFaplVm implements IVm {
 		this._procedureStackTypes.add(_procedureStackTypes.get(offset + _fp));
 		this._procedureStackSymbols.add(symbol);
 		this.loadCopy(offset, false);
-		this._procedureStack.add(this._expressionStack.pop());
+		this._procedureStack.add(popStack());
 		result = _sp - _fp;
 		_sp = _sp + 1;
 		return result;
@@ -150,7 +152,7 @@ public class FFaplVm implements IVm {
 		this._globalMemoryTypes.add(type.typeID());
 		
 		if(initvalue(type.typeID())){
-			this._globalMemory.add(this._expressionStack.pop());
+			this._globalMemory.add(popStack());
 		}else{
 			this._globalMemory.add(null);
 		}
@@ -176,8 +178,8 @@ public class FFaplVm implements IVm {
 	public void loadArrayElement() throws FFaplAlgebraicException{
 		Array a;
 		BInteger b;
-		b = (BInteger) _expressionStack.pop();
-		a = (Array) _expressionStack.pop();
+		b = (BInteger) popStack();
+		a = (Array) popStack();
 		if(!a.isNull()){
 			if(a.typeID() == IJavaType.ARRAY){
 				if(b.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) <= 0){
@@ -217,12 +219,12 @@ public class FFaplVm implements IVm {
 	public void storeValue(int offset, boolean global) throws FFaplAlgebraicException {
 		Object val;
 		if(global){
-			val = this._expressionStack.pop();
+			val = popStack();
 			val = this.castTo(this._globalMemoryTypes.get(offset),
 							val, _globalMemory.get(offset));
 			this._globalMemory.set(offset, val);
 		}else{
-			val = this._expressionStack.pop();
+			val = popStack();
 			val = this.castTo(this._procedureStackTypes.get(offset + _fp),
 							val, _procedureStack.get(offset + _fp));
 			this._procedureStack.set(offset + _fp, val);
@@ -236,9 +238,9 @@ public class FFaplVm implements IVm {
 		IJavaType c, d;
 		
 		//System.out.println(this);
-		c = (IJavaType) _expressionStack.pop();
-		b = (BInteger) _expressionStack.pop();
-		a = (Array) _expressionStack.pop();
+		c = (IJavaType) popStack();
+		b = (BInteger) popStack();
+		a = (Array) popStack();
 		if(!a.isNull()){
 			if(a.typeID() == IJavaType.ARRAY){
 				if(b.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) <= 0){
@@ -265,7 +267,7 @@ public class FFaplVm implements IVm {
 	@Override
 	public void storeFormalParamValue(int offset) throws FFaplAlgebraicException {
 		Object val;
-		val = this._expressionStack.pop();
+		val = popStack();
 		//val = this.castTo(this._procedureStackTypes.elementAt(offset + _fp),
 							//val, _procedureStack.elementAt(offset + _fp));
 		this._procedureStack.set(offset + _fp, val);
@@ -274,7 +276,7 @@ public class FFaplVm implements IVm {
 	@Override
 	public void arrayLen() throws FFaplAlgebraicException{
 		Array a;
-		a = (Array) _expressionStack.pop();
+		a = (Array) popStack();
 		_expressionStack.push(BInteger.valueOf(a.length(), _thread));
 	}
 
@@ -283,8 +285,8 @@ public class FFaplVm implements IVm {
 		IJavaType a;
 		IJavaType b;
 		IJavaType[] conv;
-		b = (IJavaType) this._expressionStack.pop();
-		a = (IJavaType) this._expressionStack.pop();
+		b = (IJavaType) popStack();
+		a = (IJavaType) popStack();
 		
 		if(b.typeID() != a.typeID()){
 			conv = convertToMaxType(a, b);
@@ -356,8 +358,8 @@ public class FFaplVm implements IVm {
 		IJavaType a;
 		IJavaType b;
 		IJavaType[] conv;
-		b = (IJavaType) this._expressionStack.pop();
-		a = (IJavaType) this._expressionStack.pop();
+		b = (IJavaType) popStack();
+		a = (IJavaType) popStack();
 		
 		if(b.typeID() != a.typeID()){
 			conv = convertToMaxType(a, b);
@@ -422,8 +424,8 @@ public class FFaplVm implements IVm {
 		IJavaType a;
 		IJavaType b;
 		IJavaType[] conv;
-		b = (IJavaType) this._expressionStack.pop();
-		a = (IJavaType) this._expressionStack.pop();
+		b = (IJavaType) popStack();
+		a = (IJavaType) popStack();
 		
 		if(b.typeID() != a.typeID()){
 			conv = convertToMaxType(a, b);
@@ -487,8 +489,8 @@ public class FFaplVm implements IVm {
 		IJavaType a;
 		IJavaType b;
 		IJavaType[] conv;
-		b = (IJavaType) this._expressionStack.pop();
-		a = (IJavaType) this._expressionStack.pop();
+		b = (IJavaType) popStack();
+		a = (IJavaType) popStack();
 		
 		if(b.typeID() != a.typeID()){
 			conv = convertToMaxType(a, b);
@@ -547,8 +549,8 @@ public class FFaplVm implements IVm {
 		IJavaType a;
 		IJavaType b;
 		IJavaType[] conv;
-		b = (IJavaType) this._expressionStack.pop();
-		a = (IJavaType) this._expressionStack.pop();
+		b = (IJavaType) popStack();
+		a = (IJavaType) popStack();
 		
 		if(b.typeID() != a.typeID()){
 			conv = convertToMaxType(a, b);
@@ -580,10 +582,15 @@ public class FFaplVm implements IVm {
 	public void pow() throws FFaplAlgebraicException {
 		Object a ;
 		Object b ;
-		b = _expressionStack.pop();
-		a = _expressionStack.pop();
+		b = popStack();
+		a = popStack();
 		//TODO error bei division durch Polynomial
-		if(b instanceof ResidueClass){
+		
+		if(b instanceof RNG_Placebo) {
+			b =  ((RNG_Placebo)b).next();
+		}else if(b instanceof TRNG_Placebo) {
+			b =  ((TRNG_Placebo)b).next();
+		}else if(b instanceof ResidueClass){
 			b = ((ResidueClass) b).value();
 		}
 		
@@ -609,7 +616,7 @@ public class FFaplVm implements IVm {
 	@Override
 	public void neg() throws FFaplAlgebraicException {
 		Object a ;
-		a = _expressionStack.pop();
+		a = popStack();
 		if(a instanceof BigInteger){
 			this.pushStack(((BigInteger) a).negate());
 		}else if(a instanceof Polynomial){
@@ -627,8 +634,8 @@ public class FFaplVm implements IVm {
 	public void and() throws FFaplAlgebraicException {
 		IJavaType a;
 		IJavaType b;
-		b = (IJavaType) _expressionStack.pop();
-		a = (IJavaType) _expressionStack.pop();
+		b = (IJavaType) popStack();
+		a = (IJavaType) popStack();
 		
 		if ((a instanceof JBoolean) && (b instanceof JBoolean))
 		{
@@ -646,8 +653,8 @@ public class FFaplVm implements IVm {
 	public void or() throws FFaplAlgebraicException {
 		IJavaType a;
 		IJavaType b;
-		b = (IJavaType) _expressionStack.pop();
-		a = (IJavaType) _expressionStack.pop();
+		b = (IJavaType) popStack();
+		a = (IJavaType) popStack();
 
 		
 		if ((a instanceof JBoolean) && (b instanceof JBoolean))
@@ -668,8 +675,8 @@ public class FFaplVm implements IVm {
 	public void xor() throws FFaplAlgebraicException {
 		IJavaType a;
 		IJavaType b;
-		b = (IJavaType) _expressionStack.pop();
-		a = (IJavaType) _expressionStack.pop();
+		b = (IJavaType) popStack();
+		a = (IJavaType) popStack();
 
 		
 		if ((a instanceof JBoolean) && (b instanceof JBoolean))
@@ -690,8 +697,8 @@ public class FFaplVm implements IVm {
 	public void isGreater() throws FFaplAlgebraicException {
 		Object a ;
 		Object b ;
-		b = _expressionStack.pop();
-		a = _expressionStack.pop();
+		b = popStack();
+		a = popStack();
 		
 		if(a instanceof BigInteger){
 			if(b instanceof BigInteger){
@@ -720,8 +727,8 @@ public class FFaplVm implements IVm {
 	public void isGreaterEqual() throws FFaplAlgebraicException {
 		Object a ;
 		Object b ;
-		b = _expressionStack.pop();
-		a = _expressionStack.pop();
+		b = popStack();
+		a = popStack();
 		
 		if(a instanceof BigInteger){
 			if(b instanceof BigInteger){
@@ -752,8 +759,8 @@ public class FFaplVm implements IVm {
 		IJavaType a ;
 		IJavaType b ;
 		IJavaType[] max;
-		b = (IJavaType) _expressionStack.pop();
-		a = (IJavaType) _expressionStack.pop();
+		b = (IJavaType) popStack();
+		a = (IJavaType) popStack();
 		max = convertToMaxType(a,b);
 		
 		if(max[0] instanceof BigInteger){
@@ -885,8 +892,8 @@ public class FFaplVm implements IVm {
 	public void isLess() throws FFaplAlgebraicException {
 		Object a ;
 		Object b ;
-		b = _expressionStack.pop();
-		a = _expressionStack.pop();
+		b = popStack();
+		a = popStack();
 		
 		if(a instanceof BigInteger){
 			if(b instanceof BigInteger){
@@ -916,8 +923,8 @@ public class FFaplVm implements IVm {
 	public void isLessEqual() throws FFaplAlgebraicException {
 		Object a ;
 		Object b ;
-		b = _expressionStack.pop();
-		a = _expressionStack.pop();
+		b = popStack();
+		a = popStack();
 		
 		if(a instanceof BigInteger){
 			if(b instanceof BigInteger){
@@ -944,14 +951,14 @@ public class FFaplVm implements IVm {
 
 	@Override
 	public void not() throws FFaplAlgebraicException {
-		JBoolean a = (JBoolean) _expressionStack.pop();
+		JBoolean a = (JBoolean) popStack();
 		_expressionStack.push(a.not());		
 	}
 	
 	@Override
 	public void funcReturn() {
 
-		_rt = (IJavaType) this._expressionStack.pop();		
+		_rt = (IJavaType) popStack();		
 	}
 
 	@Override
@@ -1790,11 +1797,11 @@ public class FFaplVm implements IVm {
 		//switch (typeID){
 		//case FFaplTypeCrossTable.FFAPLINTEGER:
 		//	b = null;
-		//	a = _expressionStack.pop();
+		//	a = popStack();
 		//		break;
 		//default:
-			b = _expressionStack.pop();
-			a = _expressionStack.pop();				
+			b = popStack();
+			a = popStack();				
 		//}
 		
 		_expressionStack.push(castTo(typeID, a, b));
@@ -2175,7 +2182,7 @@ public class FFaplVm implements IVm {
 			return val;
 		}else{
 			val = createArray(((FFaplArray)arrayType).subarray(1), initArray);
-			length = (BInteger) _expressionStack.pop();
+			length = (BInteger) popStack();
 			
 			if(length.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) <= 0){
 				elements = new Object[length.intValue()];

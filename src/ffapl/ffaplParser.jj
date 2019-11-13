@@ -1,8 +1,7 @@
 
 options
 {
-  JDK_VERSION = "1.6";
-  STATIC = false;
+  JDK_VERSION = "1.8";
   UNICODE_INPUT = true;
   JAVA_UNICODE_ESCAPE = true;
 } 
@@ -20,6 +19,7 @@ import ffapl.visitor.*;
 import ffapl.types.*;
 import ffapl.java.logging.*;
 import ffapl.java.exception.*;
+import java.nio.charset.Charset;
 
 /**
  * @author Alexander Ortner
@@ -54,12 +54,15 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants
    */
   public FFaplInterpreter(FFaplLogger logger, InputStream stream)
   {
-		this(stream);
+		this(stream, Charset.forName("UTF-8"));
 		_logger = logger;
 		_interrupted = false;
 		
   }
-
+  
+  public FFaplLogger getLogger(){
+        return _logger;
+  }
      
   /**
   * Start to parse and interpret the code
@@ -79,14 +82,10 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants
         	_javaInterpreter.visit(_root, null);     	      
     	}catch(ParseException pe){
     		_logger.log(ILevel.ERROR,
-    					CompilerMessage.getError((ICompilerError) pe, _programName),
-    					pe.errorLine(),
-    					pe.errorColumn());
-    	}catch(TokenMgrError te){
+    					CompilerMessage.getError((ICompilerError) pe, _programName));
+    	}catch(TokenMgrException te){
     		_logger.log(ILevel.ERROR,
-    					CompilerMessage.getError((ICompilerError) te, _programName),
-    					te.errorLine(),
-    					te.errorColumn());
+    					CompilerMessage.getError((ICompilerError) te, _programName));
     	}catch(FFaplAlgebraicException e){
 			_logger.log(ILevel.ERROR, CompilerMessage.getError((ICompilerError) e, _programName),
 			            e.errorLine(),

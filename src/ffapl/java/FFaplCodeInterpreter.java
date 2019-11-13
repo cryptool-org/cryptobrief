@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.util.Stack;
 import java.util.Vector;
 
-import ffapl.FFapl;
+import ffapl.FFaplInterpreter;
 import ffapl.java.classes.*;
 import ffapl.java.exception.FFaplAlgebraicException;
 import ffapl.java.interfaces.*;
@@ -1546,7 +1546,7 @@ public class FFaplCodeInterpreter implements ICodeInterpreter {
 	private Object div(BigInteger a, BigInteger b) throws FFaplAlgebraicException {
 		if(b.equals(BigInteger.ZERO)){
 			Object[] arguments = {a + 
-					FFapl.tokenImage[FFapl.DIVIDE].replace("\"", "") + b };
+					FFaplInterpreter.tokenImage[FFaplInterpreter.DIVIDE].replace("\"", "") + b };
 			throw new FFaplAlgebraicException(arguments, IAlgebraicError.DIVZERO);
 		}
 		return a.divide(b);
@@ -1624,7 +1624,7 @@ public class FFaplCodeInterpreter implements ICodeInterpreter {
 	private Object mod(BigInteger a, BigInteger b) throws FFaplAlgebraicException {
 		if((b).compareTo(BigInteger.ZERO) <= 0){
 			Object[] arguments = {a + " " +
-					FFapl.tokenImage[FFapl.MODULO].replace("\"", "") + " " + b, b};
+					FFaplInterpreter.tokenImage[FFaplInterpreter.MODULO].replace("\"", "") + " " + b, b};
 			throw new FFaplAlgebraicException(arguments, IAlgebraicError.VAL_LESS_EQUAL_ZERO);
 		}
 		return a.mod(b);
