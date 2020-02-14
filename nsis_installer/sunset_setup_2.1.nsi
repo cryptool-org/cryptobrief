@@ -4,6 +4,7 @@
 Name "Sunset"
 BrandingText "Sunset - Install System V1.0"
 
+Unicode True 
 
 ;--------------------------------
 ; Constants
