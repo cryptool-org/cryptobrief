@@ -26,9 +26,9 @@ BrandingText "Sunset - Install System V1.0"
 !define REGKEY "SOFTWARE\$(^Name)"
 !define VERSION 2.1.1
 !define PRODUCT_VERSION 2.1.1.0
-!define COMPANY "Alpen-Adria Universit�t Klagenfurt"
-!define COPYRIGHT "Copyright 2013-2019, Alpen-Adria Universit�t Klagenfurt"
-!define FILEDESCRIPTION "IDE f�r FFapl-Entwickler"
+!define COMPANY "Alpen-Adria Universitaet Klagenfurt"
+!define COPYRIGHT "Copyright 2013-2019, Alpen-Adria Universitaet Klagenfurt"
+!define FILEDESCRIPTION "IDE for FFapl-Developer"
 
 
 
@@ -285,8 +285,8 @@ FunctionEnd
 ;AUTHOR: Ashwin Jayaprakash
 ;WEBSITE: http://www.JavaForU.com
 ;--------------------------------
-LangString NOTINSTALLED_1 ${LANG_GERMAN} "Java Runtime Environment (JRE) ist nicht installiert auf ihrem System.$\nSie ben�tigen Version"
-LangString NOTINSTALLED_2 ${LANG_GERMAN} "oder neuer um Sunset auszuf�hren. $\n$\nVersuchen Sie es erneut, sobald Sie die richtige JRE Version installiert haben. $\n$\nJava Runtime Environment jetzt laden?"
+LangString NOTINSTALLED_1 ${LANG_GERMAN} "Java Runtime Environment (JRE) ist nicht installiert auf ihrem System.$\nSie benötigen Version"
+LangString NOTINSTALLED_2 ${LANG_GERMAN} "oder neuer um Sunset auszuführen. $\n$\nVersuchen Sie es erneut, sobald Sie die richtige JRE Version installiert haben. $\n$\nJava Runtime Environment jetzt laden?"
 
 LangString NOTINSTALLED_1 ${LANG_ENGLISH} "Java Runtime Environment (JRE) is not installed on your computer. $\nYou need version"
 LangString NOTINSTALLED_2 ${LANG_ENGLISH} "or newer to run Sunset.$\n$\nTry again as soon as you installed the right JRE version.  $\n$\nGet Java Runtime Environment now?"
@@ -297,7 +297,7 @@ LangString WRONGVERSION_3 ${LANG_ENGLISH} "or newer is required to run this prog
 
 LangString WRONGVERSION_1 ${LANG_GERMAN} "Die installierte Java Runtime Environment (JRE) Version auf ihrem System ist"
 LangString WRONGVERSION_2 ${LANG_GERMAN} ". $\nVersion"
-LangString WRONGVERSION_3 ${LANG_GERMAN} "oder neuer wird ben�tigt um Sunset auszuf�hren.$\n$\nVersuchen Sie es erneut, sobald Sie die richtige JRE Version installiert haben.$\n$\nJava Runtime Environment jetzt laden?"
+LangString WRONGVERSION_3 ${LANG_GERMAN} "oder neuer wird benötigt um Sunset auszuführen.$\n$\nVersuchen Sie es erneut, sobald Sie die richtige JRE Version installiert haben.$\n$\nJava Runtime Environment jetzt laden?"
 
 
 Function LocateJVM
