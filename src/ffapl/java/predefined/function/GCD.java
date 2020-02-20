@@ -53,7 +53,7 @@ public class GCD implements IPredefinedProcFunc {
 			
 			 interpreter.pushStack(Algorithm.gcd((BInteger)a, (BInteger)b));
 		}else{
-			System.out.println("error");
+			System.err.println("error in GCD.execute");
 		}
 	   
 	    interpreter.funcReturn();

@@ -69,7 +69,7 @@ public class EEA implements IPredefinedProcFunc {
 												((BInteger)a).getThread()));
 			
 		}else{
-			System.out.println("error");
+			System.err.println("error in EEA.execute");
 		}
 	   
 	    interpreter.funcReturn();

@@ -315,7 +315,7 @@ public class JPanelCode extends javax.swing.JPanel {
 					//System.out.println(length + " <-> " + txtBytes.length);
 					if(txtBytes.length != length ){
 						//TODO make output message
-						System.out.println("not everything written to file");
+						System.err.println("not everything written to file");
 						saved = false;
 					}else{
 						saved = true;
@@ -343,7 +343,7 @@ public class JPanelCode extends javax.swing.JPanel {
 				_tabtitle.setTitle(_file.getName());
 			}else{
 				//TODO output
-				System.out.println("No Tab Title set");
+				System.err.println("error during file saving: no tab title set");
 			}
 		}
 		

@@ -696,7 +696,7 @@ public class PrintOutVisitorExtended implements IVoidArgVisitor<Integer> {
 		for(int i = level; i > 0; i--){
 			temp = temp + ".";
 		}
-		System.out.println(temp + node);		
+		//s(temp + node);		
 	}
 
 	@Override

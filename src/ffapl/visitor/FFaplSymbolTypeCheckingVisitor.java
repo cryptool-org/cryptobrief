@@ -1166,7 +1166,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 		case 5: //argument List
 			try{
 				if(symbol != null && symbol instanceof FFaplArray){   
-					System.out.println(((FFaplArray) symbol).subarray(1));
+					//System.out.println(((FFaplArray) symbol).subarray(1));
 					attribv = node._node1.accept(this, ((FFaplArray) symbol).subarray(1));
 					attribv = FFaplTypeConversation.castTo(attribv, ((FFaplArray) symbol).subarray(1));
 					type = attribv.firstElement().getType();
@@ -1177,7 +1177,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 						for(int i = 1; i < attribv.size(); i++){
 							
 							arr = (FFaplArray) attribv.elementAt(i).getType();
-							System.out.println(len + " here " + arr.getLength());
+							//System.out.println(len + " here " + arr.getLength());
 							if(len != arr.getLength()){
 								Object[] arguments = {len, arr.getLength()};
 								throw new FFaplException(arguments, ICompilerError.INVALID_SUBARRAY_LENGTH);
@@ -1186,7 +1186,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 						arr = new FFaplArray(((FFaplArray)type).baseType(), ((FFaplArray)type).getDim() +1);
 						arr.setLength(attribv.size());
 					}else{
-						System.out.println(type);
+						//System.out.println(type);
 						//TODO: ARRAY initialsierung beachten
 						arr = new FFaplArray(type, 1);
 						arr.setLength(attribv.size());

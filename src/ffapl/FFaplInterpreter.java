@@ -3846,7 +3846,8 @@ t7 = new FFaplNodeToken(t1);
     trace_enabled = false;
   }
 
-  protected java.io.PrintStream tracePS = System.out;
+  /** Debug output. */
+  protected java.io.PrintStream tracePS = new java.io.PrintStream(OutputStream.nullOutputStream()); //System.out;
 
   protected void trace_call(final String s) {
     if (trace_enabled) {

@@ -116,7 +116,7 @@ public class ReadFunctions implements IPredefinedProcFunc {
                                             BigInteger temp;
                                             BInteger ret;
                                             if(validIntRegex(s)){
-                                                    System.out.println("Regex valid");
+                                                    //System.out.println("Regex valid");
                                                     if(s.contains("^")){
                                                             String[] splitted = s.split("\\^");
                                                             temp = Algorithm.squareAndMultiply(BigInteger.valueOf((Long.valueOf(splitted[0]))),
@@ -130,7 +130,7 @@ public class ReadFunctions implements IPredefinedProcFunc {
                                                     interpreter.pushStack(ret);
                                                     correctInput = true;
                                             } else {
-                                                    System.out.println("Regex invalid");
+                                                    //System.out.println("Regex invalid");
         //                                            ret = new BInteger(BigInteger.ZERO, _thread);
         //                                            s = "0"; //for logging purpose to show the added value
 
@@ -166,7 +166,7 @@ public class ReadFunctions implements IPredefinedProcFunc {
                                             interpreter.pushStack(poly);
                                             correctInput = true;
                                     } else{
-                                            System.out.println("regex is false");
+                                            //System.out.println("regex is false");
                                             //ActionListenerCloseTab.setProgramRunning(false);
                                             //Thread.currentThread().stop();
                                             wrongInput(s);

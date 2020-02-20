@@ -58,7 +58,7 @@ public class LegendreSymbol implements IPredefinedProcFunc {
 			result = Algorithm.legendreSymbol(((BInteger)a), ((BInteger)b)); 
 			
 		}else{
-			System.out.println("error");
+			System.err.println("error in LegendreSymbol.execute");
 		}
 	   
 		interpreter.pushStack(new BInteger(result,null));

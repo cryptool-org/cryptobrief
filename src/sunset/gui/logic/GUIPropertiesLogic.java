@@ -114,9 +114,9 @@ public class GUIPropertiesLogic {
 				FFaplProperties.getInstance().setLocale(new Locale(language));
 			}
 		} catch (FileNotFoundException e) {
-			System.out.println("FileNotFoundException. Load default properties.");
+			System.err.println("FileNotFoundException. Load default properties.");
 		} catch (IOException e) {
-			System.out.println("IO Exception in load properties. Load default properties.");
+			System.err.println("IO Exception in load properties. Load default properties.");
 		}
 	}
 	
