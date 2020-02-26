@@ -199,6 +199,11 @@ public class FFaplJFrame extends javax.swing.JFrame {
 				String pid = ManagementFactory.getRuntimeMXBean().getName();
 				System.out.println("process ID:" + pid);
 
+				SunsetBundle.getInstance().setLocale(
+						new Locale(GUIPropertiesLogic.getInstance().getProperty(
+								IProperties.LANGUAGE)));
+				FFaplRegex.init();
+
 				//Reader reader = new FileReader(arguments[1]);
 				BufferedReader stdinReader = new BufferedReader(new InputStreamReader(System.in));
 

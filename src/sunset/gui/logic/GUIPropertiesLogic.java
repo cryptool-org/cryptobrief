@@ -90,7 +90,7 @@ public class GUIPropertiesLogic {
 	 * init GUI properties
 	 * @throws IOException 
 	 */
-	private void initGUIProperties() throws IOException{	
+	private void initGUIProperties() throws IOException{
 		InputStream myInputStream;
 		try {
 			File file = new File(IProperties.PROPERTYFILE_PATH_USER);
