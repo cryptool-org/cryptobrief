@@ -24,8 +24,8 @@ BrandingText "Sunset - Install System V1.0"
 
 # General Symbol Definitions
 !define REGKEY "SOFTWARE\$(^Name)"
-!define VERSION 2.1.1
-!define PRODUCT_VERSION 2.1.1.0
+!define VERSION 2.1.2
+!define PRODUCT_VERSION 2.1.2.0
 !define COMPANY "Alpen-Adria Universit�t Klagenfurt"
 !define COPYRIGHT "Copyright 2013-2019, Alpen-Adria Universit�t Klagenfurt"
 !define FILEDESCRIPTION "IDE f�r FFapl-Entwickler"
