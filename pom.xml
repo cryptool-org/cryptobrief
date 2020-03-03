@@ -65,6 +65,9 @@
 							<sourceDirectory>src/ffapl</sourceDirectory>
 							<outputDirectory>src</outputDirectory>
 							<javaUnicodeEscape>true</javaUnicodeEscape>
+							<excludes>
+								<exclude>src/ffapl/ParseException.java</exclude>
+							</excludes>
 						</configuration>
 					</execution>
 				</executions>

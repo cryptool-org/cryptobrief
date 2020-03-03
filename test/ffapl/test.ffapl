@@ -1,6 +1,8 @@
 program calculate{
-X: RandomGenerator(1:10);
-a: Z(23);
-a := 2^X;
-println(a);
+p: Polynomial;
+a: RandomGenerator(1:10);
+b: Integer;
+b:= a;
+p := [1+(b)x + (3)x^2]; // Zufallspolynom
+println(p);
 }
