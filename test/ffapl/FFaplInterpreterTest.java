@@ -12,7 +12,7 @@ import ffapl.utils.Observer;
 
 public class FFaplInterpreterTest {
 
-	//@Test
+	@Test
 	public void InterpreterTest() throws InterruptedException, ExecutionException {
 		FFaplLogger logger = new FFaplLogger("test");
 		logger.addObserver(new Observer() {

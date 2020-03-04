@@ -2,6 +2,8 @@
 /* ParserGeneratorCCOptions:KEEP_LINE_COLUMN=true */
 package ffapl;
 
+import ffapl.lib.interfaces.ICompilerError;
+
 /**
  * This exception is thrown when parse errors are encountered.
  * You can explicitly create objects of this exception type by
@@ -11,7 +13,7 @@ package ffapl;
  * You can modify this class to customize your error reporting
  * mechanisms so long as you retain the public fields.
  */
-public class ParseException extends Exception {
+public class ParseException extends Exception implements ICompilerError {
   /**
    * The end of line string for this machine.
    */
@@ -185,5 +187,33 @@ public class ParseException extends Exception {
     }
     return retval.toString();
   }
+
+ /* ParserGeneratorCC - OriginalChecksum=7354b9025cd54b653d4e3e101d11dae4 (do not edit this line) */
+  
+  @Override
+  public int errorColumn() {	
+  	return currentToken.next.beginColumn;
+  }
+
+  @Override
+  public int errorNumber() {
+  	return ICompilerError.SYNTAX; 
+  }
+
+  @Override
+  public int errorLine() {
+  	return currentToken.next.beginLine;
+  }
+
+@Override
+public String getErrorMessage() {
+	return this.getMessage();
 }
-/* ParserGeneratorCC - OriginalChecksum=7354b9025cd54b653d4e3e101d11dae4 (do not edit this line) */
+
+@Override
+public String errorType() {
+	return "ParseException";
+}
+
+}
+
