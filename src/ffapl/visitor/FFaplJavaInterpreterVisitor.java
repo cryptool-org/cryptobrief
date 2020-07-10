@@ -1991,7 +1991,7 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 		Object obj = null;
 		if(node.ispresent()){
 			for (final Iterator<INode> e = node.iterator(); e.hasNext();) {
-				e.next().accept(this, argument); 
+				obj = e.next().accept(this, argument);
 				if(obj instanceof LoopState){
 					if(LoopState.BREAK == obj){
 						break;
