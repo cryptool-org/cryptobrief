@@ -882,9 +882,14 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 			Object obj;
 			while(condition.getValue()){
 				isRunning();
-				
+
+				// execute body
 				obj = node._node8.accept(this, argument);
-				
+
+				// check for break (no need for cast since == just compares references)
+				if (obj == LoopState.BREAK)
+					break;
+
 				//i = i + step
 				_interpreter.loadValue(s1.getOffset(), false);//from
 				_interpreter.pushStack(step);
@@ -899,11 +904,6 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 					_interpreter.isGreaterEqual();
 				}
 				condition = (JBoolean) _interpreter.popStack();	
-				if(obj instanceof LoopState){
-					if(LoopState.BREAK == obj){
-						break;
-					}
-				}
 				//System.out.println(_interpreter);
 				/*c ++;
 				if(c > 10){
@@ -1947,14 +1947,17 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 			Object obj ;
 			while(val.getValue()){
 				isRunning();
+
+				// execute body
 				obj = node._node3.accept(this, argument);
+
+				// check for break (no need for cast since == just compares references)
+				if (obj == LoopState.BREAK)
+					break;
+
+				// calculate condition
 				node._node2.accept(this, argument);
 				val = (JBoolean) _interpreter.popStack();
-				if(obj instanceof LoopState){
-					if(LoopState.BREAK == obj){
-						break;
-					}
-				}
 			}
 		}catch(FFaplException e){
 				e.addToken(node._node1.getToken());
