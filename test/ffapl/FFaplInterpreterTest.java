@@ -3,6 +3,7 @@ package ffapl;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 
 import ffapl.java.logging.FFaplLogMessage;
@@ -12,7 +13,7 @@ import ffapl.utils.Observer;
 
 public class FFaplInterpreterTest {
 
-	@Test
+	//@DynamicTest
 	public void InterpreterTest() throws InterruptedException, ExecutionException {
 		FFaplLogger logger = new FFaplLogger("test");
 		logger.addObserver(new Observer() {

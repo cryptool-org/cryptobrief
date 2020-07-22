@@ -25,8 +25,8 @@ Unicode True
 
 # General Symbol Definitions
 !define REGKEY "SOFTWARE\$(^Name)"
-!define VERSION 2.1.1
-!define PRODUCT_VERSION 2.1.1.0
+!define VERSION 2.1.2
+!define PRODUCT_VERSION 2.1.2.0
 !define COMPANY "Alpen-Adria Universitaet Klagenfurt"
 !define COPYRIGHT "Copyright 2013-2019, Alpen-Adria Universitaet Klagenfurt"
 !define FILEDESCRIPTION "IDE for FFapl-Developer"
