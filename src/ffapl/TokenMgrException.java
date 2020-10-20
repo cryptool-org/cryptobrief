@@ -2,8 +2,10 @@
 /* ParserGeneratorCCOptions: */
 package ffapl;
 
+import ffapl.lib.interfaces.ICompilerError;
+
 /** Token Manager Error. */
-public class TokenMgrException extends RuntimeException
+public class TokenMgrException extends RuntimeException implements ICompilerError
 {
 
   /**
@@ -42,6 +44,10 @@ public class TokenMgrException extends RuntimeException
    * one of the above 4 values.
    */
   int errorCode;
+  int errorLine;
+  int errorColumn;
+  String errorMessage;
+  
 
   /**
    * Replaces unprintable characters by their escaped (or unicode escaped)
@@ -140,7 +146,35 @@ public class TokenMgrException extends RuntimeException
 
   /** Full Constructor. */
   public TokenMgrException(boolean EOFSeen, int lexState, int errorLine, int errorColumn, String errorAfter, int curChar, int reason) {
-    this(LexicalErr(EOFSeen, lexState, errorLine, errorColumn, errorAfter, curChar), reason);
+	  this(LexicalErr(EOFSeen, lexState, errorLine, errorColumn, errorAfter, curChar), reason);
+	  this.errorLine = errorLine;
+	  this.errorColumn = errorColumn;
+	  this.errorMessage = LexicalErr(EOFSeen, lexState, errorLine, errorColumn, errorAfter, curChar); 
   }
+
+	@Override
+	public int errorNumber() {
+		return errorCode;
+	}
+	
+	@Override
+	public int errorLine() {
+		return errorLine;
+	}
+	
+	@Override
+	public int errorColumn() {
+		return errorColumn;
+	}
+	
+	@Override
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+	
+	@Override
+	public String errorType() {
+		return "TokenMgrException";
+	}
 }
 /* ParserGeneratorCC - OriginalChecksum=f6061fa363ebfff05f80c10fd869b27f (do not edit this line) */
