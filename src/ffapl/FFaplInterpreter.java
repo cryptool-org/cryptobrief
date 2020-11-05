@@ -12,7 +12,9 @@ import ffapl.visitor.*;
 import ffapl.types.*;
 import ffapl.java.logging.*;
 import ffapl.java.exception.*;
+import ffapl.java.util.*;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 
 /**
  * @author Alexander Ortner
@@ -26,6 +28,8 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants, FF
   private FFaplJavaInterpreterVisitor _javaInterpreter;
   private FFaplSymbolTable _symbolTable;
   private ASTProgram _root;
+  private RestrictedHashMap<String,Type> _identTypeMapping;
+  private String _currentAssignmentIdent;
   public static boolean _interrupted;
 
   /**
@@ -35,9 +39,10 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants, FF
   public FFaplInterpreter(FFaplLogger logger, Reader reader)
   {
   this(reader);
+  this.disable_tracing();
   _logger = logger;
   _interrupted = false;
-
+  _identTypeMapping = new RestrictedHashMap<String,Type>();
   }
 
   /**
@@ -47,9 +52,10 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants, FF
   public FFaplInterpreter(FFaplLogger logger, InputStream stream)
   {
   this(stream, Charset.forName("UTF-8"));
+  this.disable_tracing();
   _logger = logger;
   _interrupted = false;
-
+  _identTypeMapping = new RestrictedHashMap<String,Type>();
   }
 
   public FFaplLogger getLogger(){
@@ -1217,6 +1223,7 @@ Token t1;
       t1 = jj_consume_token(IDENT);
 t2 = new FFaplNodeToken(t1);
      t4 = new FFaplNodeOpt();
+     _currentAssignmentIdent = t1.image;
       switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
       case SQUARED_BRACE_LEFT:
       case DOT:{
@@ -1848,6 +1855,21 @@ t6.addNode(new FFaplNodeToken(t5));
 t6.addNode(new FFaplNodeToken(t5));
         t9 = new FFaplNodeOpt();
         t8.setType(new FFaplResidueClass());
+// (temporary) solution for github issue #5 "Compilation error when parsing creation expressions of type Z()[n] using a constant n"
+
+          // check if the current assignment identifier is in the restricted HashMap
+       if (_identTypeMapping.containsKey(_currentAssignmentIdent)) {
+
+          // check if the type of this variable is FFaplResidueClass...
+      if (_identTypeMapping.get(_currentAssignmentIdent) instanceof FFaplResidueClass) {
+         //... then immediately return to prevent parsing an FFaplPolynomialResidue type
+       t6.addNode(t9);
+         t8.addNode(t6);
+         t1 = new FFaplNodeChoice(t8, 1, amount);
+
+         {if ("" != null) return new ASTComplexAlgebraicType(FFT_COMPLEXALGEBRAICTYPE, t1);}
+      }
+     }
         if (jj_2_10(2)) {
 t7 = new FFaplNodeSequence();
           t5 = jj_consume_token(SQUARED_BRACE_LEFT);
@@ -2257,6 +2279,7 @@ Token t1;
   FFaplNodeListOpt t4;
   ASTDeclType t6;
   FFaplNodeSequence t8;
+  ArrayList<String> idents;
       //t1 = < DECLARE >
        //  {
        //    t2 = null;// new FFaplNodeToken(t1);
@@ -2264,6 +2287,8 @@ Token t1;
         t1 = jj_consume_token(IDENT);
 t3 = new FFaplNodeToken(t1);
      t4 = new FFaplNodeListOpt();
+     idents = new ArrayList<String>();
+       idents.add(t1.image);
       label_18:
       while (true) {
         switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
@@ -2280,12 +2305,37 @@ t8.addNode(new FFaplNodeToken(t1));
         t1 = jj_consume_token(IDENT);
 t8.addNode(new FFaplNodeToken(t1));
        t4.addNode(t8);
+       idents.add(t1.image);
       }
       t1 = jj_consume_token(COLON);
 t5 = new FFaplNodeToken(t1);
       t6 = DeclType();
       t1 = jj_consume_token(SEMICOLON);
 t7 = new FFaplNodeToken(t1);
+// (temporary) solution for github issue #5 "Compilation error when parsing creation expressions of type Z()[n] using a constant n"
+
+    FFaplNodeChoice n_choice = t6._node1; // _node1 is a choice node
+
+    if (n_choice.getNode() instanceof FFaplNodeSequence) {
+      FFaplNodeSequence n_sequence = (FFaplNodeSequence) n_choice.getNode(); // sequence node
+
+      // first element contains the AST type node
+      if (n_sequence.elementAt(0) instanceof ASTExprComplexAType) {
+         // this solution is only needed for nodes of type ASTExprComplexAType
+
+       ASTExprComplexAType n_complex = (ASTExprComplexAType)n_sequence.elementAt(0);
+       FFaplNodeChoice n_compl_choice = n_complex._node1; // _node1 is a choice node
+
+       if (n_compl_choice.getNode() instanceof FFaplNodeType) {
+        FFaplNodeType n_type = (FFaplNodeType) n_compl_choice.getNode();
+
+        for (String ident : idents) {
+            // put all identifiers with their corresponding type in this declaration statement into the restricted HashMap 
+             _identTypeMapping.put(ident, n_type.getType());
+        }
+       }
+      }
+  }
 {if ("" != null) return new ASTDecl(FFT_DECL, t3, t4, t5, t6, t7);}
     throw new IllegalStateException ("Missing return statement in function");
     } finally {
@@ -3042,9 +3092,15 @@ t7 = new FFaplNodeToken(t1);
     finally { jj_save(11, xla); }
   }
 
-  private boolean jj_3R_38()
+  private boolean jj_3_2()
  {
-    if (jj_scan_token(ECRANDOMSUB)) return true;
+    if (jj_3R_28()) return true;
+    return false;
+  }
+
+  private boolean jj_3_8()
+ {
+    if (jj_3R_33()) return true;
     return false;
   }
 
@@ -3116,19 +3172,103 @@ t7 = new FFaplNodeToken(t1);
     { if (!jj_rescan) trace_return("Expr(LOOKAHEAD SUCCEEDED)"); return false; }
   }
 
-  private boolean jj_3_11()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_34()) jj_scanpos = xsp;
-    if (jj_3R_35()) return true;
-    return false;
-  }
-
   private boolean jj_3R_44()
  {
     if (jj_3R_47()) return true;
     return false;
+  }
+
+  private boolean jj_3R_28()
+ {
+    if (!jj_rescan) trace_call("ECPAI(LOOKING AHEAD...)");
+    if (jj_scan_token(ECLEFT)) { if (!jj_rescan) trace_return("ECPAI(LOOKAHEAD FAILED)"); return true; }
+    if (jj_scan_token(ECPAI)) { if (!jj_rescan) trace_return("ECPAI(LOOKAHEAD FAILED)"); return true; }
+    { if (!jj_rescan) trace_return("ECPAI(LOOKAHEAD SUCCEEDED)"); return false; }
+  }
+
+  private boolean jj_3R_31()
+ {
+    if (!jj_rescan) trace_call("AddOp(LOOKING AHEAD...)");
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_39()) {
+    jj_scanpos = xsp;
+    if (jj_3R_40()) { if (!jj_rescan) trace_return("AddOp(LOOKAHEAD FAILED)"); return true; }
+    }
+    { if (!jj_rescan) trace_return("AddOp(LOOKAHEAD SUCCEEDED)"); return false; }
+  }
+
+  private boolean jj_3_4()
+ {
+    if (jj_3R_30()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_35()
+ {
+    if (!jj_rescan) trace_call("IdTerm(LOOKING AHEAD...)");
+    if (jj_scan_token(IDENT)) { if (!jj_rescan) trace_return("IdTerm(LOOKAHEAD FAILED)"); return true; }
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_43()) jj_scanpos = xsp;
+    { if (!jj_rescan) trace_return("IdTerm(LOOKAHEAD SUCCEEDED)"); return false; }
+  }
+
+  private boolean jj_3R_39()
+ {
+    if (jj_scan_token(PLUS)) return true;
+    return false;
+  }
+
+  private boolean jj_3_12()
+ {
+    if (jj_3R_33()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_32()
+ {
+    if (!jj_rescan) trace_call("MulExpr(LOOKING AHEAD...)");
+    if (jj_3R_41()) { if (!jj_rescan) trace_return("MulExpr(LOOKAHEAD FAILED)"); return true; }
+    { if (!jj_rescan) trace_return("MulExpr(LOOKAHEAD SUCCEEDED)"); return false; }
+  }
+
+  private boolean jj_3R_40()
+ {
+    if (jj_scan_token(MINUS)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_56()
+ {
+    if (jj_scan_token(IDENT)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_43()
+ {
+    if (jj_scan_token(POWER)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_47()
+ {
+    if (!jj_rescan) trace_call("CondOrExpr(LOOKING AHEAD...)");
+    if (jj_3R_51()) { if (!jj_rescan) trace_return("CondOrExpr(LOOKAHEAD FAILED)"); return true; }
+    { if (!jj_rescan) trace_return("CondOrExpr(LOOKAHEAD SUCCEEDED)"); return false; }
+  }
+
+  private boolean jj_3R_29()
+ {
+    if (!jj_rescan) trace_call("ECRandom(LOOKING AHEAD...)");
+    if (jj_scan_token(ECLEFT)) { if (!jj_rescan) trace_return("ECRandom(LOOKAHEAD FAILED)"); return true; }
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_37()) {
+    jj_scanpos = xsp;
+    if (jj_3R_38()) { if (!jj_rescan) trace_return("ECRandom(LOOKAHEAD FAILED)"); return true; }
+    }
+    { if (!jj_rescan) trace_return("ECRandom(LOOKAHEAD SUCCEEDED)"); return false; }
   }
 
   private boolean jj_3R_33()
@@ -3151,78 +3291,27 @@ t7 = new FFaplNodeToken(t1);
     return false;
   }
 
-  private boolean jj_3R_31()
+  private boolean jj_3R_37()
  {
-    if (!jj_rescan) trace_call("AddOp(LOOKING AHEAD...)");
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_39()) {
-    jj_scanpos = xsp;
-    if (jj_3R_40()) { if (!jj_rescan) trace_return("AddOp(LOOKAHEAD FAILED)"); return true; }
-    }
-    { if (!jj_rescan) trace_return("AddOp(LOOKAHEAD SUCCEEDED)"); return false; }
-  }
-
-  private boolean jj_3_4()
- {
-    if (jj_3R_30()) return true;
+    if (jj_scan_token(ECRANDOM)) return true;
     return false;
   }
 
-  private boolean jj_3R_34()
+  private boolean jj_3R_45()
  {
-    if (jj_scan_token(MINUS)) return true;
+    if (jj_3R_48()) return true;
     return false;
   }
 
-  private boolean jj_3R_39()
+  private boolean jj_3R_38()
  {
-    if (jj_scan_token(PLUS)) return true;
+    if (jj_scan_token(ECRANDOMSUB)) return true;
     return false;
   }
 
   private boolean jj_3R_42()
  {
     if (jj_scan_token(COMMA)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_72()
- {
-    if (!jj_rescan) trace_call("Polynomial(LOOKING AHEAD...)");
-    if (jj_scan_token(SQUARED_BRACE_LEFT)) { if (!jj_rescan) trace_return("Polynomial(LOOKAHEAD FAILED)"); return true; }
-    { if (!jj_rescan) trace_return("Polynomial(LOOKAHEAD SUCCEEDED)"); return false; }
-  }
-
-  private boolean jj_3R_32()
- {
-    if (!jj_rescan) trace_call("MulExpr(LOOKING AHEAD...)");
-    if (jj_3R_41()) { if (!jj_rescan) trace_return("MulExpr(LOOKAHEAD FAILED)"); return true; }
-    { if (!jj_rescan) trace_return("MulExpr(LOOKAHEAD SUCCEEDED)"); return false; }
-  }
-
-  private boolean jj_3R_40()
- {
-    if (jj_scan_token(MINUS)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_56()
- {
-    if (jj_scan_token(IDENT)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_47()
- {
-    if (!jj_rescan) trace_call("CondOrExpr(LOOKING AHEAD...)");
-    if (jj_3R_51()) { if (!jj_rescan) trace_return("CondOrExpr(LOOKAHEAD FAILED)"); return true; }
-    { if (!jj_rescan) trace_return("CondOrExpr(LOOKAHEAD SUCCEEDED)"); return false; }
-  }
-
-  private boolean jj_3R_45()
- {
-    if (jj_3R_48()) return true;
     return false;
   }
 
@@ -3235,6 +3324,15 @@ t7 = new FFaplNodeToken(t1);
   private boolean jj_3R_58()
  {
     if (jj_scan_token(CURLY_BRACE_LEFT)) return true;
+    return false;
+  }
+
+  private boolean jj_3_11()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_34()) jj_scanpos = xsp;
+    if (jj_3R_35()) return true;
     return false;
   }
 
@@ -3308,18 +3406,23 @@ t7 = new FFaplNodeToken(t1);
     { if (!jj_rescan) trace_return("CondAndExpr(LOOKAHEAD SUCCEEDED)"); return false; }
   }
 
-  private boolean jj_3R_27()
+  private boolean jj_3R_34()
  {
-    if (!jj_rescan) trace_call("ECPoint(LOOKING AHEAD...)");
-    if (jj_scan_token(ECLEFT)) { if (!jj_rescan) trace_return("ECPoint(LOOKAHEAD FAILED)"); return true; }
-    if (jj_3R_36()) { if (!jj_rescan) trace_return("ECPoint(LOOKAHEAD FAILED)"); return true; }
-    { if (!jj_rescan) trace_return("ECPoint(LOOKAHEAD SUCCEEDED)"); return false; }
+    if (jj_scan_token(MINUS)) return true;
+    return false;
   }
 
   private boolean jj_3R_64()
  {
     if (jj_scan_token(FALSE)) return true;
     return false;
+  }
+
+  private boolean jj_3R_72()
+ {
+    if (!jj_rescan) trace_call("Polynomial(LOOKING AHEAD...)");
+    if (jj_scan_token(SQUARED_BRACE_LEFT)) { if (!jj_rescan) trace_return("Polynomial(LOOKAHEAD FAILED)"); return true; }
+    { if (!jj_rescan) trace_return("Polynomial(LOOKAHEAD SUCCEEDED)"); return false; }
   }
 
   private boolean jj_3R_65()
@@ -3341,18 +3444,18 @@ t7 = new FFaplNodeToken(t1);
     return false;
   }
 
-  private boolean jj_3_7()
- {
-    if (jj_3R_33()) return true;
-    return false;
-  }
-
   private boolean jj_3R_30()
  {
     if (!jj_rescan) trace_call("ProcFuncCall(LOOKING AHEAD...)");
     if (jj_scan_token(IDENT)) { if (!jj_rescan) trace_return("ProcFuncCall(LOOKAHEAD FAILED)"); return true; }
     if (jj_scan_token(BRACE_LEFT)) { if (!jj_rescan) trace_return("ProcFuncCall(LOOKAHEAD FAILED)"); return true; }
     { if (!jj_rescan) trace_return("ProcFuncCall(LOOKAHEAD SUCCEEDED)"); return false; }
+  }
+
+  private boolean jj_3_7()
+ {
+    if (jj_3R_33()) return true;
+    return false;
   }
 
   private boolean jj_3R_46()
@@ -3402,14 +3505,6 @@ t7 = new FFaplNodeToken(t1);
     return false;
   }
 
-  private boolean jj_3R_28()
- {
-    if (!jj_rescan) trace_call("ECPAI(LOOKING AHEAD...)");
-    if (jj_scan_token(ECLEFT)) { if (!jj_rescan) trace_return("ECPAI(LOOKAHEAD FAILED)"); return true; }
-    if (jj_scan_token(ECPAI)) { if (!jj_rescan) trace_return("ECPAI(LOOKAHEAD FAILED)"); return true; }
-    { if (!jj_rescan) trace_return("ECPAI(LOOKAHEAD SUCCEEDED)"); return false; }
-  }
-
   private boolean jj_3R_68()
  {
     if (jj_3R_72()) return true;
@@ -3427,16 +3522,6 @@ t7 = new FFaplNodeToken(t1);
     if (!jj_rescan) trace_call("CreationExpr(LOOKING AHEAD...)");
     if (jj_scan_token(NEW)) { if (!jj_rescan) trace_return("CreationExpr(LOOKAHEAD FAILED)"); return true; }
     { if (!jj_rescan) trace_return("CreationExpr(LOOKAHEAD SUCCEEDED)"); return false; }
-  }
-
-  private boolean jj_3R_35()
- {
-    if (!jj_rescan) trace_call("IdTerm(LOOKING AHEAD...)");
-    if (jj_scan_token(IDENT)) { if (!jj_rescan) trace_return("IdTerm(LOOKAHEAD FAILED)"); return true; }
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_43()) jj_scanpos = xsp;
-    { if (!jj_rescan) trace_return("IdTerm(LOOKAHEAD SUCCEEDED)"); return false; }
   }
 
   private boolean jj_3R_69()
@@ -3457,47 +3542,12 @@ t7 = new FFaplNodeToken(t1);
     return false;
   }
 
-  private boolean jj_3_12()
+  private boolean jj_3R_27()
  {
-    if (jj_3R_33()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_43()
- {
-    if (jj_scan_token(POWER)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_29()
- {
-    if (!jj_rescan) trace_call("ECRandom(LOOKING AHEAD...)");
-    if (jj_scan_token(ECLEFT)) { if (!jj_rescan) trace_return("ECRandom(LOOKAHEAD FAILED)"); return true; }
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_37()) {
-    jj_scanpos = xsp;
-    if (jj_3R_38()) { if (!jj_rescan) trace_return("ECRandom(LOOKAHEAD FAILED)"); return true; }
-    }
-    { if (!jj_rescan) trace_return("ECRandom(LOOKAHEAD SUCCEEDED)"); return false; }
-  }
-
-  private boolean jj_3_2()
- {
-    if (jj_3R_28()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_37()
- {
-    if (jj_scan_token(ECRANDOM)) return true;
-    return false;
-  }
-
-  private boolean jj_3_8()
- {
-    if (jj_3R_33()) return true;
-    return false;
+    if (!jj_rescan) trace_call("ECPoint(LOOKING AHEAD...)");
+    if (jj_scan_token(ECLEFT)) { if (!jj_rescan) trace_return("ECPoint(LOOKAHEAD FAILED)"); return true; }
+    if (jj_3R_36()) { if (!jj_rescan) trace_return("ECPoint(LOOKAHEAD FAILED)"); return true; }
+    { if (!jj_rescan) trace_return("ECPoint(LOOKAHEAD SUCCEEDED)"); return false; }
   }
 
   /** Generated Token Manager. */
@@ -3846,8 +3896,7 @@ t7 = new FFaplNodeToken(t1);
     trace_enabled = false;
   }
 
-  /** Debug output. */
-  protected java.io.PrintStream tracePS = new java.io.PrintStream(OutputStream.nullOutputStream()); //System.out;
+  protected java.io.PrintStream tracePS = System.out;
 
   protected void trace_call(final String s) {
     if (trace_enabled) {

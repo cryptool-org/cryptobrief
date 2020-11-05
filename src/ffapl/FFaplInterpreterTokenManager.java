@@ -12,7 +12,9 @@ import ffapl.visitor.*;
 import ffapl.types.*;
 import ffapl.java.logging.*;
 import ffapl.java.exception.*;
+import ffapl.java.util.*;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 
 /** Token Manager. */
 @SuppressWarnings ("unused")

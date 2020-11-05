@@ -19,7 +19,9 @@ import ffapl.visitor.*;
 import ffapl.types.*;
 import ffapl.java.logging.*;
 import ffapl.java.exception.*;
+import ffapl.java.util.*;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 
 /**
  * @author Alexander Ortner
@@ -34,6 +36,8 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants
   private FFaplJavaInterpreterVisitor _javaInterpreter;
   private FFaplSymbolTable _symbolTable;
   private ASTProgram _root;
+  private RestrictedHashMap<String,Type> _identTypeMapping;
+  private String _currentAssignmentIdent;
   public static boolean _interrupted;
 
   /**
@@ -43,9 +47,10 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants
   public FFaplInterpreter(FFaplLogger logger, Reader reader)
   {
 		this(reader);
+		this.disable_tracing();
 		_logger = logger;
 		_interrupted = false;
-		
+		_identTypeMapping = new RestrictedHashMap<String,Type>();
   }
 
   /**
@@ -55,9 +60,10 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants
   public FFaplInterpreter(FFaplLogger logger, InputStream stream)
   {
 		this(stream, Charset.forName("UTF-8"));
+		this.disable_tracing();
 		_logger = logger;
 		_interrupted = false;
-		
+		_identTypeMapping = new RestrictedHashMap<String,Type>();
   }
   
   public FFaplLogger getLogger(){
@@ -1400,6 +1406,7 @@ ASTAssignment Assignment() throws FFaplException:
 	  {
 	    t2 = new FFaplNodeToken(t1);
 	    t4 = new FFaplNodeOpt();
+	    _currentAssignmentIdent = t1.image;
 	  }
   [
   	t5 = Selector()
@@ -2049,7 +2056,7 @@ ASTComplexAlgebraicType ComplexAlgebraicType() throws FFaplException:
 			    t6.addNode(new FFaplNodeToken(t5));
 			  }
 		  	t5 = < BRACE_LEFT >
-			  	{
+			  	{	
 			  	  t6.addNode(new FFaplNodeToken(t5));
 			 	}
 		  	t5 = < BRACE_RIGHT >
@@ -2057,6 +2064,23 @@ ASTComplexAlgebraicType ComplexAlgebraicType() throws FFaplException:
 			  	  t6.addNode(new FFaplNodeToken(t5));
 			  	  t9 = new FFaplNodeOpt();
 			  	  t8.setType(new FFaplResidueClass());
+			  	}
+			  	{
+			  	    // (temporary) solution for github issue #5 "Compilation error when parsing creation expressions of type Z()[n] using a constant n"
+
+			  	    // check if the current assignment identifier is in the restricted HashMap
+			  		if (_identTypeMapping.containsKey(_currentAssignmentIdent)) {
+			  		
+			  		  	// check if the type of this variable is FFaplResidueClass...
+						if (_identTypeMapping.get(_currentAssignmentIdent) instanceof FFaplResidueClass) {
+						  	//... then immediately return to prevent parsing an FFaplPolynomialResidue type
+							t6.addNode(t9);
+						  	t8.addNode(t6);
+						  	t1 = new FFaplNodeChoice(t8, 1, amount);
+						  	
+						  	return new ASTComplexAlgebraicType(FFT_COMPLEXALGEBRAICTYPE, t1);
+						}
+					}
 			  	}
 			 [
 			  LOOKAHEAD(2)
@@ -2435,6 +2459,7 @@ ASTDecl Decl() throws FFaplException:
   FFaplNodeListOpt t4;
   ASTDeclType t6;
   FFaplNodeSequence t8;
+  ArrayList<String> idents;
 }
 {
   //t1 = < DECLARE >
@@ -2445,6 +2470,8 @@ ASTDecl Decl() throws FFaplException:
   	  {
 	    t3 = new FFaplNodeToken(t1);
 	    t4 = new FFaplNodeListOpt();
+	    idents = new ArrayList<String>();
+  	    idents.add(t1.image);
 	  }
   (
 	    {
@@ -2458,6 +2485,7 @@ ASTDecl Decl() throws FFaplException:
       	{
 	      t8.addNode(new FFaplNodeToken(t1));
 	      t4.addNode(t8);
+	      idents.add(t1.image);
 	  	}
   )*
   t1 = < COLON >
@@ -2469,8 +2497,32 @@ ASTDecl Decl() throws FFaplException:
   	  {
 	    t7 = new FFaplNodeToken(t1);
 	  }
+	{
+	    // (temporary) solution for github issue #5 "Compilation error when parsing creation expressions of type Z()[n] using a constant n"
+	    
+	  	FFaplNodeChoice n_choice = t6._node1;	// _node1 is a choice node
 
-  
+	  	if (n_choice.getNode() instanceof FFaplNodeSequence) { 
+		    FFaplNodeSequence n_sequence = (FFaplNodeSequence) n_choice.getNode();	// sequence node
+	
+		    // first element contains the AST type node
+		    if (n_sequence.elementAt(0) instanceof ASTExprComplexAType) {
+		      	// this solution is only needed for nodes of type ASTExprComplexAType
+		      	
+		    	ASTExprComplexAType n_complex = (ASTExprComplexAType)n_sequence.elementAt(0);	
+		    	FFaplNodeChoice n_compl_choice = n_complex._node1; // _node1 is a choice node
+
+		    	if (n_compl_choice.getNode() instanceof FFaplNodeType) { 
+			    	FFaplNodeType n_type = (FFaplNodeType) n_compl_choice.getNode();
+
+			    	for (String ident : idents) {
+			    	  	 // put all identifiers with their corresponding type in this declaration statement into the restricted HashMap 
+			    	     _identTypeMapping.put(ident, n_type.getType());
+			    	}
+			    }
+		    }
+		}
+ 	}
  {
    return new ASTDecl(FFT_DECL, t3, t4, t5, t6, t7);
  }
