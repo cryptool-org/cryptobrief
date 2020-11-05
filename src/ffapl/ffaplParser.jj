@@ -47,6 +47,7 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants
   public FFaplInterpreter(FFaplLogger logger, Reader reader)
   {
 		this(reader);
+		this.disable_tracing();
 		_logger = logger;
 		_interrupted = false;
 		_identTypeMapping = new RestrictedHashMap<String,Type>();
@@ -59,6 +60,7 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants
   public FFaplInterpreter(FFaplLogger logger, InputStream stream)
   {
 		this(stream, Charset.forName("UTF-8"));
+		this.disable_tracing();
 		_logger = logger;
 		_interrupted = false;
 		_identTypeMapping = new RestrictedHashMap<String,Type>();

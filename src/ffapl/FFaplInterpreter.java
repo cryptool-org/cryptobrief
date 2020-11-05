@@ -39,6 +39,7 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants, FF
   public FFaplInterpreter(FFaplLogger logger, Reader reader)
   {
   this(reader);
+  this.disable_tracing();
   _logger = logger;
   _interrupted = false;
   _identTypeMapping = new RestrictedHashMap<String,Type>();
@@ -51,6 +52,7 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants, FF
   public FFaplInterpreter(FFaplLogger logger, InputStream stream)
   {
   this(stream, Charset.forName("UTF-8"));
+  this.disable_tracing();
   _logger = logger;
   _interrupted = false;
   _identTypeMapping = new RestrictedHashMap<String,Type>();
@@ -1858,8 +1860,9 @@ t6.addNode(new FFaplNodeToken(t5));
           // check if the current assignment identifier is in the restricted HashMap
        if (_identTypeMapping.containsKey(_currentAssignmentIdent)) {
 
-          // if the type of this variable is FFaplResidueClass, immediately return and therefore prevent parsing an FFaplPolynomialResidue type
+          // check if the type of this variable is FFaplResidueClass...
       if (_identTypeMapping.get(_currentAssignmentIdent) instanceof FFaplResidueClass) {
+         //... then immediately return to prevent parsing an FFaplPolynomialResidue type
        t6.addNode(t9);
          t8.addNode(t6);
          t1 = new FFaplNodeChoice(t8, 1, amount);
@@ -3089,6 +3092,12 @@ t7 = new FFaplNodeToken(t1);
     finally { jj_save(11, xla); }
   }
 
+  private boolean jj_3_2()
+ {
+    if (jj_3R_28()) return true;
+    return false;
+  }
+
   private boolean jj_3_8()
  {
     if (jj_3R_33()) return true;
@@ -3390,12 +3399,6 @@ t7 = new FFaplNodeToken(t1);
     return false;
   }
 
-  private boolean jj_3R_34()
- {
-    if (jj_scan_token(MINUS)) return true;
-    return false;
-  }
-
   private boolean jj_3R_51()
  {
     if (!jj_rescan) trace_call("CondAndExpr(LOOKING AHEAD...)");
@@ -3403,17 +3406,23 @@ t7 = new FFaplNodeToken(t1);
     { if (!jj_rescan) trace_return("CondAndExpr(LOOKAHEAD SUCCEEDED)"); return false; }
   }
 
-  private boolean jj_3R_72()
+  private boolean jj_3R_34()
  {
-    if (!jj_rescan) trace_call("Polynomial(LOOKING AHEAD...)");
-    if (jj_scan_token(SQUARED_BRACE_LEFT)) { if (!jj_rescan) trace_return("Polynomial(LOOKAHEAD FAILED)"); return true; }
-    { if (!jj_rescan) trace_return("Polynomial(LOOKAHEAD SUCCEEDED)"); return false; }
+    if (jj_scan_token(MINUS)) return true;
+    return false;
   }
 
   private boolean jj_3R_64()
  {
     if (jj_scan_token(FALSE)) return true;
     return false;
+  }
+
+  private boolean jj_3R_72()
+ {
+    if (!jj_rescan) trace_call("Polynomial(LOOKING AHEAD...)");
+    if (jj_scan_token(SQUARED_BRACE_LEFT)) { if (!jj_rescan) trace_return("Polynomial(LOOKAHEAD FAILED)"); return true; }
+    { if (!jj_rescan) trace_return("Polynomial(LOOKAHEAD SUCCEEDED)"); return false; }
   }
 
   private boolean jj_3R_65()
@@ -3539,12 +3548,6 @@ t7 = new FFaplNodeToken(t1);
     if (jj_scan_token(ECLEFT)) { if (!jj_rescan) trace_return("ECPoint(LOOKAHEAD FAILED)"); return true; }
     if (jj_3R_36()) { if (!jj_rescan) trace_return("ECPoint(LOOKAHEAD FAILED)"); return true; }
     { if (!jj_rescan) trace_return("ECPoint(LOOKAHEAD SUCCEEDED)"); return false; }
-  }
-
-  private boolean jj_3_2()
- {
-    if (jj_3R_28()) return true;
-    return false;
   }
 
   /** Generated Token Manager. */
