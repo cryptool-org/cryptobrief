@@ -2,6 +2,10 @@
 **Sunset** is the name of the integrated development enviroment that embodies
 the compiler for the **finite field application language (FFapl)**.
 
+Why? ...try locating yourself on any of the four grid places, to get an answer as to *why should I be interested?*
+
+![Where would you put yourself in terms of programming/number theory skills?](https://github.com/stefan-rass/sunset-ffapl/why-sunset.png)
+
 Sunset/FFapl is an eLearning tool, following a simple philosophy: *implementing
 cryptographic protocols and algorithms should be easy!*
 
