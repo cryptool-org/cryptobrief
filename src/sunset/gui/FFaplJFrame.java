@@ -112,6 +112,7 @@ public class FFaplJFrame extends javax.swing.JFrame {
 	private JMenu jMenuFile;
 	private JMenu jMenuExtras;
 	private JMenu jMenuEdit;
+	private JMenu jMenuSearch;
 	private JMenu jMenuRun;
 	private JMenu jMenuView;
 	private JTabbedPane jTabbedPane_info;
@@ -163,6 +164,7 @@ public class FFaplJFrame extends javax.swing.JFrame {
 	private JCheckBoxMenuItem jCheckBoxMenuItem_Api;
 	private JMenuItem jMenuItem_ZoomIn;
 	private JMenuItem jMenuItem_ZoomOut;
+	private JMenuItem jMenuItem_Search;
 	private JMenu jMenuHelp;
 	private JLabel _lineColumnPosition;
 	private JLabel _lineColumnTxt;
@@ -843,6 +845,19 @@ public class FFaplJFrame extends javax.swing.JFrame {
 								KeyEvent.VK_V, ActionEvent.CTRL_MASK));
 					}
 
+					jMenuSearch = new JMenu();
+					jMenuBarMain.add(jMenuSearch);
+					jMenuSearch.setText("Search");
+					jMenuSearch.setName("menu_search");
+					{
+						jMenuItem_Search = new JMenuItem();
+						jMenuSearch.add(jMenuItem_Search);
+						jMenuItem_Search.setText("Search");
+						jMenuItem_Search.setName("menuitem_search");
+						jMenuItem_Search.setAccelerator(KeyStroke.getKeyStroke(
+								KeyEvent.VK_F, ActionEvent.CTRL_MASK));
+					}
+					
 					jMenuRun = new JMenu();
 					jMenuBarMain.add(jMenuRun);
 					jMenuRun.setText("Run");
