@@ -28,7 +28,7 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants, FF
   private FFaplJavaInterpreterVisitor _javaInterpreter;
   private FFaplSymbolTable _symbolTable;
   private ASTProgram _root;
-  private RestrictedHashMap<String,Type> _identTypeMapping;
+  private ASTNodeMessageBroker<String,Type> _identTypeMapping;
   private String _currentAssignmentIdent;
   public static boolean _interrupted;
 
@@ -42,7 +42,7 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants, FF
   this.disable_tracing();
   _logger = logger;
   _interrupted = false;
-  _identTypeMapping = new RestrictedHashMap<String,Type>();
+  _identTypeMapping = new ASTNodeMessageBroker<String,Type>();
   }
 
   /**
@@ -55,7 +55,7 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants, FF
   this.disable_tracing();
   _logger = logger;
   _interrupted = false;
-  _identTypeMapping = new RestrictedHashMap<String,Type>();
+  _identTypeMapping = new ASTNodeMessageBroker<String,Type>();
   }
 
   public FFaplLogger getLogger(){

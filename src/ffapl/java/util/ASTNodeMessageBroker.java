@@ -9,13 +9,13 @@ import java.util.Map;
  * @param <K> - the type of the Key of the restricted HashMap
  * @param <V> - the type of the Value of the restricted HashMap
  */
-public class RestrictedHashMap<K,V> {
+public class ASTNodeMessageBroker<K,V> {
 	private Map<K,V> map;
 	
 	/**
 	 * Constructor
 	 */
-	public RestrictedHashMap() {
+	public ASTNodeMessageBroker() {
 		map = new HashMap<K,V>();
 	}
 	
