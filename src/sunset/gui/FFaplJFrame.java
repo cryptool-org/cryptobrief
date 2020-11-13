@@ -8,6 +8,7 @@ import java.awt.Frame;
 import java.awt.Image;
 import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.*;
 import java.lang.management.ManagementFactory;
@@ -75,6 +76,7 @@ import sunset.gui.listener.ActionListenerRedo;
 import sunset.gui.listener.ActionListenerSave;
 import sunset.gui.listener.ActionListenerSaveAll;
 import sunset.gui.listener.ActionListenerSaveAs;
+import sunset.gui.listener.ActionListenerSearchReplace;
 import sunset.gui.listener.ActionListenerShowAPI;
 import sunset.gui.listener.ActionListenerUndo;
 import sunset.gui.listener.ActionListenerZoom;
@@ -165,6 +167,7 @@ public class FFaplJFrame extends javax.swing.JFrame {
 	private JMenuItem jMenuItem_ZoomIn;
 	private JMenuItem jMenuItem_ZoomOut;
 	private JMenuItem jMenuItem_Search;
+	private JMenuItem jMenuItem_Replace;
 	private JMenu jMenuHelp;
 	private JLabel _lineColumnPosition;
 	private JLabel _lineColumnTxt;
@@ -601,6 +604,7 @@ public class FFaplJFrame extends javax.swing.JFrame {
 						this.setTitle(MessageFormat.format(
 								IProperties.APPTITLE, "- " + filename + " -"));
 						jTabbedPane_Code.setSelectedIndex(0);
+						getCurrentCodePanel().getCodePane().getInputMap().put(KeyStroke.getKeyStroke("ctrl H"), "none");
 					}
 				}
 				{
@@ -856,6 +860,14 @@ public class FFaplJFrame extends javax.swing.JFrame {
 						jMenuItem_Search.setName("menuitem_search");
 						jMenuItem_Search.setAccelerator(KeyStroke.getKeyStroke(
 								KeyEvent.VK_F, ActionEvent.CTRL_MASK));
+						
+						jMenuItem_Replace = new JMenuItem();
+						jMenuSearch.add(jMenuItem_Replace);
+						jMenuItem_Replace.setText("Replace");
+						jMenuItem_Replace.setName("menuitem_replace");
+						jMenuItem_Replace.setAccelerator(KeyStroke.getKeyStroke(
+								KeyEvent.VK_H, ActionEvent.CTRL_MASK));
+						
 					}
 					
 					jMenuRun = new JMenu();
@@ -1092,6 +1104,11 @@ public class FFaplJFrame extends javax.swing.JFrame {
 		setDropTarget(new DropTarget(this, new DropTargetListenerFile(this,
 				(JTabbedPaneCode) jTabbedPane_Code, _undoComp, _redoComp,
 				_saveComp, _saveAllComp, _lineColumnPosition)));
+		Vector<Component> replaceComp = new Vector<Component>();
+		replaceComp.add(jMenuItem_Replace);
+		ActionListener listenerSearchReplace = new ActionListenerSearchReplace(this, replaceComp);
+		jMenuItem_Search.addActionListener(listenerSearchReplace);
+		jMenuItem_Replace.addActionListener(listenerSearchReplace);
 		jTabbedPane_Code.addChangeListener(new ChangeListenerSelectedTab(this,
 				jScrollPane_Console, jTextField_input, _undoComp, _redoComp, _saveComp,
 				_saveAllComp, _closeTabComp, _closeAllTabComp, jPanel_status));
@@ -1227,5 +1244,9 @@ public class FFaplJFrame extends javax.swing.JFrame {
 
 	public static Vector<Component> getStartComp(){
 		return _startComp;
+	}
+	
+	public JPanelCode getCurrentCodePanel() {		
+		return (JPanelCode)jTabbedPane_Code.getSelectedComponent();
 	}
 }
