@@ -10,6 +10,8 @@ import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.text.MessageFormat;
@@ -118,7 +120,7 @@ public class FFaplJFrame extends javax.swing.JFrame {
 	private JMenu jMenuRun;
 	private JMenu jMenuView;
 	private JTabbedPane jTabbedPane_info;
-	private JTabbedPane jTabbedPane_Code;
+	private static JTabbedPane jTabbedPane_Code;
 	private JSplitPane jSplitPane_main;
 	private JSplitPane jSplitPane_mainmain;
 	// private JSplitPane jSplitPane_API;
@@ -1246,7 +1248,7 @@ public class FFaplJFrame extends javax.swing.JFrame {
 		return _startComp;
 	}
 	
-	public JPanelCode getCurrentCodePanel() {		
+	public static JPanelCode getCurrentCodePanel() {		
 		return (JPanelCode)jTabbedPane_Code.getSelectedComponent();
 	}
 }

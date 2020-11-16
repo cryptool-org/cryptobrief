@@ -14,6 +14,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import sunset.gui.FFaplJFrame;
+import sunset.gui.interfaces.IDialogSearch;
 import sunset.gui.listener.ActionListenerCloseWindow;
 import sunset.gui.listener.ActionListenerFindString;
 import sunset.gui.util.TranslateGUIElements;
@@ -37,9 +38,10 @@ import java.awt.Font;
 import java.awt.Dialog.ModalExclusionType;
 import javax.swing.JLayeredPane;
 import javax.swing.JCheckBox;
+import javax.swing.Box;
 
 @SuppressWarnings("serial")
-public class JDialogSearchReplace extends JDialog {
+public class JDialogSearchReplace extends JDialog implements IDialogSearch {
 
 	private FFaplJFrame _frame;
 	private final JPanel contentPanel = new JPanel();
@@ -47,24 +49,30 @@ public class JDialogSearchReplace extends JDialog {
 	private JTextField jTextField_searchtext;
 	private JTextField jTextField_replacetext;
 	private JButton jButton_find;
+	private JButton jButton_replace;
 	private JButton jButton_cancel;
 	private JLabel jLabel_searchfor;
 	private JLabel jLabel_replacewith;
 	private Vector<Component> replaceComp = new Vector<Component>();
 	private int dialog_width = 450;
-	private int dialog_height = 240;
+	private int dialog_height = 260;
 	private JPanel panelStatus;
 	private JLabel jLabel_status;
+	private JCheckBox chckbxMatchCase;
+	private JCheckBox chckbxRegularExpression;
+	private JCheckBox chckbxDotMatchNewLine;
+	private JCheckBox chckbxWrapAround;
 
 	/**
 	 * Create the dialog.
 	 */
 	public JDialogSearchReplace(FFaplJFrame frame) {
 		super(frame);
+		setResizable(false);
 		this._frame = frame;
 		setFont(new Font("Dialog", Font.PLAIN, 10));
 		initGUI();
-		initComponents();
+		initListener();
 		translate();
 	}
 	
@@ -89,28 +97,58 @@ public class JDialogSearchReplace extends JDialog {
 				panelSearchReplaceMain.setLayout(null);
 				
 				jLabel_searchfor = new JLabel("Search for:");
-				jLabel_searchfor.setBounds(35, 10, 113, 26);
+				jLabel_searchfor.setBounds(10, 10, 74, 26);
 				jLabel_searchfor.setHorizontalAlignment(SwingConstants.CENTER);
 				jLabel_searchfor.setName("label_searchfor");
 				panelSearchReplaceMain.add(jLabel_searchfor);
 				
 				jTextField_searchtext = new JTextField();
-				jTextField_searchtext.setBounds(158, 11, 253, 26);
+				jTextField_searchtext.setBounds(88, 10, 224, 26);
 				jTextField_searchtext.setColumns(10);
 				panelSearchReplaceMain.add(jTextField_searchtext);
 				
 				jLabel_replacewith = new JLabel("Replace with:");
-				jLabel_replacewith.setBounds(35, 46, 113, 26);
+				jLabel_replacewith.setBounds(10, 46, 74, 26);
 				jLabel_replacewith.setHorizontalAlignment(SwingConstants.CENTER);
 				jLabel_replacewith.setName("label_replacewith");
 				panelSearchReplaceMain.add(jLabel_replacewith);
 				replaceComp.add(jLabel_replacewith);
 				
 				jTextField_replacetext = new JTextField();
-				jTextField_replacetext.setBounds(158, 47, 253, 26);
+				jTextField_replacetext.setBounds(88, 46, 224, 26);
 				jTextField_replacetext.setColumns(10);
 				panelSearchReplaceMain.add(jTextField_replacetext);
 				replaceComp.add(jTextField_replacetext);
+				{
+					jButton_find = new JButton("Find Next");
+					jButton_find.setBounds(330, 13, 81, 21);
+					panelSearchReplaceMain.add(jButton_find);
+					jButton_find.setName("button_find");
+					getRootPane().setDefaultButton(jButton_find);
+				}
+				
+				jButton_replace = new JButton("Replace");
+				jButton_replace.setName("button_replace");
+				jButton_replace.setBounds(330, 49, 81, 21);
+				panelSearchReplaceMain.add(jButton_replace);
+				replaceComp.add(jButton_replace);
+				
+				chckbxMatchCase = new JCheckBox("Match case");
+				chckbxMatchCase.setBounds(88, 87, 120, 21);
+				panelSearchReplaceMain.add(chckbxMatchCase);
+				
+				chckbxRegularExpression = new JCheckBox("Regular expression");
+				chckbxRegularExpression.setBounds(88, 108, 120, 21);
+				panelSearchReplaceMain.add(chckbxRegularExpression);
+				
+				chckbxDotMatchNewLine = new JCheckBox(". matches newline");
+				chckbxDotMatchNewLine.setBounds(210, 108, 120, 21);
+				chckbxDotMatchNewLine.setVisible(false);
+				panelSearchReplaceMain.add(chckbxDotMatchNewLine);
+				
+				chckbxWrapAround = new JCheckBox("Wrap around");
+				chckbxWrapAround.setBounds(210, 87, 93, 21);
+				panelSearchReplaceMain.add(chckbxWrapAround);
 				
 				panelStatus = new JPanel();
 				panelSearchReplace.add(panelStatus, BorderLayout.SOUTH);
@@ -129,17 +167,22 @@ public class JDialogSearchReplace extends JDialog {
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
-				jButton_find = new JButton("Search");
-				jButton_find.setName("button_find");
-				buttonPane.add(jButton_find);
-				getRootPane().setDefaultButton(jButton_find);
-			}
-			{
 				jButton_cancel = new JButton("Cancel");
 				jButton_cancel.setName("button_cancel");
 				buttonPane.add(jButton_cancel);
 			}
 		}
+	}
+	
+	private void initListener() {
+		
+		jButton_cancel.addActionListener(new ActionListenerCloseWindow(this));
+		jButton_find.addActionListener(new ActionListenerFindString(this));
+		this.addWindowFocusListener(new WindowAdapter() {
+		    public void windowGainedFocus(WindowEvent e) {
+		    	jTextField_searchtext.requestFocusInWindow();
+		    }
+		});
 		
 		jTabbedPane_main.addChangeListener(new ChangeListener() {
 			@Override
@@ -151,17 +194,14 @@ public class JDialogSearchReplace extends JDialog {
 				}
 			}
 	    });
-	}
-	
-	private void initComponents() {
 		
-		jButton_cancel.addActionListener(new ActionListenerCloseWindow(this));
-		jButton_find.addActionListener(new ActionListenerFindString(this));
-		this.addWindowFocusListener(new WindowAdapter() {
-		    public void windowGainedFocus(WindowEvent e) {
-		    	jTextField_searchtext.requestFocusInWindow();
-		    }
+		chckbxRegularExpression.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				chckbxDotMatchNewLine.setVisible(chckbxRegularExpression.isSelected());
+			}
 		});
+		
 		this.addEscapeListener(this);
 	}
 	
@@ -205,13 +245,35 @@ public class JDialogSearchReplace extends JDialog {
 		setBounds(x_pos, y_pos, dialog_width, dialog_height);
 		translate();
 	}
-	
-	public String getSearchString() {
+
+	@Override
+	public String searchPattern() {
 		return jTextField_searchtext.getText();
 	}
-	
+
+	@Override
+	public boolean matchCase() {
+		return chckbxMatchCase.isSelected();
+	}
+
+	@Override
 	public void setStatus(String status, Color color) {
 		jLabel_status.setText(status);
 		jLabel_status.setForeground(color);
+	}
+
+	@Override
+	public boolean useRegEx() {
+		return chckbxRegularExpression.isSelected();
+	}
+
+	@Override
+	public boolean dotMatchesNewLine() {
+		return chckbxDotMatchNewLine.isSelected();
+	}
+
+	@Override
+	public boolean wrapAround() {
+		return chckbxWrapAround.isSelected();
 	}
 }

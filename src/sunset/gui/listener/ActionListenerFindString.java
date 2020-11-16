@@ -12,11 +12,12 @@ import javax.swing.text.Document;
 
 import sunset.gui.FFaplJFrame;
 import sunset.gui.dialog.JDialogSearchReplace;
+import sunset.gui.interfaces.IDialogSearch;
 import sunset.gui.logic.SearchReplaceLogic;
 
 public class ActionListenerFindString implements ActionListener {
 
-	private JDialogSearchReplace _dialogSearch;
+	private IDialogSearch _dialogSearch;
 	
 	public ActionListenerFindString(JDialogSearchReplace dialogSearch) {
 		_dialogSearch = dialogSearch;
@@ -25,25 +26,33 @@ public class ActionListenerFindString implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
-		String searchFor = _dialogSearch.getSearchString();
+		String pattern = _dialogSearch.searchPattern();
+		boolean bMatchCase = _dialogSearch.matchCase();
 		String text;
 		
 		try {
-			JTextPane textPaneCode = _dialogSearch.getFrame().getCurrentCodePanel().getCodePane();
-			
-			textPaneCode.grabFocus();
+			JTextPane textPaneCode = FFaplJFrame.getCurrentCodePanel().getCodePane();
 			Document doc = textPaneCode.getDocument();
 			text = doc.getText(0, doc.getLength());
 			int caretPos = textPaneCode.getCaretPosition();
 			
-			int foundIndex = SearchReplaceLogic.getIntance().getIndexOf(text, searchFor, caretPos);
+			SearchReplaceLogic searchReplace = new SearchReplaceLogic();
+			boolean bWrapAround = _dialogSearch.wrapAround();
+			boolean bFound;
 			
-			if (foundIndex != -1) {
-				_dialogSearch.setStatus("\"" + searchFor + "\" found at position " + foundIndex, Color.black);
-				textPaneCode.setCaretPosition(foundIndex);
-				textPaneCode.moveCaretPosition(foundIndex + searchFor.length());
+			if (_dialogSearch.useRegEx()) {
+				boolean bDotMatchesNewLine = _dialogSearch.dotMatchesNewLine();
+				bFound = searchReplace.searchRegex(text, pattern, caretPos, bMatchCase, bWrapAround, bDotMatchesNewLine);
 			} else {
-				_dialogSearch.setStatus("\"" + searchFor + "\" not found from position " + caretPos, Color.red);
+				bFound = searchReplace.search(text, pattern, caretPos, bMatchCase, bWrapAround);
+			}
+			
+			if (bFound) {
+				_dialogSearch.setStatus(searchReplace.getMessage(), Color.black);
+				textPaneCode.setCaretPosition(searchReplace.getStart());
+				textPaneCode.moveCaretPosition(searchReplace.getEnd());
+			} else {
+				_dialogSearch.setStatus(searchReplace.getMessage(), Color.red);
 			}
 		} catch (BadLocationException e1) {
 			e1.printStackTrace();
