@@ -6,9 +6,12 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.Image;
+import java.awt.KeyboardFocusManager;
 import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -596,6 +599,8 @@ public class FFaplJFrame extends javax.swing.JFrame {
 						if (((JPanelCode) jPanel_code).loadFile(_openFile)) {
 							filename = _openFile.getName();
 						}
+						jPanel_code.getInputMap()
+						.put(KeyStroke.getKeyStroke("ctrl H"), "none");
 						jTabbedPane_Code.addTab(filename, jPanel_code);
 						jTabbedPane_Code.setTabComponentAt(0,
 								new JPanelTabTitle(jTabbedPane_Code,
@@ -1120,6 +1125,14 @@ public class FFaplJFrame extends javax.swing.JFrame {
 				(JTabbedPaneCode) jTabbedPane_Code));
 		jMenuItem_snippet.addActionListener(new ActionListenerEditApiEntry(this, null));
 		jTextField_input.addActionListener(new ActionListenerInputField((JTabbedPaneCode) jTabbedPane_Code));
+		this.addWindowListener(new WindowAdapter() {
+		    public void windowActivated(WindowEvent e) {
+		    	JPanelCode currentCodePanel = getCurrentCodePanel(); 
+		    	if (currentCodePanel != null) {
+		    		currentCodePanel.getCodePane().requestFocusInWindow();
+		    	}
+		    }
+		});
 	}
 
 	private void initComponents() {

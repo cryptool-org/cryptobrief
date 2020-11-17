@@ -14,7 +14,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import sunset.gui.FFaplJFrame;
-import sunset.gui.interfaces.IDialogSearch;
+import sunset.gui.interfaces.IDialogSearchReplace;
 import sunset.gui.listener.ActionListenerCloseWindow;
 import sunset.gui.listener.ActionListenerFindString;
 import sunset.gui.util.TranslateGUIElements;
@@ -24,8 +24,6 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
-import java.awt.Dialog.ModalityType;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -35,13 +33,10 @@ import java.util.Vector;
 
 import javax.swing.SwingConstants;
 import java.awt.Font;
-import java.awt.Dialog.ModalExclusionType;
-import javax.swing.JLayeredPane;
 import javax.swing.JCheckBox;
-import javax.swing.Box;
 
 @SuppressWarnings("serial")
-public class JDialogSearchReplace extends JDialog implements IDialogSearch {
+public class JDialogSearchReplace extends JDialog implements IDialogSearchReplace {
 
 	private FFaplJFrame _frame;
 	private final JPanel contentPanel = new JPanel();
@@ -134,19 +129,23 @@ public class JDialogSearchReplace extends JDialog implements IDialogSearch {
 				replaceComp.add(jButton_replace);
 				
 				chckbxMatchCase = new JCheckBox("Match case");
+				chckbxMatchCase.setToolTipText("case sensitive search");
 				chckbxMatchCase.setBounds(88, 87, 120, 21);
 				panelSearchReplaceMain.add(chckbxMatchCase);
 				
 				chckbxRegularExpression = new JCheckBox("Regular expression");
+				chckbxRegularExpression.setToolTipText("regular expression search");
 				chckbxRegularExpression.setBounds(88, 108, 120, 21);
 				panelSearchReplaceMain.add(chckbxRegularExpression);
 				
 				chckbxDotMatchNewLine = new JCheckBox(". matches newline");
+				chckbxDotMatchNewLine.setToolTipText(". also matches newline characters like \\n");
 				chckbxDotMatchNewLine.setBounds(210, 108, 120, 21);
 				chckbxDotMatchNewLine.setVisible(false);
 				panelSearchReplaceMain.add(chckbxDotMatchNewLine);
 				
 				chckbxWrapAround = new JCheckBox("Wrap around");
+				chckbxWrapAround.setToolTipText("start from beginning if pattern was not found");
 				chckbxWrapAround.setBounds(210, 87, 93, 21);
 				panelSearchReplaceMain.add(chckbxWrapAround);
 				
@@ -205,7 +204,7 @@ public class JDialogSearchReplace extends JDialog implements IDialogSearch {
 		this.addEscapeListener(this);
 	}
 	
-	public void addEscapeListener(final JDialog dialog) {
+	private void addEscapeListener(final JDialog dialog) {
 	    ActionListener escListener = new ActionListener() {
 
 			@Override
@@ -228,12 +227,13 @@ public class JDialogSearchReplace extends JDialog implements IDialogSearch {
 		TranslateGUIElements.translateDialog(this);
 	}
 	
-	public FFaplJFrame getFrame() {
-		return this._frame;
-	}
-	
+	/**
+	 * Performs preparation work before the dialog is displayed. Selects the corresponding tab in the dialog.
+	 * Calculates the optimal position of the dialog, clears it's status and translates all GUI elements according to the specified language.
+	 * @param isReplace
+	 */
 	public void prepareDialog(boolean isReplace) {
-		jTabbedPane_main.setSelectedIndex(isReplace?1:0);
+		jTabbedPane_main.setSelectedIndex(isReplace ? 1 : 0);
 		
 		for (Component comp : replaceComp) {
 			comp.setVisible(isReplace);
@@ -242,6 +242,7 @@ public class JDialogSearchReplace extends JDialog implements IDialogSearch {
 		int x_pos = _frame.getWidth()/2 - dialog_width/2 + _frame.getX();
 		int y_pos = _frame.getHeight()/2 - dialog_height/2 + _frame.getY();
 		
+		setStatus("", Color.black);
 		setBounds(x_pos, y_pos, dialog_width, dialog_height);
 		translate();
 	}
@@ -252,14 +253,19 @@ public class JDialogSearchReplace extends JDialog implements IDialogSearch {
 	}
 
 	@Override
+	public void setStatus(String status, Color color) {
+		jLabel_status.setText(status);
+		jLabel_status.setForeground(color);
+	}
+
+	@Override
 	public boolean matchCase() {
 		return chckbxMatchCase.isSelected();
 	}
 
 	@Override
-	public void setStatus(String status, Color color) {
-		jLabel_status.setText(status);
-		jLabel_status.setForeground(color);
+	public boolean wrapAround() {
+		return chckbxWrapAround.isSelected();
 	}
 
 	@Override
@@ -270,10 +276,5 @@ public class JDialogSearchReplace extends JDialog implements IDialogSearch {
 	@Override
 	public boolean dotMatchesNewLine() {
 		return chckbxDotMatchNewLine.isSelected();
-	}
-
-	@Override
-	public boolean wrapAround() {
-		return chckbxWrapAround.isSelected();
 	}
 }

@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import sunset.gui.FFaplJFrame;
@@ -78,6 +79,7 @@ public class ChangeListenerSelectedTab implements ChangeListener {
 		Component comp;
 		if(codeTextPane != null){
 			_owner.setTitle(MessageFormat.format(IProperties.APPTITLE,"- " + codePanel.getTitle() + " -"));
+			codeTextPane.getInputMap().put(KeyStroke.getKeyStroke("ctrl H"), "none");
 			setEnabled(_undoComp, codeTextPane.getManager().canUndo());
 			setEnabled(_redoComp, codeTextPane.getManager().canRedo());
 			setEnabled(_saveComp, !codeTextPane.isSaved());

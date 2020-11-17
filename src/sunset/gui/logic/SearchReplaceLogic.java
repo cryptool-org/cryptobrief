@@ -4,26 +4,29 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-public class SearchReplaceLogic {
+import sunset.gui.interfaces.ISearchReplaceLogic;
+
+public class SearchReplaceLogic implements ISearchReplaceLogic {
 	
-	private int matchStart = -1;
-	private int matchEnd = -1;
+	private int matchStart;
+	private int matchEnd;
 	private String message;
 	
 	public SearchReplaceLogic() {
 	}
 
-	public boolean search(String text, String pattern, int pos, boolean bMatchCase, boolean bWrapAround) {
+	@Override
+	public boolean search(String text, String pattern, int fromIndex, boolean bMatchCase, boolean bWrapAround) {
 		matchStart = -1;
-		matchEnd = -1;
 		
 		if (bMatchCase) {
-			matchStart = text.indexOf(pattern, pos);
+			matchStart = text.indexOf(pattern, fromIndex);
 		} else {
-			matchStart = text.toLowerCase().indexOf(pattern.toLowerCase(), pos);
+			matchStart = text.toLowerCase().indexOf(pattern.toLowerCase(), fromIndex);
 		}
 		
-		if (matchStart == -1 && bWrapAround) {
+		// if not found from pos, pos was not beginning (0), and wrap around is activated, search again from 0
+		if (matchStart == -1 && fromIndex != 0 && bWrapAround) {
 			if (bMatchCase) {
 				matchStart = text.indexOf(pattern, 0);
 			} else {
@@ -33,45 +36,47 @@ public class SearchReplaceLogic {
 		
 		if (matchStart != -1) {
 			matchEnd = matchStart + pattern.length();
-			this.message = "\"" + pattern + "\" found at position " + matchStart;
-		} else {
-			this.message = "\"" + pattern + "\" not found from position " + pos;
 		}
+		
+		message = "\"" + pattern + "\"" + (matchStart == -1 ? " not" : "") + " found";
 		
 		return matchStart != -1;
 	}
 	
-	public boolean searchRegex(String text, String pattern, int pos, boolean bMatchCase, boolean bWrapAround, boolean bDotMatchesNewLine) {
+	@Override
+	public boolean searchRegex(String text, String pattern, int fromIndex, boolean bMatchCase, boolean bWrapAround, boolean bDotAll) {
 		try {
-			final int flags = (bMatchCase?0:Pattern.CASE_INSENSITIVE) | (bDotMatchesNewLine?Pattern.DOTALL:0);
+			final int flags = (bMatchCase ? 0 : Pattern.CASE_INSENSITIVE) | (bDotAll ? Pattern.DOTALL : 0);
 			Pattern p = Pattern.compile(pattern, flags);
 			Matcher m = p.matcher(text);
 
-			if (m.find(pos) || bWrapAround && m.find(0)) {
+			if (m.find(fromIndex) || bWrapAround && m.find(0)) {
 				matchStart = m.start();
 				matchEnd = m.end();
-				this.message = "\"" + pattern + "\" found at position " + matchStart;
-				return true;
 			} else {
 				matchStart = -1;
-				matchEnd = -1;
-				this.message = "\"" + pattern + "\" not found from position " + pos;
-				return false;
 			}
-		} catch (PatternSyntaxException e) {
-			this.message = e.getMessage();
+		} catch (PatternSyntaxException e) {	// bad regular expression specified 
+			message = e.getMessage();
 			return false;
 		}
+		
+		message = "\"" + pattern + "\"" + (matchStart == -1 ? " not" : "") + " found";
+		
+		return matchStart != -1;
 	}
 	
+	@Override
 	public int getStart() {
 		return matchStart;
 	}
 	
+	@Override
 	public int getEnd() {
 		return matchEnd;
 	}
 	
+	@Override
 	public String getMessage() {
 		return message;
 	}
