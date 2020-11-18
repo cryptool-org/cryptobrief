@@ -17,9 +17,9 @@ import sunset.gui.FFaplJFrame;
 import sunset.gui.interfaces.IDialogSearchReplace;
 import sunset.gui.listener.ActionListenerCloseWindow;
 import sunset.gui.listener.ActionListenerFindString;
+import sunset.gui.tabbedpane.JTabbedPaneNamed;
 import sunset.gui.util.TranslateGUIElements;
 
-import javax.swing.JTabbedPane;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -38,9 +38,11 @@ import javax.swing.JCheckBox;
 @SuppressWarnings("serial")
 public class JDialogSearchReplace extends JDialog implements IDialogSearchReplace {
 
-	private FFaplJFrame _frame;
 	private final JPanel contentPanel = new JPanel();
-	private JTabbedPane jTabbedPane_main;
+	private final int dialog_width = 480;
+	private final int dialog_height = 280;
+	private FFaplJFrame _frame;
+	private JTabbedPaneNamed jTabbedPaneNamed_main;
 	private JTextField jTextField_searchtext;
 	private JTextField jTextField_replacetext;
 	private JButton jButton_find;
@@ -49,14 +51,11 @@ public class JDialogSearchReplace extends JDialog implements IDialogSearchReplac
 	private JLabel jLabel_searchfor;
 	private JLabel jLabel_replacewith;
 	private Vector<Component> replaceComp = new Vector<Component>();
-	private int dialog_width = 450;
-	private int dialog_height = 260;
-	private JPanel panelStatus;
-	private JLabel jLabel_status;
 	private JCheckBox chckbxMatchCase;
 	private JCheckBox chckbxRegularExpression;
 	private JCheckBox chckbxDotMatchNewLine;
 	private JCheckBox chckbxWrapAround;
+	private JLabel jLabel_status;
 
 	/**
 	 * Create the dialog.
@@ -79,12 +78,20 @@ public class JDialogSearchReplace extends JDialog implements IDialogSearchReplac
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(new BorderLayout(0, 0));
 		{
-			jTabbedPane_main = new JTabbedPane(JTabbedPane.TOP);
-			contentPanel.add(jTabbedPane_main);
+			jTabbedPaneNamed_main = new JTabbedPaneNamed();
+			contentPanel.add(jTabbedPaneNamed_main);
 			{
 				JPanel panelSearchReplace = new JPanel();
-				jTabbedPane_main.addTab("Search", null, panelSearchReplace, "Search");
-				jTabbedPane_main.setEnabledAt(0, true);
+				jTabbedPaneNamed_main.addTab("Search", null, 
+						panelSearchReplace, "Search", 
+						"tabbedPane_tabsearch");
+				jTabbedPaneNamed_main.setEnabledAt(0, true);
+				
+				jTabbedPaneNamed_main.addTab("Replace", null, 
+						jTabbedPaneNamed_main.getTabComponentAt(0), "Replace", 
+						"tabbedPane_tabreplace");
+				jTabbedPaneNamed_main.setEnabledAt(1, true);
+				
 				panelSearchReplace.setLayout(new BorderLayout(0, 0));
 				
 				JPanel panelSearchReplaceMain = new JPanel();
@@ -116,77 +123,79 @@ public class JDialogSearchReplace extends JDialog implements IDialogSearchReplac
 				replaceComp.add(jTextField_replacetext);
 				{
 					jButton_find = new JButton("Find Next");
-					jButton_find.setBounds(330, 13, 81, 21);
-					panelSearchReplaceMain.add(jButton_find);
+					jButton_find.setBounds(330, 13, 101, 21);
 					jButton_find.setName("button_find");
+					panelSearchReplaceMain.add(jButton_find);
 					getRootPane().setDefaultButton(jButton_find);
 				}
 				
-				jButton_replace = new JButton("Replace");
-				jButton_replace.setName("button_replace");
-				jButton_replace.setBounds(330, 49, 81, 21);
-				panelSearchReplaceMain.add(jButton_replace);
-				replaceComp.add(jButton_replace);
+				{
+					jButton_replace = new JButton("Replace");
+					jButton_replace.setBounds(330, 49, 101, 21);
+					jButton_replace.setName("button_replace");
+					panelSearchReplaceMain.add(jButton_replace);
+					replaceComp.add(jButton_replace);
+				}
 				
 				chckbxMatchCase = new JCheckBox("Match case");
-				chckbxMatchCase.setToolTipText("case sensitive search");
-				chckbxMatchCase.setBounds(88, 87, 120, 21);
+				chckbxMatchCase.setBounds(88, 87, 224, 21);
+				chckbxMatchCase.setName("chckbx_matchcase");
 				panelSearchReplaceMain.add(chckbxMatchCase);
 				
 				chckbxRegularExpression = new JCheckBox("Regular expression");
-				chckbxRegularExpression.setToolTipText("regular expression search");
-				chckbxRegularExpression.setBounds(88, 108, 120, 21);
+				chckbxRegularExpression.setBounds(88, 133, 120, 21);
+				chckbxRegularExpression.setName("chckbx_regex");
 				panelSearchReplaceMain.add(chckbxRegularExpression);
 				
 				chckbxDotMatchNewLine = new JCheckBox(". matches newline");
-				chckbxDotMatchNewLine.setToolTipText(". also matches newline characters like \\n");
-				chckbxDotMatchNewLine.setBounds(210, 108, 120, 21);
+				chckbxDotMatchNewLine.setBounds(210, 133, 151, 21);
 				chckbxDotMatchNewLine.setVisible(false);
+				chckbxDotMatchNewLine.setName("chckbx_dotall");
 				panelSearchReplaceMain.add(chckbxDotMatchNewLine);
 				
 				chckbxWrapAround = new JCheckBox("Wrap around");
-				chckbxWrapAround.setToolTipText("start from beginning if pattern was not found");
-				chckbxWrapAround.setBounds(210, 87, 93, 21);
+				chckbxWrapAround.setBounds(88, 110, 224, 21);
+				chckbxWrapAround.setName("chckbx_wraparound");
 				panelSearchReplaceMain.add(chckbxWrapAround);
-				
-				panelStatus = new JPanel();
-				panelSearchReplace.add(panelStatus, BorderLayout.SOUTH);
-				panelStatus.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-				
-				jLabel_status = new JLabel("");
-				panelStatus.add(jLabel_status);
-			}
-			{
-				jTabbedPane_main.addTab("Replace", null, jTabbedPane_main.getTabComponentAt(0), "Replace");
-				jTabbedPane_main.setEnabledAt(1, true);
 			}
 		}
 		{
 			JPanel buttonPane = new JPanel();
-			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
-			{
-				jButton_cancel = new JButton("Cancel");
-				jButton_cancel.setName("button_cancel");
-				buttonPane.add(jButton_cancel);
-			}
+			buttonPane.setLayout(new BorderLayout(0, 0));
+			
+			JPanel panelControl = new JPanel();
+			buttonPane.add(panelControl, BorderLayout.EAST);
+			
+			jButton_cancel = new JButton("Cancel");
+			jButton_cancel.setName("button_cancel");
+			panelControl.add(jButton_cancel);
+			
+			JPanel panelStatus = new JPanel();
+			buttonPane.add(panelStatus, BorderLayout.WEST);
+			
+			jLabel_status = new JLabel("Status");
+			jLabel_status.setHorizontalAlignment(SwingConstants.CENTER);
+			panelStatus.add(jLabel_status);
 		}
 	}
 	
 	private void initListener() {
-		
 		jButton_cancel.addActionListener(new ActionListenerCloseWindow(this));
 		jButton_find.addActionListener(new ActionListenerFindString(this));
+		
 		this.addWindowFocusListener(new WindowAdapter() {
 		    public void windowGainedFocus(WindowEvent e) {
 		    	jTextField_searchtext.requestFocusInWindow();
 		    }
 		});
 		
-		jTabbedPane_main.addChangeListener(new ChangeListener() {
+		jTabbedPaneNamed_main.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				boolean bReplaceTabSelected = jTabbedPane_main.getSelectedIndex() == 1;
+				int selectedIndex = jTabbedPaneNamed_main.getSelectedIndex();
+				boolean bReplaceTabSelected = jTabbedPaneNamed_main
+						.getTabNameAt(selectedIndex).equals("tabbedPane_tabreplace");
 				
 				for (Component comp : replaceComp) {
 					comp.setVisible(bReplaceTabSelected);
@@ -220,20 +229,28 @@ public class JDialogSearchReplace extends JDialog implements IDialogSearchReplac
 	}
 	
 	private void translate() {
-		TranslateGUIElements.translateButton(jButton_cancel);
 		TranslateGUIElements.translateButton(jButton_find);
+		TranslateGUIElements.translateButton(jButton_replace);
+		TranslateGUIElements.translateButton(jButton_cancel);
 		TranslateGUIElements.translateLabel(jLabel_searchfor);
 		TranslateGUIElements.translateLabel(jLabel_replacewith);
+		TranslateGUIElements.translateCheckbox(chckbxMatchCase);
+		TranslateGUIElements.translateCheckbox(chckbxRegularExpression);
+		TranslateGUIElements.translateCheckbox(chckbxDotMatchNewLine);
+		TranslateGUIElements.translateCheckbox(chckbxWrapAround);
+		TranslateGUIElements.translateTappedPane(jTabbedPaneNamed_main);
 		TranslateGUIElements.translateDialog(this);
 	}
 	
 	/**
-	 * Performs preparation work before the dialog is displayed. Selects the corresponding tab in the dialog.
-	 * Calculates the optimal position of the dialog, clears it's status and translates all GUI elements according to the specified language.
+	 * Performs preparation work before the dialog is displayed. 
+	 * Selects the corresponding tab in the dialog.
+	 * Calculates the optimal position of the dialog, 
+	 * clears it's status and translates all GUI elements according to the specified language.
 	 * @param isReplace
 	 */
 	public void prepareDialog(boolean isReplace) {
-		jTabbedPane_main.setSelectedIndex(isReplace ? 1 : 0);
+		jTabbedPaneNamed_main.setSelectedIndex(isReplace ? 1 : 0);
 		
 		for (Component comp : replaceComp) {
 			comp.setVisible(isReplace);
@@ -242,6 +259,12 @@ public class JDialogSearchReplace extends JDialog implements IDialogSearchReplac
 		int x_pos = _frame.getWidth()/2 - dialog_width/2 + _frame.getX();
 		int y_pos = _frame.getHeight()/2 - dialog_height/2 + _frame.getY();
 		
+		jTextField_searchtext.setText("");
+		jTextField_replacetext.setText("");
+		chckbxMatchCase.setSelected(false);
+		chckbxRegularExpression.setSelected(false);
+		chckbxDotMatchNewLine.setSelected(false);
+		chckbxWrapAround.setSelected(false);
 		setStatus("", Color.black);
 		setBounds(x_pos, y_pos, dialog_width, dialog_height);
 		translate();

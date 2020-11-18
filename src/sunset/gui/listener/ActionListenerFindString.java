@@ -14,6 +14,7 @@ import sunset.gui.dialog.JDialogSearchReplace;
 import sunset.gui.interfaces.IDialogSearchReplace;
 import sunset.gui.interfaces.ISearchReplaceLogic;
 import sunset.gui.logic.SearchReplaceLogic;
+import sunset.gui.util.SunsetBundle;
 
 public class ActionListenerFindString implements ActionListener {
 
@@ -52,7 +53,7 @@ public class ActionListenerFindString implements ActionListener {
 				textPaneCode.setCaretPosition(_searchReplace.getStart());
 				textPaneCode.moveCaretPosition(_searchReplace.getEnd());
 				
-				_dialogSearch.setStatus(_searchReplace.getMessage() + " in line " + getLineNumber(doc, _searchReplace.getStart()), Color.black);
+				_dialogSearch.setStatus(_searchReplace.getMessage() + getLineNumber(doc, _searchReplace.getStart()), Color.black);
 			} else {
 				_dialogSearch.setStatus(_searchReplace.getMessage(), Color.red);
 			}

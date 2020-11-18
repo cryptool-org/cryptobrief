@@ -1,10 +1,12 @@
 package sunset.gui.logic;
 
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import sunset.gui.interfaces.ISearchReplaceLogic;
+import sunset.gui.util.SunsetBundle;
 
 public class SearchReplaceLogic implements ISearchReplaceLogic {
 	
@@ -38,7 +40,7 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 			matchEnd = matchStart + pattern.length();
 		}
 		
-		message = "\"" + pattern + "\"" + (matchStart == -1 ? " not" : "") + " found";
+		generateMessage(pattern, matchStart != -1);
 		
 		return matchStart != -1;
 	}
@@ -50,7 +52,7 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 			Pattern p = Pattern.compile(pattern, flags);
 			Matcher m = p.matcher(text);
 
-			if (m.find(fromIndex) || bWrapAround && m.find(0)) {
+			if (m.find(fromIndex) || bWrapAround && fromIndex != 0 && m.find(0)) {
 				matchStart = m.start();
 				matchEnd = m.end();
 			} else {
@@ -61,9 +63,22 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 			return false;
 		}
 		
-		message = "\"" + pattern + "\"" + (matchStart == -1 ? " not" : "") + " found";
+		generateMessage(pattern, matchStart != -1);
 		
 		return matchStart != -1;
+	}
+	
+	/**
+	 * Generates a message depending on the search outcome (success/failure)
+	 * @param pattern the pattern to search for
+	 * @param bSuccess the flag indicating if the search was successful or not
+	 */
+	private void generateMessage(String pattern, boolean bSuccess) {
+		if (SunsetBundle.getInstance().getLocale().getLanguage().equals(new Locale("en").getLanguage())) {
+			message = "\"" + pattern + "\"" + (bSuccess ? " found at line " : " not found");
+		} else if (SunsetBundle.getInstance().getLocale().getLanguage().equals(new Locale("de").getLanguage())) {
+			message = "\"" + pattern + "\"" + (bSuccess ? " gefunden in Zeile " : " nicht gefunden");
+		}
 	}
 	
 	@Override

@@ -95,6 +95,7 @@ import sunset.gui.logic.GUIPropertiesLogic;
 import sunset.gui.panel.JPanelCode;
 import sunset.gui.panel.JPanelTabTitle;
 import sunset.gui.tabbedpane.JTabbedPaneCode;
+import sunset.gui.tabbedpane.JTabbedPaneNamed;
 import sunset.gui.util.SunsetBundle;
 import sunset.gui.util.TranslateGUIElements;
 
@@ -122,7 +123,7 @@ public class FFaplJFrame extends javax.swing.JFrame {
 	private JMenu jMenuSearch;
 	private JMenu jMenuRun;
 	private JMenu jMenuView;
-	private JTabbedPane jTabbedPane_info;
+	private JTabbedPaneNamed jTabbedPane_info;
 	private static JTabbedPane jTabbedPane_Code;
 	private JSplitPane jSplitPane_main;
 	private JSplitPane jSplitPane_mainmain;
@@ -615,7 +616,7 @@ public class FFaplJFrame extends javax.swing.JFrame {
 					}
 				}
 				{
-					jTabbedPane_info = new JTabbedPane();
+					jTabbedPane_info = new JTabbedPaneNamed();
 					jSplitPane_main.add(jTabbedPane_info, JSplitPane.BOTTOM);
 					// jTabbedPane_info.setPreferredSize(new
 					// java.awt.Dimension(952, 162));
@@ -630,7 +631,7 @@ public class FFaplJFrame extends javax.swing.JFrame {
 						jPanel_console.add(jScrollPane_Console, BorderLayout.CENTER);
 						jPanel_console.add(jTextField_input, BorderLayout.AFTER_LAST_LINE);
 						jTabbedPane_info.addTab("Console", null,
-								jPanel_console, null);
+								jPanel_console, null, "tabbedPane_tabconsole");
 						jScrollPane_Console
 						.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 						// jScrollPane_Console.setAutoscrolls(true);
