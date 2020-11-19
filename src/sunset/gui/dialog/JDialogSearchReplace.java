@@ -16,7 +16,9 @@ import javax.swing.event.ChangeListener;
 import sunset.gui.FFaplJFrame;
 import sunset.gui.interfaces.IDialogSearchReplace;
 import sunset.gui.listener.ActionListenerCloseWindow;
+import sunset.gui.listener.ActionListenerFindReplace;
 import sunset.gui.listener.ActionListenerFindString;
+import sunset.gui.listener.ActionListenerReplaceString;
 import sunset.gui.tabbedpane.JTabbedPaneNamed;
 import sunset.gui.util.TranslateGUIElements;
 
@@ -81,17 +83,7 @@ public class JDialogSearchReplace extends JDialog implements IDialogSearchReplac
 			jTabbedPaneNamed_main = new JTabbedPaneNamed();
 			contentPanel.add(jTabbedPaneNamed_main);
 			{
-				JPanel panelSearchReplace = new JPanel();
-				jTabbedPaneNamed_main.addTab("Search", null, 
-						panelSearchReplace, "Search", 
-						"tabbedPane_tabsearch");
-				jTabbedPaneNamed_main.setEnabledAt(0, true);
-				
-				jTabbedPaneNamed_main.addTab("Replace", null, 
-						jTabbedPaneNamed_main.getTabComponentAt(0), "Replace", 
-						"tabbedPane_tabreplace");
-				jTabbedPaneNamed_main.setEnabledAt(1, true);
-				
+				JPanel panelSearchReplace = new JPanel();				
 				panelSearchReplace.setLayout(new BorderLayout(0, 0));
 				
 				JPanel panelSearchReplaceMain = new JPanel();
@@ -157,6 +149,16 @@ public class JDialogSearchReplace extends JDialog implements IDialogSearchReplac
 				chckbxWrapAround.setBounds(88, 110, 224, 21);
 				chckbxWrapAround.setName("chckbx_wraparound");
 				panelSearchReplaceMain.add(chckbxWrapAround);
+				
+				jTabbedPaneNamed_main.addTab("Search", null, 
+						panelSearchReplace, "Search", 
+						"tabbedPane_tabsearch");
+				jTabbedPaneNamed_main.setEnabledAt(0, true);
+				
+				jTabbedPaneNamed_main.addTab("Replace", null, 
+						jTabbedPaneNamed_main.getTabComponentAt(0), "Replace", 
+						"tabbedPane_tabreplace");
+				jTabbedPaneNamed_main.setEnabledAt(1, true);
 			}
 		}
 		{
@@ -183,6 +185,7 @@ public class JDialogSearchReplace extends JDialog implements IDialogSearchReplac
 	private void initListener() {
 		jButton_cancel.addActionListener(new ActionListenerCloseWindow(this));
 		jButton_find.addActionListener(new ActionListenerFindString(this));
+		jButton_replace.addActionListener(new ActionListenerReplaceString(this));
 		
 		this.addWindowFocusListener(new WindowAdapter() {
 		    public void windowGainedFocus(WindowEvent e) {
@@ -259,6 +262,13 @@ public class JDialogSearchReplace extends JDialog implements IDialogSearchReplac
 		int x_pos = _frame.getWidth()/2 - dialog_width/2 + _frame.getX();
 		int y_pos = _frame.getHeight()/2 - dialog_height/2 + _frame.getY();
 		
+		resetFields();
+		
+		setBounds(x_pos, y_pos, dialog_width, dialog_height);
+		translate();
+	}
+	
+	private void resetFields() {
 		jTextField_searchtext.setText("");
 		jTextField_replacetext.setText("");
 		chckbxMatchCase.setSelected(false);
@@ -266,13 +276,16 @@ public class JDialogSearchReplace extends JDialog implements IDialogSearchReplac
 		chckbxDotMatchNewLine.setSelected(false);
 		chckbxWrapAround.setSelected(false);
 		setStatus("", Color.black);
-		setBounds(x_pos, y_pos, dialog_width, dialog_height);
-		translate();
 	}
 
 	@Override
 	public String searchPattern() {
 		return jTextField_searchtext.getText();
+	}
+
+	@Override
+	public String replaceText() {
+		return jTextField_replacetext.getText();
 	}
 
 	@Override

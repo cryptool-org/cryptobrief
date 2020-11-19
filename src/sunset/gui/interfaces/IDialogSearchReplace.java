@@ -10,6 +10,12 @@ public interface IDialogSearchReplace {
 	public String searchPattern();
 	
 	/**
+	 * Returns the value of the replace textbox
+	 * @return the replacement text
+	 */
+	public String replaceText();
+	
+	/**
 	 * Sets the status of the dialog
 	 * @param status the new status of the dialog
 	 * @param color the used color for the status

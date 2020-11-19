@@ -25,6 +25,10 @@ public interface ISearchReplaceLogic {
 	 */
 	public boolean searchRegex(String text, String pattern, int fromIndex, boolean bMatchCase, boolean bWrapAround, boolean bDotAll);
 	
+	public boolean equals(String text, String pattern, boolean bMatchCase);
+	
+	public boolean matchesRegex(String text, String pattern, boolean bMatchCase, boolean bDotAll);
+	
 	/**
 	 * Returns the start position of the match, -1 if match failed
 	 * @return start position of the match, -1 if match failed

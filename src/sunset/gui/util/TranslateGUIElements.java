@@ -100,7 +100,7 @@ public class TranslateGUIElements {
 	}
 	
 	/**
-	 * Translates JTabbedPaneSearchReplace tabs
+	 * Translates translateTappedPane tabs
 	 * @param JTabbedPaneNamed
 	 */
 	public static void translateTappedPane(JTabbedPaneNamed tabbedPane){

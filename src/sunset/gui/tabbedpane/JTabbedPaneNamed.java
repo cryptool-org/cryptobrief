@@ -10,13 +10,8 @@ import javax.swing.JTabbedPane;
 @SuppressWarnings("serial")
 public class JTabbedPaneNamed extends JTabbedPane {
 	
-	private Map<Integer, String> tabNameMapping;
+	private Map<Integer, String> tabNameMapping = new HashMap<Integer, String>();
 	private int index = 0;
-	
-	public JTabbedPaneNamed() {
-		super();
-		tabNameMapping = new HashMap<Integer, String>();
-	}
 	
 	/**
 	 * Allows to specify a name for each tab
