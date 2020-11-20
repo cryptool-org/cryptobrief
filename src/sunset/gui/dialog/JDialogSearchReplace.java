@@ -3,7 +3,7 @@ package sunset.gui.dialog;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.FlowLayout;
+import java.awt.Dimension;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -15,10 +15,13 @@ import javax.swing.event.ChangeListener;
 
 import sunset.gui.FFaplJFrame;
 import sunset.gui.interfaces.IDialogSearchReplace;
+import sunset.gui.interfaces.ISearchReplaceCoordinator;
+import sunset.gui.interfaces.ISearchReplaceShowDialog;
 import sunset.gui.listener.ActionListenerCloseWindow;
-import sunset.gui.listener.ActionListenerFindReplace;
 import sunset.gui.listener.ActionListenerFindString;
+import sunset.gui.listener.ActionListenerReplaceAll;
 import sunset.gui.listener.ActionListenerReplaceString;
+import sunset.gui.search.SearchReplaceCoordinator;
 import sunset.gui.tabbedpane.JTabbedPaneNamed;
 import sunset.gui.util.TranslateGUIElements;
 
@@ -38,17 +41,15 @@ import java.awt.Font;
 import javax.swing.JCheckBox;
 
 @SuppressWarnings("serial")
-public class JDialogSearchReplace extends JDialog implements IDialogSearchReplace {
+public class JDialogSearchReplace extends JDialog implements IDialogSearchReplace, ISearchReplaceShowDialog {
 
 	private final JPanel contentPanel = new JPanel();
-	private final int dialog_width = 480;
-	private final int dialog_height = 280;
-	private FFaplJFrame _frame;
 	private JTabbedPaneNamed jTabbedPaneNamed_main;
 	private JTextField jTextField_searchtext;
 	private JTextField jTextField_replacetext;
 	private JButton jButton_find;
 	private JButton jButton_replace;
+	private JButton jButton_replaceall;
 	private JButton jButton_cancel;
 	private JLabel jLabel_searchfor;
 	private JLabel jLabel_replacewith;
@@ -65,8 +66,8 @@ public class JDialogSearchReplace extends JDialog implements IDialogSearchReplac
 	public JDialogSearchReplace(FFaplJFrame frame) {
 		super(frame);
 		setResizable(false);
-		this._frame = frame;
 		setFont(new Font("Dialog", Font.PLAIN, 10));
+		setLocationRelativeTo(null);
 		initGUI();
 		initListener();
 		translate();
@@ -78,6 +79,7 @@ public class JDialogSearchReplace extends JDialog implements IDialogSearchReplac
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
+		setPreferredSize(new Dimension(480, 280));
 		contentPanel.setLayout(new BorderLayout(0, 0));
 		{
 			jTabbedPaneNamed_main = new JTabbedPaneNamed();
@@ -127,6 +129,14 @@ public class JDialogSearchReplace extends JDialog implements IDialogSearchReplac
 					jButton_replace.setName("button_replace");
 					panelSearchReplaceMain.add(jButton_replace);
 					replaceComp.add(jButton_replace);
+				}
+				
+				{
+					jButton_replaceall = new JButton("Replace All");
+					jButton_replaceall.setBounds(330, 85, 101, 21);
+					jButton_replaceall.setName("button_replaceall");
+					panelSearchReplaceMain.add(jButton_replaceall);
+					replaceComp.add(jButton_replaceall);
 				}
 				
 				chckbxMatchCase = new JCheckBox("Match case");
@@ -184,8 +194,11 @@ public class JDialogSearchReplace extends JDialog implements IDialogSearchReplac
 	
 	private void initListener() {
 		jButton_cancel.addActionListener(new ActionListenerCloseWindow(this));
-		jButton_find.addActionListener(new ActionListenerFindString(this));
-		jButton_replace.addActionListener(new ActionListenerReplaceString(this));
+		
+		ISearchReplaceCoordinator coordinator = new SearchReplaceCoordinator(this);
+		jButton_find.addActionListener(new ActionListenerFindString(coordinator));
+		jButton_replace.addActionListener(new ActionListenerReplaceString(coordinator));
+		jButton_replaceall.addActionListener(new ActionListenerReplaceAll(coordinator));
 		
 		this.addWindowFocusListener(new WindowAdapter() {
 		    public void windowGainedFocus(WindowEvent e) {
@@ -247,11 +260,9 @@ public class JDialogSearchReplace extends JDialog implements IDialogSearchReplac
 	
 	/**
 	 * Performs preparation work before the dialog is displayed. 
-	 * Selects the corresponding tab in the dialog.
-	 * Calculates the optimal position of the dialog, 
-	 * clears it's status and translates all GUI elements according to the specified language.
 	 * @param isReplace
 	 */
+	@Override
 	public void prepareDialog(boolean isReplace) {
 		jTabbedPaneNamed_main.setSelectedIndex(isReplace ? 1 : 0);
 		
@@ -259,12 +270,8 @@ public class JDialogSearchReplace extends JDialog implements IDialogSearchReplac
 			comp.setVisible(isReplace);
 		}
 		
-		int x_pos = _frame.getWidth()/2 - dialog_width/2 + _frame.getX();
-		int y_pos = _frame.getHeight()/2 - dialog_height/2 + _frame.getY();
-		
+		pack();
 		resetFields();
-		
-		setBounds(x_pos, y_pos, dialog_width, dialog_height);
 		translate();
 	}
 	

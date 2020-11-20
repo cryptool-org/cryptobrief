@@ -5,15 +5,19 @@ import java.awt.event.ActionListener;
 
 import sunset.gui.interfaces.ISearchReplaceCoordinator;
 
-public class ActionListenerFindString implements ActionListener {
+public class ActionListenerReplaceAll implements ActionListener {
 	private ISearchReplaceCoordinator _searchReplaceCoordinator;
-
-	public ActionListenerFindString(ISearchReplaceCoordinator coordinator) {
+	
+	public ActionListenerReplaceAll(ISearchReplaceCoordinator coordinator) {
 		_searchReplaceCoordinator = coordinator;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		_searchReplaceCoordinator.findString();
+		_searchReplaceCoordinator.resetCaretPosition();
+		
+		while (_searchReplaceCoordinator.findString()) {
+			_searchReplaceCoordinator.replaceText();
+		}
 	}
 }

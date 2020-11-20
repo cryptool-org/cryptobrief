@@ -75,13 +75,14 @@ import sunset.gui.listener.ActionListenerExit;
 import sunset.gui.listener.ActionListenerInputField;
 import sunset.gui.listener.ActionListenerNewFile;
 import sunset.gui.listener.ActionListenerOpenFile;
+import sunset.gui.listener.ActionListenerOpenReplaceDialog;
+import sunset.gui.listener.ActionListenerOpenSearchDialog;
 import sunset.gui.listener.ActionListenerPreferences;
 import sunset.gui.listener.ActionListenerPrintCurrentFile;
 import sunset.gui.listener.ActionListenerRedo;
 import sunset.gui.listener.ActionListenerSave;
 import sunset.gui.listener.ActionListenerSaveAll;
 import sunset.gui.listener.ActionListenerSaveAs;
-import sunset.gui.listener.ActionListenerSearchReplace;
 import sunset.gui.listener.ActionListenerShowAPI;
 import sunset.gui.listener.ActionListenerUndo;
 import sunset.gui.listener.ActionListenerZoom;
@@ -94,6 +95,7 @@ import sunset.gui.logic.ApiLogic;
 import sunset.gui.logic.GUIPropertiesLogic;
 import sunset.gui.panel.JPanelCode;
 import sunset.gui.panel.JPanelTabTitle;
+import sunset.gui.search.SearchReplaceDialogOwner;
 import sunset.gui.tabbedpane.JTabbedPaneCode;
 import sunset.gui.tabbedpane.JTabbedPaneNamed;
 import sunset.gui.util.SunsetBundle;
@@ -1112,11 +1114,9 @@ public class FFaplJFrame extends javax.swing.JFrame {
 		setDropTarget(new DropTarget(this, new DropTargetListenerFile(this,
 				(JTabbedPaneCode) jTabbedPane_Code, _undoComp, _redoComp,
 				_saveComp, _saveAllComp, _lineColumnPosition)));
-		Vector<Component> replaceComp = new Vector<Component>();
-		replaceComp.add(jMenuItem_Replace);
-		ActionListener listenerSearchReplace = new ActionListenerSearchReplace(this, replaceComp);
-		jMenuItem_Search.addActionListener(listenerSearchReplace);
-		jMenuItem_Replace.addActionListener(listenerSearchReplace);
+		SearchReplaceDialogOwner searchReplaceDialogOwner = new SearchReplaceDialogOwner(this);
+		jMenuItem_Search.addActionListener(new ActionListenerOpenSearchDialog(searchReplaceDialogOwner));
+		jMenuItem_Replace.addActionListener(new ActionListenerOpenReplaceDialog(searchReplaceDialogOwner));
 		jTabbedPane_Code.addChangeListener(new ChangeListenerSelectedTab(this,
 				jScrollPane_Console, jTextField_input, _undoComp, _redoComp, _saveComp,
 				_saveAllComp, _closeTabComp, _closeAllTabComp, jPanel_status));

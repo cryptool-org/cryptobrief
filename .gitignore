@@ -13,3 +13,5 @@ out/
 *.iws
 *.iml
 *.ipr
+doc/SearchReplaceV2.ucls
+doc/SearchReplace.ucls

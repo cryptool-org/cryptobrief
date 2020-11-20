@@ -1,21 +1,24 @@
 package sunset.gui.listener;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import sunset.gui.dialog.JDialogSearchReplace;
+import sunset.gui.interfaces.ISearchReplaceCoordinator;
 
-public class ActionListenerReplaceString extends ActionListenerFindReplace {
-
-	public ActionListenerReplaceString(JDialogSearchReplace dialogSearchReplace) {
-		super(dialogSearchReplace);
+public class ActionListenerReplaceString implements ActionListener {
+	private ISearchReplaceCoordinator _searchReplaceCoordinator;
+	
+	public ActionListenerReplaceString(ISearchReplaceCoordinator coordinator) {
+		_searchReplaceCoordinator = coordinator;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (isSearchPatternSelected()) {
-			replaceText();
-		} else {		
-			findString();
+		if (_searchReplaceCoordinator.isSearchPatternSelected()) {
+			_searchReplaceCoordinator.replaceText();
+			_searchReplaceCoordinator.findString();
+		} else {
+			_searchReplaceCoordinator.findString();
 		}
 	}
 }

@@ -1,22 +1,19 @@
-package sunset.gui.logic;
+package sunset.gui.search;
 
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import sunset.gui.interfaces.ISearchReplaceLogic;
+import sunset.gui.interfaces.ISearchLogic;
 import sunset.gui.util.SunsetBundle;
 
-public class SearchReplaceLogic implements ISearchReplaceLogic {
+public class SearchLogic implements ISearchLogic {
 	
 	private int matchStart;
 	private int matchEnd;
 	private String message;
 	
-	public SearchReplaceLogic() {
-	}
-
 	@Override
 	public boolean search(String text, String pattern, int fromIndex, boolean bMatchCase, boolean bWrapAround) {
 		matchStart = -1;
@@ -64,6 +61,14 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 		return false;
 	}
 	
+	/**
+	 * Returns a Matcher object corresponding to the specified text and regular expression pattern
+	 * @param text the text the matcher is based on
+	 * @param pattern the pattern the matcher is based on
+	 * @param bMatchCase the flag indicating if case sensitive regular expression matching is required
+	 * @param bDotAll the flag indicating if . should match newline characters in the regular expression
+	 * @return a Matcher object corresponding to the given parameters, null if an invalid regular expression was specified
+	 */
 	private Matcher getMatcher(String text, String pattern, boolean bMatchCase, boolean bDotAll) {
 		try {
 			final int flags = (bMatchCase ? 0 : Pattern.CASE_INSENSITIVE) | (bDotAll ? Pattern.DOTALL : 0);
