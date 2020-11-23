@@ -5,7 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import sunset.gui.interfaces.ISearchLogic;
+import sunset.gui.search.interfaces.ISearchLogic;
 import sunset.gui.util.SunsetBundle;
 
 public class SearchLogic implements ISearchLogic {

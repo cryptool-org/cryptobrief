@@ -75,8 +75,6 @@ import sunset.gui.listener.ActionListenerExit;
 import sunset.gui.listener.ActionListenerInputField;
 import sunset.gui.listener.ActionListenerNewFile;
 import sunset.gui.listener.ActionListenerOpenFile;
-import sunset.gui.listener.ActionListenerOpenReplaceDialog;
-import sunset.gui.listener.ActionListenerOpenSearchDialog;
 import sunset.gui.listener.ActionListenerPreferences;
 import sunset.gui.listener.ActionListenerPrintCurrentFile;
 import sunset.gui.listener.ActionListenerRedo;
@@ -96,6 +94,8 @@ import sunset.gui.logic.GUIPropertiesLogic;
 import sunset.gui.panel.JPanelCode;
 import sunset.gui.panel.JPanelTabTitle;
 import sunset.gui.search.SearchReplaceDialogOwner;
+import sunset.gui.search.listener.ActionListenerOpenReplaceDialog;
+import sunset.gui.search.listener.ActionListenerOpenSearchDialog;
 import sunset.gui.tabbedpane.JTabbedPaneCode;
 import sunset.gui.tabbedpane.JTabbedPaneNamed;
 import sunset.gui.util.SunsetBundle;
@@ -614,7 +614,8 @@ public class FFaplJFrame extends javax.swing.JFrame {
 						this.setTitle(MessageFormat.format(
 								IProperties.APPTITLE, "- " + filename + " -"));
 						jTabbedPane_Code.setSelectedIndex(0);
-						getCurrentCodePanel().getCodePane().getInputMap().put(KeyStroke.getKeyStroke("ctrl H"), "none");
+						getCurrentCodePanel().getCodePane().getInputMap()
+						.put(KeyStroke.getKeyStroke("ctrl H"), "none");
 					}
 				}
 				{

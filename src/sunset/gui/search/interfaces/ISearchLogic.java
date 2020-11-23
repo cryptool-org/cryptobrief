@@ -1,4 +1,4 @@
-package sunset.gui.interfaces;
+package sunset.gui.search.interfaces;
 
 public interface ISearchLogic {
 	

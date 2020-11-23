@@ -1,4 +1,4 @@
-package sunset.gui.listener;
+package sunset.gui.search.listener;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

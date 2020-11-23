@@ -1,8 +1,8 @@
-package sunset.gui.interfaces;
+package sunset.gui.search.interfaces;
 
 import java.awt.Color;
 
-public interface IDialogSearchReplace {
+public interface ISearchReplaceDialog {
 	/**
 	 * Returns the value of the search textbox
 	 * @return the pattern to search for

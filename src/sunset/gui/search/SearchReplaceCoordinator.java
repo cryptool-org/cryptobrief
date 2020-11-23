@@ -8,16 +8,15 @@ import javax.swing.text.Document;
 import javax.swing.text.Element;
 
 import sunset.gui.FFaplJFrame;
-import sunset.gui.dialog.JDialogSearchReplace;
-import sunset.gui.interfaces.IDialogSearchReplace;
-import sunset.gui.interfaces.ISearchLogic;
-import sunset.gui.interfaces.ISearchReplaceCoordinator;
+import sunset.gui.search.interfaces.ISearchReplaceDialog;
+import sunset.gui.search.interfaces.ISearchLogic;
+import sunset.gui.search.interfaces.ISearchReplaceCoordinator;
 
 public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
-	private IDialogSearchReplace _dialogSearchReplace;
+	private ISearchReplaceDialog _dialogSearchReplace;
 	private ISearchLogic  		 _searchLogic;
 	
-	public SearchReplaceCoordinator(IDialogSearchReplace dialogSearchReplace) {
+	public SearchReplaceCoordinator(ISearchReplaceDialog dialogSearchReplace) {
 		_dialogSearchReplace = dialogSearchReplace;
 		_searchLogic = new SearchLogic();
 	}
@@ -55,20 +54,28 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 					textPaneCode.setCaretPosition(_searchLogic.getStart());
 					textPaneCode.moveCaretPosition(_searchLogic.getEnd());
 					
-					_dialogSearchReplace.setStatus(_searchLogic.getMessage() + getLineNumber(doc, _searchLogic.getStart()), Color.black);
+					setStatus(_searchLogic.getMessage() + getLineNumber(doc, _searchLogic.getStart()), SearchStatus.SEARCH_SUCCESS);
 					
 					return true;
 				} else {
-					_dialogSearchReplace.setStatus(_searchLogic.getMessage() + getLineNumber(doc, caretPos), Color.red);
+					setStatus(_searchLogic.getMessage() + getLineNumber(doc, caretPos), SearchStatus.FAILURE);
 				}
 			} catch (BadLocationException e1) {
-				_dialogSearchReplace.setStatus(e1.getMessage(), Color.red);
+				setStatus(e1.getMessage(), SearchStatus.FAILURE);
 			}
+		} else {
+			setStatus("No file opened", SearchStatus.FAILURE);
 		}
 		
 		return false;
 	}
 	
+	/**
+	 * Calculates the line number from the caret position inside a document
+	 * @param doc the subject document
+	 * @param position the current caret position
+	 * @return the corresponding line number
+	 */
 	private int getLineNumber(Document doc, int position) {
 		Element root, element;
 		root = doc.getRootElements()[0];
@@ -88,8 +95,8 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 	public boolean isSearchPatternSelected() {
 		if (FFaplJFrame.getCurrentCodePanel() != null) {
 			JTextPane textPaneCode = FFaplJFrame.getCurrentCodePanel().getCodePane();
-			String pattern = _dialogSearchReplace.searchPattern();
 			String selectedText = textPaneCode.getSelectedText();
+			String pattern = _dialogSearchReplace.searchPattern();
 			boolean bMatchCase = _dialogSearchReplace.matchCase();
 			
 			if (selectedText == null) {
@@ -117,12 +124,25 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 			if (_dialogSearchReplace.useRegEx()) {
 				String pattern = _dialogSearchReplace.searchPattern();
 				String selectedText = textPaneCode.getSelectedText();
-				String result = selectedText.replaceAll(pattern, replaceText);
-				
-				textPaneCode.replaceSelection(result);	
-			} else {
-				textPaneCode.replaceSelection(replaceText);			
+				replaceText = selectedText.replaceAll(pattern, replaceText);
 			}
+			
+			textPaneCode.replaceSelection(replaceText);	
 		}
+	}
+	
+	@Override
+	public void setStatus(String message, int status) {
+		Color c = Color.black;
+		
+		if (status == SearchStatus.FAILURE) {
+			c = Color.red;
+		} else if (status == SearchStatus.SEARCH_SUCCESS) {
+			c = Color.black;
+		} else if (status == SearchStatus.REPLACE_SUCCESS) {
+			c = Color.blue;
+		}
+		
+		_dialogSearchReplace.setStatus(message, c);
 	}
 }

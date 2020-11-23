@@ -14,14 +14,14 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import sunset.gui.FFaplJFrame;
-import sunset.gui.interfaces.IDialogSearchReplace;
-import sunset.gui.interfaces.ISearchReplaceCoordinator;
-import sunset.gui.interfaces.ISearchReplaceShowDialog;
 import sunset.gui.listener.ActionListenerCloseWindow;
-import sunset.gui.listener.ActionListenerFindString;
-import sunset.gui.listener.ActionListenerReplaceAll;
-import sunset.gui.listener.ActionListenerReplaceString;
 import sunset.gui.search.SearchReplaceCoordinator;
+import sunset.gui.search.interfaces.ISearchReplaceDialog;
+import sunset.gui.search.interfaces.ISearchReplaceCoordinator;
+import sunset.gui.search.interfaces.ISearchReplaceShowDialog;
+import sunset.gui.search.listener.ActionListenerFindString;
+import sunset.gui.search.listener.ActionListenerReplaceAll;
+import sunset.gui.search.listener.ActionListenerReplaceString;
 import sunset.gui.tabbedpane.JTabbedPaneNamed;
 import sunset.gui.util.TranslateGUIElements;
 
@@ -41,7 +41,7 @@ import java.awt.Font;
 import javax.swing.JCheckBox;
 
 @SuppressWarnings("serial")
-public class JDialogSearchReplace extends JDialog implements IDialogSearchReplace, ISearchReplaceShowDialog {
+public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialog, ISearchReplaceShowDialog {
 
 	private final JPanel contentPanel = new JPanel();
 	private JTabbedPaneNamed jTabbedPaneNamed_main;
@@ -282,7 +282,7 @@ public class JDialogSearchReplace extends JDialog implements IDialogSearchReplac
 		chckbxRegularExpression.setSelected(false);
 		chckbxDotMatchNewLine.setSelected(false);
 		chckbxWrapAround.setSelected(false);
-		setStatus("", Color.black);
+		jLabel_status.setText("");
 	}
 
 	@Override
