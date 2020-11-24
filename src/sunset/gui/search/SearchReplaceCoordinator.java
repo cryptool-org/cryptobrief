@@ -13,11 +13,11 @@ import sunset.gui.search.interfaces.ISearchLogic;
 import sunset.gui.search.interfaces.ISearchReplaceCoordinator;
 
 public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
-	private ISearchReplaceDialog _dialogSearchReplace;
+	private ISearchReplaceDialog _dialog;
 	private ISearchLogic  		 _searchLogic;
 	
 	public SearchReplaceCoordinator(ISearchReplaceDialog dialogSearchReplace) {
-		_dialogSearchReplace = dialogSearchReplace;
+		_dialog = dialogSearchReplace;
 		_searchLogic = new SearchLogic();
 	}
 	
@@ -30,7 +30,7 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 	}
 	
 	@Override
-	public boolean findString() {
+	public boolean findString(boolean bIgnoreWrapAroundFlag) {
 		if (FFaplJFrame.getCurrentCodePanel() != null) {
 			try {
 				JTextPane textPaneCode = FFaplJFrame.getCurrentCodePanel().getCodePane();
@@ -38,13 +38,13 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 				String text = doc.getText(0, doc.getLength());
 				int caretPos = textPaneCode.getCaretPosition();
 				
-				String pattern = _dialogSearchReplace.searchPattern();
-				boolean bMatchCase = _dialogSearchReplace.matchCase();
-				boolean bWrapAround = _dialogSearchReplace.wrapAround();
-				boolean bDotAll = _dialogSearchReplace.dotMatchesNewLine();
+				String pattern = _dialog.searchPattern();
+				boolean bMatchCase = _dialog.matchCase();
+				boolean bWrapAround = _dialog.wrapAround() && !bIgnoreWrapAroundFlag;
+				boolean bDotAll = _dialog.dotMatchesNewLine();
 				boolean bFound;
 				
-				if (_dialogSearchReplace.useRegEx()) {
+				if (_dialog.useRegEx()) {
 					bFound = _searchLogic.searchRegex(text, pattern, caretPos, bMatchCase, bWrapAround, bDotAll);
 				} else {
 					bFound = _searchLogic.search(text, pattern, caretPos, bMatchCase, bWrapAround);
@@ -96,15 +96,15 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 		if (FFaplJFrame.getCurrentCodePanel() != null) {
 			JTextPane textPaneCode = FFaplJFrame.getCurrentCodePanel().getCodePane();
 			String selectedText = textPaneCode.getSelectedText();
-			String pattern = _dialogSearchReplace.searchPattern();
-			boolean bMatchCase = _dialogSearchReplace.matchCase();
+			String pattern = _dialog.searchPattern();
+			boolean bMatchCase = _dialog.matchCase();
 			
 			if (selectedText == null) {
 				return false;
 			}
 			
-			if (_dialogSearchReplace.useRegEx()) {		
-				boolean bDotAll = _dialogSearchReplace.dotMatchesNewLine();
+			if (_dialog.useRegEx()) {		
+				boolean bDotAll = _dialog.dotMatchesNewLine();
 				
 				return _searchLogic.matchesRegex(selectedText, pattern, bMatchCase, bDotAll);
 			} else {
@@ -119,10 +119,10 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 	public void replaceText() {
 		if (FFaplJFrame.getCurrentCodePanel() != null) {
 			JTextPane textPaneCode = FFaplJFrame.getCurrentCodePanel().getCodePane();
-			String replaceText = _dialogSearchReplace.replaceText();
+			String replaceText = _dialog.replaceText();
 			
-			if (_dialogSearchReplace.useRegEx()) {
-				String pattern = _dialogSearchReplace.searchPattern();
+			if (_dialog.useRegEx()) {
+				String pattern = _dialog.searchPattern();
 				String selectedText = textPaneCode.getSelectedText();
 				replaceText = selectedText.replaceAll(pattern, replaceText);
 			}
@@ -143,6 +143,6 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 			c = Color.blue;
 		}
 		
-		_dialogSearchReplace.setStatus(message, c);
+		_dialog.setStatus(message, c);
 	}
 }

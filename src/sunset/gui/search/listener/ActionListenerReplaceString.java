@@ -7,25 +7,25 @@ import sunset.gui.search.SearchStatus;
 import sunset.gui.search.interfaces.ISearchReplaceCoordinator;
 
 public class ActionListenerReplaceString implements ActionListener {
-	private ISearchReplaceCoordinator _searchReplaceCoordinator;
+	private ISearchReplaceCoordinator _coordinator;
 	
 	public ActionListenerReplaceString(ISearchReplaceCoordinator coordinator) {
-		_searchReplaceCoordinator = coordinator;
+		_coordinator = coordinator;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (_searchReplaceCoordinator.isSearchPatternSelected()) {
-			_searchReplaceCoordinator.replaceText();
-			boolean found = _searchReplaceCoordinator.findString();
+		if (_coordinator.isSearchPatternSelected()) {
+			_coordinator.replaceText();
+			boolean found = _coordinator.findString(false);
 			
 			if (found) {
-				_searchReplaceCoordinator.setStatus("Replace: 1 occurrence replaced, next occurrence found", SearchStatus.REPLACE_SUCCESS);
+				_coordinator.setStatus("Replace: 1 occurrence replaced, next occurrence found", SearchStatus.REPLACE_SUCCESS);
 			} else {
-				_searchReplaceCoordinator.setStatus("Replace: 1 occurrence replaced, no further occurrences", SearchStatus.REPLACE_SUCCESS);
+				_coordinator.setStatus("Replace: 1 occurrence replaced, no further occurrences found", SearchStatus.REPLACE_SUCCESS);
 			}
 		} else {
-			_searchReplaceCoordinator.findString();
+			_coordinator.findString(false);
 		}
 	}
 }

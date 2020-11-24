@@ -6,14 +6,14 @@ import java.awt.event.ActionListener;
 import sunset.gui.search.SearchReplaceDialogOwner;
 
 public class ActionListenerOpenReplaceDialog implements ActionListener {
-	private SearchReplaceDialogOwner _searchReplaceDialogOwner;
+	private SearchReplaceDialogOwner _owner;
 	
 	public ActionListenerOpenReplaceDialog(SearchReplaceDialogOwner owner) {
-		_searchReplaceDialogOwner = owner;
+		_owner = owner;
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		_searchReplaceDialogOwner.showDialog(true);
+		_owner.showDialog(true);
 	}
 }

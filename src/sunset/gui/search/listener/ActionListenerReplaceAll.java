@@ -7,23 +7,23 @@ import sunset.gui.search.SearchStatus;
 import sunset.gui.search.interfaces.ISearchReplaceCoordinator;
 
 public class ActionListenerReplaceAll implements ActionListener {
-	private ISearchReplaceCoordinator _searchReplaceCoordinator;
+	private ISearchReplaceCoordinator _coordinator;
 	
 	public ActionListenerReplaceAll(ISearchReplaceCoordinator coordinator) {
-		_searchReplaceCoordinator = coordinator;
+		_coordinator = coordinator;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		int count = 0;
 		
-		_searchReplaceCoordinator.resetCaretPosition();
+		_coordinator.resetCaretPosition();
 		
-		while (_searchReplaceCoordinator.findString()) {
-			_searchReplaceCoordinator.replaceText();
+		while (_coordinator.findString(true)) {
+			_coordinator.replaceText();
 			count++;
 		}
 		
-		_searchReplaceCoordinator.setStatus("Replace All: " + count + " occurrences were replaced", SearchStatus.REPLACE_SUCCESS);
+		_coordinator.setStatus("Replace All: " + count + " occurrences were replaced", SearchStatus.REPLACE_SUCCESS);
 	}
 }
