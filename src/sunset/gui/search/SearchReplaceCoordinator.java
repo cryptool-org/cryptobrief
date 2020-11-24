@@ -125,7 +125,7 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 				String pattern = _dialog.searchPattern();
 				String selectedText = textPaneCode.getSelectedText();
 				try {
-					replaceText = selectedText.replaceAll(pattern, replaceText);
+					replaceText = selectedText.replaceAll(pattern, replaceText.translateEscapes());
 				} catch (Exception e) {
 					setStatus(e.getMessage(), SearchStatus.FAILURE);
 					return false;
