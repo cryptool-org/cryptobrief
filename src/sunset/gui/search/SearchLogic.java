@@ -10,36 +10,36 @@ import sunset.gui.util.SunsetBundle;
 
 public class SearchLogic implements ISearchLogic {
 	
-	private int matchStart;
-	private int matchEnd;
-	private String message;
+	private int _matchStart;
+	private int _matchEnd;
+	private String _message;
 	
 	@Override
 	public boolean search(String text, String pattern, int fromIndex, boolean bMatchCase, boolean bWrapAround) {
-		matchStart = -1;
+		_matchStart = -1;
 		
 		if (bMatchCase) {
-			matchStart = text.indexOf(pattern, fromIndex);
+			_matchStart = text.indexOf(pattern, fromIndex);
 		} else {
-			matchStart = text.toLowerCase().indexOf(pattern.toLowerCase(), fromIndex);
+			_matchStart = text.toLowerCase().indexOf(pattern.toLowerCase(), fromIndex);
 		}
 		
 		// if not found from pos, pos was not beginning, and wrap around is activated, search again from 0
-		if (matchStart == -1 && fromIndex != 0 && bWrapAround) {
+		if (_matchStart == -1 && fromIndex != 0 && bWrapAround) {
 			if (bMatchCase) {
-				matchStart = text.indexOf(pattern, 0);
+				_matchStart = text.indexOf(pattern, 0);
 			} else {
-				matchStart = text.toLowerCase().indexOf(pattern.toLowerCase(), 0);
+				_matchStart = text.toLowerCase().indexOf(pattern.toLowerCase(), 0);
 			}
 		}
 		
-		if (matchStart != -1) {
-			matchEnd = matchStart + pattern.length();
+		if (_matchStart != -1) {
+			_matchEnd = _matchStart + pattern.length();
 		}
 		
-		generateMessage(pattern, matchStart != -1);
+		generateMessage(pattern, _matchStart != -1);
 		
-		return matchStart != -1;
+		return _matchStart != -1;
 	}
 	
 	@Override
@@ -48,14 +48,14 @@ public class SearchLogic implements ISearchLogic {
 		
 		if (m != null) {
 			if (m.find(fromIndex) || bWrapAround && fromIndex != 0 && m.find(0)) {
-				matchStart = m.start();
-				matchEnd = m.end();
+				_matchStart = m.start();
+				_matchEnd = m.end();
 			} else {
-				matchStart = -1;
+				_matchStart = -1;
 			}
 
-			generateMessage(pattern, matchStart != -1);
-			return matchStart != -1;
+			generateMessage(pattern, _matchStart != -1);
+			return _matchStart != -1;
 		}
 		
 		return false;
@@ -76,8 +76,8 @@ public class SearchLogic implements ISearchLogic {
 			Matcher m = p.matcher(text);
 			
 			return m;
-		} catch (PatternSyntaxException e) {	// bad regular expression specified 
-			message = e.getMessage();
+		} catch (PatternSyntaxException e) {	// bad regular expression pattern specified 
+			_message = e.getMessage();
 			return null;
 		}
 	}
@@ -89,25 +89,25 @@ public class SearchLogic implements ISearchLogic {
 	 */
 	private void generateMessage(String pattern, boolean bSuccess) {
 		if (SunsetBundle.getInstance().getLocale().getLanguage().equals(new Locale("en").getLanguage())) {
-			message = "\"" + pattern + "\"" + (bSuccess ? " found at line " : " not found from line ");
+			_message = "\"" + pattern + "\"" + (bSuccess ? " found at line " : " not found from line ");
 		} else if (SunsetBundle.getInstance().getLocale().getLanguage().equals(new Locale("de").getLanguage())) {
-			message = "\"" + pattern + "\"" + (bSuccess ? " gefunden in Zeile " : " nicht gefunden ab Zeile ");
+			_message = "\"" + pattern + "\"" + (bSuccess ? " gefunden in Zeile " : " nicht gefunden ab Zeile ");
 		}
 	}
 	
 	@Override
 	public int getStart() {
-		return matchStart;
+		return _matchStart;
 	}
 	
 	@Override
 	public int getEnd() {
-		return matchEnd;
+		return _matchEnd;
 	}
 	
 	@Override
 	public String getMessage() {
-		return message;
+		return _message;
 	}
 
 	@Override

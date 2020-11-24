@@ -20,8 +20,9 @@ public interface ISearchReplaceCoordinator {
 	
 	/**
 	 * Replaces the selected text in the {@link JTextPane} with the replacement text
+	 * @return true if the replacement was successful, false otherwise
 	 */
-	public void replaceText();
+	public boolean replaceText();
 	
 	/**
 	 * Sets the caret position of the {@link JTextPane} to 0 to prepare for a Replace All command

@@ -60,8 +60,8 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 				} else {
 					setStatus(_searchLogic.getMessage() + getLineNumber(doc, caretPos), SearchStatus.FAILURE);
 				}
-			} catch (BadLocationException e1) {
-				setStatus(e1.getMessage(), SearchStatus.FAILURE);
+			} catch (BadLocationException e) {
+				setStatus(e.getMessage(), SearchStatus.FAILURE);
 			}
 		} else {
 			setStatus("No file opened", SearchStatus.FAILURE);
@@ -116,7 +116,7 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 	}
 	
 	@Override
-	public void replaceText() {
+	public boolean replaceText() {
 		if (FFaplJFrame.getCurrentCodePanel() != null) {
 			JTextPane textPaneCode = FFaplJFrame.getCurrentCodePanel().getCodePane();
 			String replaceText = _dialog.replaceText();
@@ -124,11 +124,19 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 			if (_dialog.useRegEx()) {
 				String pattern = _dialog.searchPattern();
 				String selectedText = textPaneCode.getSelectedText();
-				replaceText = selectedText.replaceAll(pattern, replaceText);
+				try {
+					replaceText = selectedText.replaceAll(pattern, replaceText);
+				} catch (Exception e) {
+					setStatus(e.getMessage(), SearchStatus.FAILURE);
+					return false;
+				}
 			}
 			
-			textPaneCode.replaceSelection(replaceText);	
+			textPaneCode.replaceSelection(replaceText);
+			return true;
 		}
+		
+		return false;
 	}
 	
 	@Override
