@@ -119,13 +119,13 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 	public boolean replaceText() {
 		if (FFaplJFrame.getCurrentCodePanel() != null) {
 			JTextPane textPaneCode = FFaplJFrame.getCurrentCodePanel().getCodePane();
-			String replaceText = _dialog.replaceText();
+			String replaceText = _dialog.replaceText().translateEscapes();
 			
 			if (_dialog.useRegEx()) {
 				String pattern = _dialog.searchPattern();
 				String selectedText = textPaneCode.getSelectedText();
 				try {
-					replaceText = selectedText.replaceAll(pattern, replaceText.translateEscapes());
+					replaceText = selectedText.replaceAll(pattern, replaceText);
 				} catch (Exception e) {
 					setStatus(e.getMessage(), SearchStatus.FAILURE);
 					return false;
