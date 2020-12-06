@@ -58,6 +58,7 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 	private JCheckBox chckbxRegularExpression;
 	private JCheckBox chckbxDotMatchNewLine;
 	private JCheckBox chckbxWrapAround;
+	private JCheckBox chckbxAdvSearch;
 	private JLabel jLabel_status;
 
 	/**
@@ -140,7 +141,7 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 				}
 				
 				chckbxMatchCase = new JCheckBox("Match case");
-				chckbxMatchCase.setBounds(88, 87, 224, 21);
+				chckbxMatchCase.setBounds(88, 87, 120, 21);
 				chckbxMatchCase.setName("chckbx_matchcase");
 				panelSearchReplaceMain.add(chckbxMatchCase);
 				
@@ -150,15 +151,19 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 				panelSearchReplaceMain.add(chckbxRegularExpression);
 				
 				chckbxDotMatchNewLine = new JCheckBox(". matches newline");
-				chckbxDotMatchNewLine.setBounds(210, 133, 151, 21);
-				chckbxDotMatchNewLine.setVisible(false);
+				chckbxDotMatchNewLine.setBounds(210, 133, 120, 21);
 				chckbxDotMatchNewLine.setName("chckbx_dotall");
 				panelSearchReplaceMain.add(chckbxDotMatchNewLine);
 				
 				chckbxWrapAround = new JCheckBox("Wrap around");
-				chckbxWrapAround.setBounds(88, 110, 224, 21);
+				chckbxWrapAround.setBounds(210, 87, 120, 21);
 				chckbxWrapAround.setName("chckbx_wraparound");
 				panelSearchReplaceMain.add(chckbxWrapAround);
+				
+				chckbxAdvSearch = new JCheckBox("Advanced search");
+				chckbxAdvSearch.setBounds(88, 110, 120, 21);
+				chckbxAdvSearch.setName("chckbx_wraparound");
+				panelSearchReplaceMain.add(chckbxAdvSearch);
 				
 				jTabbedPaneNamed_main.addTab("Search", null, 
 						panelSearchReplace, "Search", 
@@ -222,7 +227,16 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 		chckbxRegularExpression.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				chckbxDotMatchNewLine.setVisible(chckbxRegularExpression.isSelected());
+				chckbxDotMatchNewLine.setEnabled(chckbxRegularExpression.isSelected());
+				chckbxAdvSearch.setEnabled(!chckbxRegularExpression.isSelected());
+			}
+		});
+		
+		chckbxAdvSearch.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				chckbxRegularExpression.setEnabled(!chckbxAdvSearch.isSelected());
+				chckbxDotMatchNewLine.setEnabled(!chckbxAdvSearch.isSelected());
 			}
 		});
 		
@@ -319,5 +333,10 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 	@Override
 	public boolean dotMatchesNewLine() {
 		return chckbxDotMatchNewLine.isSelected();
+	}
+
+	@Override
+	public boolean useAdvancedSearch() {
+		return chckbxAdvSearch.isSelected();
 	}
 }

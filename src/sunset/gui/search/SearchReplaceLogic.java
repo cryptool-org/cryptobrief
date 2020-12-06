@@ -5,10 +5,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import sunset.gui.search.interfaces.ISearchLogic;
+import sunset.gui.search.interfaces.ISearchReplaceLogic;
 import sunset.gui.util.SunsetBundle;
 
-public class SearchLogic implements ISearchLogic {
+public class SearchReplaceLogic implements ISearchReplaceLogic {
 	
 	private int _matchStart;
 	private int _matchEnd;
@@ -128,5 +128,12 @@ public class SearchLogic implements ISearchLogic {
 		} else {
 			return text.toLowerCase().equals(pattern.toLowerCase());
 		}
+	}
+
+	@Override
+	public String replaceRegex(String text, String pattern, String replaceWith, boolean bMatchCase, boolean bDotAll) {
+		Matcher m = getMatcher(text, pattern, bMatchCase, bDotAll);
+		
+		return m.replaceAll(replaceWith);
 	}
 }

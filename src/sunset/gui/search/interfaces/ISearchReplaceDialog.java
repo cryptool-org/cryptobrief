@@ -45,4 +45,10 @@ public interface ISearchReplaceDialog {
 	 * @return status of . matches newline checkbox
 	 */
 	public boolean dotMatchesNewLine();	
+	
+	/**
+	 * Returns the value of the use advanced search flag, i.e. if advanced search should be used
+	 * @return status of advanced search checkbox
+	 */
+	public boolean useAdvancedSearch();
 }

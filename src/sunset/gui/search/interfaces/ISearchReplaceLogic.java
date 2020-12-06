@@ -1,6 +1,6 @@
 package sunset.gui.search.interfaces;
 
-public interface ISearchLogic {
+public interface ISearchReplaceLogic {
 	
 	/**
 	 * Searches for a pattern in a given text from a specified position
@@ -61,4 +61,16 @@ public interface ISearchLogic {
 	 * @return the message of the search operation or the exception message if a invalid regular expression was used
 	 */
 	public String getMessage();
+	
+	/**
+	 * Replaces all occurrences of the pattern in a given text with the replaceWith text,
+	 * starting from a specified position using regular expressions
+	 * @param text the subject string in which the pattern is searched
+	 * @param pattern the regular expression pattern to search for
+	 * @param replaceWith the replacement text
+	 * @param bMatchCase the flag to specify if case sensitive search is used
+	 * @param bDotAll the flag to specify if a dot should also match newline characters
+	 * @return the result string of the replacement operation
+	 */
+	public String replaceRegex(String text, String pattern, String replaceWith, boolean bMatchCase, boolean bDotAll);
 }
