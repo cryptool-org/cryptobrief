@@ -5,6 +5,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import sunset.gui.search.advanced.AdvancedSearch;
+import sunset.gui.search.exception.InvalidPatternException;
 import sunset.gui.search.interfaces.ISearchReplaceLogic;
 import sunset.gui.util.SunsetBundle;
 
@@ -16,21 +18,15 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 	
 	@Override
 	public boolean search(String text, String pattern, int fromIndex, boolean bMatchCase, boolean bWrapAround) {
-		_matchStart = -1;
-		
 		if (bMatchCase) {
 			_matchStart = text.indexOf(pattern, fromIndex);
 		} else {
 			_matchStart = text.toLowerCase().indexOf(pattern.toLowerCase(), fromIndex);
 		}
 		
-		// if not found from pos, pos was not beginning, and wrap around is activated, search again from 0
+		// if not found starting fromIndex, fromIndex was not 0, and wrap around is activated, search again from 0
 		if (_matchStart == -1 && fromIndex != 0 && bWrapAround) {
-			if (bMatchCase) {
-				_matchStart = text.indexOf(pattern, 0);
-			} else {
-				_matchStart = text.toLowerCase().indexOf(pattern.toLowerCase(), 0);
-			}
+			return search(text, pattern, 0, bMatchCase, bWrapAround);
 		}
 		
 		if (_matchStart != -1) {
@@ -135,5 +131,33 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 		Matcher m = getMatcher(text, pattern, bMatchCase, bDotAll);
 		
 		return m.replaceAll(replaceWith);
+	}
+
+	@Override
+	public boolean searchAdvanced(String text, String pattern, int fromIndex, boolean bMatchCase, boolean bWrapAround) {
+		AdvancedSearch advSearch = new AdvancedSearch();	
+		
+		try {
+			boolean bFound = advSearch.find(text, pattern, fromIndex, bMatchCase);
+			
+			// if not found starting fromIndex, fromIndex was not 0, and wrap around is activated, search again from 0
+			if (!bFound && fromIndex != 0 && bWrapAround) {
+				bFound = advSearch.find(text, pattern, 0, bMatchCase);
+			}
+			
+			if (!bFound) {
+				return search(text, pattern, fromIndex, bMatchCase, bWrapAround);
+			} else {
+				_matchStart = advSearch.getStart();
+				_matchEnd = advSearch.getEnd();
+			}
+			
+			generateMessage(pattern, bFound);
+			
+			return bFound;
+		} catch (InvalidPatternException e) {
+			_message = e.getMessage();
+			return false;
+		}
 	}
 }

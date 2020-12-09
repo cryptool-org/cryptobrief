@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentListener;
 
 import sunset.gui.FFaplJFrame;
 import sunset.gui.listener.ActionListenerCloseWindow;
@@ -39,6 +40,8 @@ import java.util.Vector;
 import javax.swing.SwingConstants;
 import java.awt.Font;
 import javax.swing.JCheckBox;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 @SuppressWarnings("serial")
 public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialog, ISearchReplaceShowDialog {
@@ -153,6 +156,7 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 				chckbxDotMatchNewLine = new JCheckBox(". matches newline");
 				chckbxDotMatchNewLine.setBounds(210, 133, 120, 21);
 				chckbxDotMatchNewLine.setName("chckbx_dotall");
+				chckbxDotMatchNewLine.setEnabled(false);
 				panelSearchReplaceMain.add(chckbxDotMatchNewLine);
 				
 				chckbxWrapAround = new JCheckBox("Wrap around");
@@ -236,7 +240,6 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				chckbxRegularExpression.setEnabled(!chckbxAdvSearch.isSelected());
-				chckbxDotMatchNewLine.setEnabled(!chckbxAdvSearch.isSelected());
 			}
 		});
 		

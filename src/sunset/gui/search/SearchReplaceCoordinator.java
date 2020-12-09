@@ -48,6 +48,8 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 				
 				if (_dialog.useRegEx()) {
 					bFound = _logic.searchRegex(text, pattern, caretPos, bMatchCase, bWrapAround, bDotAll);
+				} else if (_dialog.useAdvancedSearch()){
+					bFound = _logic.searchAdvanced(text, pattern, caretPos, bMatchCase, bWrapAround);
 				} else {
 					bFound = _logic.search(text, pattern, caretPos, bMatchCase, bWrapAround);
 				}
@@ -61,11 +63,11 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 					textPaneCode.setCaretPosition(_logic.getStart());
 					textPaneCode.moveCaretPosition(_logic.getEnd());
 					
-					setStatus(_logic.getMessage() + getLineNumber(doc, _logic.getStart()), SearchStatus.SEARCH_SUCCESS);
+					setStatus(_logic.getMessage() + " at line " + getLineNumber(doc, _logic.getStart()), SearchStatus.SEARCH_SUCCESS);
 					
 					return true;
 				} else {
-					setStatus(_logic.getMessage() + getLineNumber(doc, caretPos), SearchStatus.FAILURE);
+					setStatus(_logic.getMessage() + " at line " + getLineNumber(doc, caretPos), SearchStatus.FAILURE);
 				}
 			} catch (BadLocationException e) {
 				setStatus(e.getMessage(), SearchStatus.FAILURE);

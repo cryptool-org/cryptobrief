@@ -12,6 +12,17 @@ public interface ISearchReplaceLogic {
 	 * @return true if the pattern was found in the text considering the options, otherwise false
 	 */
 	public boolean search(String text, String pattern, int fromIndex, boolean bMatchCase, boolean bWrapAround);
+
+	/**
+	 * Searches for a pattern in a given text from a specified position using advanced search
+	 * @param text the subject string in which the pattern is searched
+	 * @param pattern the pattern to search for
+	 * @param fromIndex the index the search should start from
+	 * @param bMatchCase the flag to specify if case sensitive search is used
+	 * @param bWrapAround the flag to specify if wrap around search is used
+	 * @return true if the pattern was found in the text using advanced search and considering the options, otherwise false
+	 */
+	public boolean searchAdvanced(String text, String pattern, int fromIndex, boolean bMatchCase, boolean bWrapAround);
 	
 	/**
 	 * Searches for a pattern in a given text from a specified position using regular expressions
