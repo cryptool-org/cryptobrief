@@ -1,17 +1,18 @@
 package sunset.gui.search.advanced;
 
 import org.junit.Assert;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
 import sunset.gui.search.exception.InvalidPatternException;
 
 class AdvancedSearchTest {
 	
-	AdvancedSearch _search;
+	static AdvancedSearch _search;
 
-	@BeforeEach
-	void setUp() throws Exception {
+	@BeforeAll
+	static void setUp() throws Exception {
 		_search = new AdvancedSearch();
 	}
 
@@ -418,5 +419,10 @@ class AdvancedSearchTest {
 		} catch (InvalidPatternException e) {
 			Assert.fail();
 		}
+	}
+	
+	@AfterAll
+	static void tearDown() {
+		_search = null;
 	}
 }
