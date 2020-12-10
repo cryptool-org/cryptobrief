@@ -32,19 +32,20 @@ public class AdvancedSearch {
 	public boolean find(String text, String pattern, int fromIndex, boolean bMatchCase) throws InvalidPatternException {
 		reset();
 		
-		System.out.println("Find executed. " + (text.length() < 20 ? "Text: " + text : "") 
+		System.out.println("\nFind executed:\t" + (text.length() < 20 ? "Text: " + text : "") 
 				+ " Pattern: " + pattern + " fromIndex: " + fromIndex + " matchCase: " + bMatchCase);
 		
-		if (!isPreCheckSuccessful(text, pattern, fromIndex, bMatchCase)) {
-			return false;
-		}
+		ArrayList<Integer> varPositions = getVariablePositions(pattern);
 		
-		ArrayList<Integer> varPositions = getVariablePositions(pattern);	
+		if (!validatePattern(pattern, varPositions) || !containsPattern(text, pattern, fromIndex, bMatchCase)) {
+			return false;	// if pattern is invalid or text does not contain pattern, return false
+		}
 		
 		int currVarPosition, nextVarPosition, prevMatch, varIndex;
 		currVarPosition = varPositions.get(0);
 		String nextPattern = removeEscapes(pattern.substring(0, currVarPosition));
 		_matchStart = getIndexOf(text, nextPattern, fromIndex, true, bMatchCase);
+		
 		prevMatch = _matchStart + nextPattern.length();
 		
 		for (int i = 0; i < varPositions.size(); i++) {
@@ -58,11 +59,14 @@ public class AdvancedSearch {
 			prevMatch = _matchEnd;
 		}
 		
-		System.out.println("Find result: " + _matchStart + "," + _matchEnd + "," + printArray(_captures));
+		System.out.println("Find result:\t" + _matchStart + "," + _matchEnd + "," + convertArrayToString(_captures));
 		
 		return true;
 	}
 	
+	/**
+	 * Resets the matcher
+	 */
 	private void reset() {
 		_matchStart = -1;
 		_matchEnd = -1;
@@ -70,7 +74,12 @@ public class AdvancedSearch {
 		_captures = new String[MAX_VARS];
 	}
 	
-	private String printArray(String[] array) {
+	/**
+	 * Puts the elements of the given array into a string separated by comma
+	 * @param array the array to be printed
+	 * @return string containing array elements separated by comma
+	 */
+	private String convertArrayToString(String[] array) {
 		String result = "";
 		
 		if (array.length == 0) {
@@ -84,6 +93,11 @@ public class AdvancedSearch {
 		return result.substring(0, result.length()-1);
 	}
 	
+	/**
+	 * Analyzes the given pattern and returns the positions of all non-escaped variables in the pattern 
+	 * @param pattern the pattern to be analyzed
+	 * @return An ArrayList of Integers containing start positions of all variables
+	 */
 	private ArrayList<Integer> getVariablePositions(String pattern) {
 		ArrayList<Integer> varIndexes = new ArrayList<Integer>();
 		
@@ -109,8 +123,20 @@ public class AdvancedSearch {
 		return varIndexes;
 	}
 	
-	private boolean isPreCheckSuccessful(String text, String pattern, int fromIndex, boolean bMatchCase) throws InvalidPatternException {
-		// check if there are two consecutive variables without delimiter
+	/**
+	 * Validates the given pattern. Checks if the pattern fulfills the following conditions:
+	 * - the pattern does not comprise two consecutive variables without delimiter
+	 * - the pattern comprises all variables only once
+	 * - the pattern includes at least one variable
+	 * @param pattern the pattern to be validated
+	 * @param varPositions the ArrayList containing all variable positions in the pattern
+	 * @return true if the pattern is valid, i.e. fulfills above conditions
+	 * @throws InvalidPatternException if the pattern is invalid, i.e. fulfills one of the conditions:
+	 * - the pattern comprises two variables without delimiter in between
+	 * - the pattern comprises a variable more than once
+	 */
+	private boolean validatePattern(String pattern, ArrayList<Integer> varPositions) throws InvalidPatternException {
+		// check if there are two consecutive variables without delimiter, i.e. if the regex INVALID_PATTERN is found in the pattern
 		Pattern p = Pattern.compile(INVALID_PATTERN);
 		Matcher m = p.matcher(pattern);
 		
@@ -119,23 +145,56 @@ public class AdvancedSearch {
 			throw new InvalidPatternException(msg + pattern.substring(m.end()-4, m.end()));
 		}
 		
-		if (!pattern.matches(SUPPORTED_PATTERN)) {
-			return false;
+		// check if a variable is used more than once
+		ArrayList<Integer> varIndexes = new ArrayList<Integer>();
+		int varIndex;
+		
+		for (int varPos : varPositions) {
+			varIndex = getVarIndex(pattern, varPos);
+			
+			if (varIndexes.contains(varIndex)) {
+				String msg = "Invalid search pattern! Variable has been used more than once: ";
+				throw new InvalidPatternException(msg + "%" + varIndex);
+			} else {
+				varIndexes.add(varIndex);
+			}
 		}
 		
-		String pattern_regex = "\\Q" + convertPatternToRegex(pattern) + "\\E";
-		
-		System.out.println("PreCheck Regex Pattern: " + pattern_regex);
-		
-		m = getMatcher(text, pattern_regex, bMatchCase, true);
-		
-		if (!m.find(fromIndex)) {	// use regex to perform a first check if text contains the literals of the pattern
+		// check if the pattern includes at least one variable, i.e. if the pattern matches the regex SUPPORTED_PATTERN 
+		if (!pattern.matches(SUPPORTED_PATTERN)) {
 			return false;
 		}
 		
 		return true;
 	}
 	
+	/**
+	 * Checks if the given text contains the given pattern starting fromIndex and considering the bMatchCase flag
+	 * @param text the text to be checked
+	 * @param pattern the pattern to be searched in the text
+	 * @param fromIndex the starting index of the text where the pattern is searched from 
+	 * @param bMatchCase the flag indicating if case sensitive search should be used to find the pattern in the text
+	 * @return true if the pattern converted to regular expressions is found in the given text considering fromIndex and bMatchCase
+	 */
+	private boolean containsPattern(String text, String pattern, int fromIndex, boolean bMatchCase) {		
+		String patternRegex = convertPatternToRegex(pattern);
+		
+		System.out.println("Regex Pattern:\t" + patternRegex);
+		
+		Matcher m = getMatcher(text, patternRegex, bMatchCase, true);
+		
+		if (!m.find(fromIndex)) {	// use regex to check if text contains the converted pattern
+			return false;
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Converts the given pattern into a regular expression pattern
+	 * @param pattern the advanced search pattern to be converted to a regular expression pattern
+	 * @return a regex version of the pattern where all literals are escaped and variables are replaced by .*
+	 */
 	private String convertPatternToRegex(String pattern) {
 		// non escaped variables are replaced by .* (pattern starts with variable)
 		pattern = pattern.replaceAll("^" + VARIABLE, "\\\\E.*\\\\Q");
@@ -146,9 +205,17 @@ public class AdvancedSearch {
 		// escaped variables %%[0-9] are replaced by the string %[0-9]
 		pattern = pattern.replaceAll(VAR_ESC + "(" + VARIABLE + ")", "$1");
 		
-		return pattern;
+		return "\\Q" + pattern + "\\E";
 	}
 	
+	/**
+	 * Returns a Matcher object corresponding to the specified text and regular expression pattern
+	 * @param text the text the matcher is based on
+	 * @param pattern the pattern the matcher is based on
+	 * @param bMatchCase the flag indicating if case sensitive regular expression matching is required
+	 * @param bDotAll the flag indicating if . should match newline characters in the regular expression
+	 * @return a Matcher object corresponding to the given parameters, null if an invalid regular expression was specified
+	 */
 	private Matcher getMatcher(String text, String pattern, boolean bMatchCase, boolean bDotAll) {
 		try {
 			final int flags = (bMatchCase ? 0 : Pattern.CASE_INSENSITIVE) | (bDotAll ? Pattern.DOTALL : 0);
@@ -161,12 +228,28 @@ public class AdvancedSearch {
 		}
 	}
 	
+	/**
+	 * Removes the escaping character from the given pattern
+	 * @param pattern the pattern from which the escaping character should be removed
+	 * @return the pattern with all escaped variables replaced by variables
+	 */
 	private String removeEscapes(String pattern) {
 		return pattern.replaceAll(VAR_ESC + "(" + VARIABLE + ")", "$1");
 	}
 	
+	/**
+	 * Returns the index of the subPattern in the text, considering startFrom, isStart and bMatchCase parameters
+	 * If the subPattern is empty, it returns the startFrom position if isStart is true, otherwise it returns the length of the text.
+	 * @param text the text where the subPattern has to be searched in
+	 * @param subPattern the pattern which is searched in the text
+	 * @param startFrom the index indicating the starting index of the search in the text
+	 * @param isStart the flag indicating if the subPattern is at the start of the pattern
+	 * @param bMatchCase the flag indicating if case sensitive search should be used
+	 * @return the index of the pattern inside the text.
+	 * If the subPattern is empty, it returns the startFrom position if isStart is true, otherwise it returns the length of the text.
+	 */
 	private int getIndexOf(String text, String subPattern, int startFrom, boolean isStart, boolean bMatchCase) {
-		if (subPattern.isEmpty()) {	// pattern can only be empty at start or end
+		if (subPattern.isEmpty()) {	// subPattern can only be empty at start or end
 			return isStart ? startFrom : text.length();
 		}
 		
@@ -177,12 +260,25 @@ public class AdvancedSearch {
 		}
 	}
 	
+	/**
+	 * Returns the index of a variable
+	 * @param pattern the pattern where the position of the variable is checked
+	 * @param varPosition the position of the variable in the pattern
+	 * @return the index of the variable, i.e. for variable %2 it returns 2
+	 */
 	private int getVarIndex(String pattern, int varPosition) {
 		char cVarIndex = pattern.charAt(varPosition+1);
 		
 		return Character.getNumericValue(cVarIndex);
 	}
 	
+	/**
+	 * 
+	 * @param text
+	 * @param prevMatch
+	 * @param nextMatch
+	 * @param varIndex
+	 */
 	private void performMatch(String text, int prevMatch, int nextMatch, int varIndex) {
 		_captures[varIndex] = "";
 		
@@ -191,14 +287,26 @@ public class AdvancedSearch {
 		}
 	}
 	
+	/**
+	 * Returns the captures of the advanced search
+	 * @return the captures of the advanced search
+	 */
 	public String[] getCaptures() {
 		return _captures;
 	}
 	
+	/**
+	 * Returns the start position of the match, -1 if match failed
+	 * @return the start position of the match, -1 if match failed
+	 */
 	public int getStart() {
 		return _matchStart;
 	}
 	
+	/**
+	 * Returns the end position of the match
+	 * @return the end position of the match
+	 */
 	public int getEnd() {
 		return _matchEnd;
 	}

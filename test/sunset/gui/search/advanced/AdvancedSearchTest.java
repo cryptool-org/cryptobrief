@@ -49,38 +49,39 @@ class AdvancedSearchTest {
 			Assert.assertTrue(_search.find("bdf", "%8b%4d%0f%5", 0, false));
 			checkResult(0,3,new String[] {"", null, null, null, "", "", null, null, "", null});
 			
+			Assert.assertTrue(_search.find("bdf", "%8b%4d%0f%5", 0, false));
+			checkResult(0,3,new String[] {"", null, null, null, "", "", null, null, "", null});
+			
+			Assert.assertTrue(_search.find("abcdaabbccdde", "a%8b%4c%0d%5e", 0, false));
+			checkResult(0,13,new String[] {"", null, null, null, "", "aabbccdd", null, null, "", null});
+			
+			Assert.assertTrue(_search.find("abcdababcdaabbccdde", "a%8b%4c%0d%5e", 0, false));
+			checkResult(0,19,new String[] {"", null, null, null, "", "ababcdaabbccdd", null, null, "", null});
+			
 		} catch (InvalidPatternException e) {
 			Assert.fail();
 		}
 	}
 	
 	void checkResult(int start, int end, String[] captures) {
+		System.out.println("Expected:\t" + start + "," + end + "," + convertArrayToString(captures));
 		Assert.assertEquals(start, _search.getStart());
 		Assert.assertEquals(end, _search.getEnd());
 		Assert.assertArrayEquals(captures, _search.getCaptures());
 	}
 	
-	@Test
-	void testSingleVariable() {
-		try {
-			Assert.assertTrue(_search.find("aabbccdd", "%0c%0", 0, false));
-			checkResult(0,8,new String[] {"cdd", null, null, null, null, null, null, null, null, null});
-			
-			Assert.assertTrue(_search.find("aabbcd", "a%2b%2c", 0, false));
-			checkResult(0,5,new String[] {null, null, "b", null, null, null, null, null, null, null});
-			
-			Assert.assertTrue(_search.find("aabccdeefgg", "%1b%1d%1f%1", 0, false));
-			checkResult(0,11,new String[] {null, "gg", null, null, null, null, null, null, null, null});
-	
-			Assert.assertTrue(_search.find("aabccdeefgg", "%8b%8d%8f%8", 0, false));
-			checkResult(0,11,new String[] {null, null, null, null, null, null, null, null, "gg", null});
-			
-			Assert.assertTrue(_search.find("bdf", "%2b%2d%2f%2", 0, false));
-			checkResult(0,3,new String[] {null, null, "", null, null, null, null, null, null, null});
-			
-		} catch (InvalidPatternException e) {
-			Assert.fail();
+	private String convertArrayToString(String[] array) {
+		String result = "";
+		
+		if (array.length == 0) {
+			return "";
 		}
+		
+		for (String s : array) {
+			result += s + ",";
+		}
+		
+		return result.substring(0, result.length()-1);
 	}
 	
 	@Test
@@ -153,6 +154,9 @@ class AdvancedSearchTest {
 			Assert.assertTrue(_search.find("$$%$$$%$$$%", "%1%$%2", 0, false));
 			checkResult(0,11,new String[] {null, "$$", "$$%$$$%", null, null, null, null, null, null, null});
 			
+			Assert.assertTrue(_search.find("$$%$$$%$?$%", "$$%1%$?%2", 0, false));
+			checkResult(0,11,new String[] {null, "%$$$", "$%", null, null, null, null, null, null, null});
+			
 		} catch (InvalidPatternException e) {
 			Assert.fail();
 		}
@@ -181,6 +185,9 @@ class AdvancedSearchTest {
 			
 			Assert.assertTrue(_search.find("0123456789", "0123%56789", 0, false));
 			checkResult(0,10,new String[] {null, null, null, null, null, "45", null, null, null, null});
+			
+			Assert.assertTrue(_search.find("0123401234567", "012345%5", 0, false));
+			checkResult(5,13,new String[] {null, null, null, null, null, "67", null, null, null, null});
 			
 		} catch (InvalidPatternException e) {
 			Assert.fail();
@@ -267,6 +274,9 @@ class AdvancedSearchTest {
 			Assert.assertTrue(_search.find("bDf", "%8b%4D%0f%5", 0, true));
 			checkResult(0,3,new String[] {"", null, null, null, "", "", null, null, "", null});
 			
+			Assert.assertTrue(_search.find("abcdeAabbccdde", "A%8b%4c%0d%5e", 0, true));
+			checkResult(5,14,new String[] {"c", null, null, null, "b", "d", null, null, "a", null});
+			
 			Assert.assertFalse(_search.find("aBcDeFgH", "A%1c", 0, true));
 			Assert.assertFalse(_search.find("aBcDeFgH", "a%1b", 0, true));
 			Assert.assertFalse(_search.find("aBcDeFgH", "a%1h", 0, true));
@@ -275,6 +285,7 @@ class AdvancedSearchTest {
 			Assert.assertFalse(_search.find("aBcDeFgH", "aBcd%8H", 0, true));
 			Assert.assertFalse(_search.find("AaaaaaaaA", "a%1A%2a", 0, true));
 			Assert.assertFalse(_search.find("aaaB", "a%0a%1ab", 0, true));
+			Assert.assertFalse(_search.find("aBcdEaaBBccdde", "a%8b%4c%0d%5e", 0, true));
 			
 		} catch (InvalidPatternException e) {
 			Assert.fail();
@@ -282,7 +293,7 @@ class AdvancedSearchTest {
 	}
 
 	@Test
-	void testWrongPatterns() {
+	void testInvalidPattern1() {
 		InvalidPatternException e;
 		String msg = "Invalid search pattern! Missing delimiter between variables: "; 
 		
@@ -321,6 +332,60 @@ class AdvancedSearchTest {
 		  });
 		
 		Assert.assertEquals(e.getMessage(), msg + "%0%1");
+	}
+	
+	@Test
+	void testInvalidPattern2() {
+		InvalidPatternException e;
+		String msg = "Invalid search pattern! Variable has been used more than once: ";
+		
+		e = Assert.assertThrows(InvalidPatternException.class, () -> {
+			_search.find("abc", "%0a%0c%0", 0, false);
+		  });
+		
+		Assert.assertEquals(e.getMessage(), msg + "%0");
+		
+		e = Assert.assertThrows(InvalidPatternException.class, () -> {
+			_search.find("abc", "%0b%1c%0", 0, false);
+		  });
+		
+		Assert.assertEquals(e.getMessage(), msg + "%0");
+		
+		e = Assert.assertThrows(InvalidPatternException.class, () -> {
+			_search.find("abc", "a%0b%2c%2", 0, false);
+		  });
+		
+		Assert.assertEquals(e.getMessage(), msg + "%2");
+		
+		e = Assert.assertThrows(InvalidPatternException.class, () -> {
+			_search.find("abc", "%1a%1b%2", 0, false);
+		  });
+		
+		Assert.assertEquals(e.getMessage(), msg + "%1");
+		
+		e = Assert.assertThrows(InvalidPatternException.class, () -> {
+			_search.find("aabbccdd", "%0c%0", 0, false);
+		  });
+		
+		Assert.assertEquals(e.getMessage(), msg + "%0");
+
+		e = Assert.assertThrows(InvalidPatternException.class, () -> {
+			_search.find("aabbcd", "a%2b%2c", 0, false);
+		  });
+		
+		Assert.assertEquals(e.getMessage(), msg + "%2");
+
+		e = Assert.assertThrows(InvalidPatternException.class, () -> {
+			_search.find("aabccdeefgg", "%1b%1d%2f%3", 0, false);
+		  });
+		
+		Assert.assertEquals(e.getMessage(), msg + "%1");
+
+		e = Assert.assertThrows(InvalidPatternException.class, () -> {
+			_search.find("aabccdeefgg", "%8b%8d%2f%2", 0, false);
+		  });
+		
+		Assert.assertEquals(e.getMessage(), msg + "%8");
 	}
 
 	@Test
