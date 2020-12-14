@@ -5,11 +5,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
+import sunset.gui.search.advanced.interfaces.IAdvancedSearch;
 import sunset.gui.search.exception.InvalidPatternException;
 
 class AdvancedSearchTest {
 	
-	static AdvancedSearch _search;
+	static IAdvancedSearch _search;
 
 	@BeforeAll
 	static void setUp() throws Exception {

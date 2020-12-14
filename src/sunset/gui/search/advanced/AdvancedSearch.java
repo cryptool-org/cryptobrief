@@ -5,9 +5,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import sunset.gui.search.advanced.interfaces.IAdvancedSearch;
 import sunset.gui.search.exception.InvalidPatternException;
 
-public class AdvancedSearch {
+public class AdvancedSearch implements IAdvancedSearch{
 	private final static int MAX_VARS = 10;
 	private final static char VAR_START = '%';
 	private final static char VAR_ESC = '%';
@@ -29,6 +30,7 @@ public class AdvancedSearch {
 	private int _matchStart = -1;
 	private int _matchEnd = -1;
 	
+	@Override
 	public boolean find(String text, String pattern, int fromIndex, boolean bMatchCase) throws InvalidPatternException {
 		reset();
 		
@@ -287,26 +289,17 @@ public class AdvancedSearch {
 		}
 	}
 	
-	/**
-	 * Returns the captures of the advanced search
-	 * @return the captures of the advanced search
-	 */
+	@Override
 	public String[] getCaptures() {
 		return _captures;
 	}
 	
-	/**
-	 * Returns the start position of the match, -1 if match failed
-	 * @return the start position of the match, -1 if match failed
-	 */
+	@Override
 	public int getStart() {
 		return _matchStart;
 	}
 	
-	/**
-	 * Returns the end position of the match
-	 * @return the end position of the match
-	 */
+	@Override
 	public int getEnd() {
 		return _matchEnd;
 	}

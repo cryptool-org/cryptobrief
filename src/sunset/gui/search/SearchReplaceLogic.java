@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import sunset.gui.search.advanced.AdvancedSearch;
+import sunset.gui.search.advanced.interfaces.IAdvancedSearch;
 import sunset.gui.search.exception.InvalidPatternException;
 import sunset.gui.search.interfaces.ISearchReplaceLogic;
 import sunset.gui.util.SunsetBundle;
@@ -135,7 +136,7 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 
 	@Override
 	public boolean searchAdvanced(String text, String pattern, int fromIndex, boolean bMatchCase, boolean bWrapAround) {
-		AdvancedSearch advSearch = new AdvancedSearch();	
+		IAdvancedSearch advSearch = new AdvancedSearch();	
 		
 		try {
 			boolean bFound = advSearch.find(text, pattern, fromIndex, bMatchCase);
