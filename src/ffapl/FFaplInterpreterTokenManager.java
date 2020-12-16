@@ -21,7 +21,7 @@ import java.util.ArrayList;
 public class FFaplInterpreterTokenManager implements FFaplInterpreterConstants {
 
   /** Debug output. */
-  private java.io.PrintStream debugStream = System.out;
+  private java.io.PrintStream debugStream = new java.io.PrintStream(OutputStream.nullOutputStream()); //System.out;
 
   /**
    * @return debug output

@@ -1606,7 +1606,7 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 				pfs.getTreeNode().accept(this, argument);
 			}else if(s1 instanceof FFaplPreProcFuncSymbol){
 				ppfs = (FFaplPreProcFuncSymbol) s1;
-				ppfs.execute(_interpreter);
+				ppfs.execute(_interpreter, _logger);
 			}else{
 				Object[] arguments = {"Interpreter ASTProcFuncCall"};
 				throw new FFaplAlgebraicException(arguments, IAlgebraicError.INTERNAL);

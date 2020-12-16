@@ -30,8 +30,8 @@ public class IProperties {
 	public final static String SHOW_API = "SHOW.API";
 	public final static String GUI_WIDTH = "GUI.WIDTH";
 	public final static String GUI_HEIGHT = "GUI.HEIGHT";
-	public final static String GUI_DIVIDER_CONSOLE = "DIVIDER.CONSOLE";
-	public final static String GUI_DIVIDER_API = "DIVIDER.API";
+	public final static String GUI_DIVIDER_CONSOLE = "GUI.DIVIDER.CONSOLE";
+	public final static String GUI_DIVIDER_API = "GUI.DIVIDER.API";
 	public final static String GUI_MAXIMIZED = "GUI.MAXIMIZED";
 	public final static String LOGGER_MODE = "LOGGER.MODE";
 	public final static String SYSTEM = "SYSTEM";

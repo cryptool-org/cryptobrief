@@ -15,6 +15,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.text.MessageFormat;
@@ -338,19 +339,15 @@ public class FFaplJFrame extends javax.swing.JFrame {
 	 * Store the GUI Properties to the file
 	 */
 	public void storeGUIProperties() {
-		GUIPropertiesLogic.getInstance().setProperty(IProperties.GUI_HEIGHT,
-				String.valueOf(this.getHeight()));
-		GUIPropertiesLogic.getInstance().setIntegerProperty(
-				IProperties.GUI_WIDTH, this.getWidth());
+		if (!(this.getExtendedState() == Frame.MAXIMIZED_BOTH)) {
+			GUIPropertiesLogic.getInstance().setProperty(IProperties.GUI_HEIGHT,
+					String.valueOf(this.getHeight()));
+			GUIPropertiesLogic.getInstance().setIntegerProperty(
+					IProperties.GUI_WIDTH, this.getWidth());
+		}
 		GUIPropertiesLogic.getInstance().setBooleanProperty(
 				IProperties.GUI_MAXIMIZED,
 				this.getExtendedState() == Frame.MAXIMIZED_BOTH);
-		GUIPropertiesLogic.getInstance().setIntegerProperty(
-				IProperties.GUI_DIVIDER_API,
-				jSplitPane_mainmain.getDividerLocation());
-		GUIPropertiesLogic.getInstance().setIntegerProperty(
-				IProperties.GUI_DIVIDER_CONSOLE,
-				jSplitPane_main.getDividerLocation());
 		GUIPropertiesLogic.getInstance().storePropertyFile();
 	}
 
@@ -530,6 +527,9 @@ public class FFaplJFrame extends javax.swing.JFrame {
 
 				getContentPane().add(jSplitPane_mainmain, BorderLayout.CENTER);
 				jSplitPane_mainmain.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+				jSplitPane_mainmain.setResizeWeight(0.7);
+				jSplitPane_mainmain.setContinuousLayout(true);
+				
 				// jSplitPane_mainmain.setPreferredSize(new
 				// java.awt.Dimension(954, 489));
 
@@ -579,6 +579,8 @@ public class FFaplJFrame extends javax.swing.JFrame {
 				jSplitPane_mainmain.add(jSplitPane_main, JSplitPane.TOP);
 				// getContentPane().add(jSplitPane_main, BorderLayout.CENTER);
 				jSplitPane_main.setOrientation(JSplitPane.VERTICAL_SPLIT);
+				jSplitPane_main.setResizeWeight(0.55);
+				jSplitPane_main.setContinuousLayout(true);
 
 				{
 					jTabbedPane_Code = new JTabbedPaneCode();
@@ -1008,22 +1010,17 @@ public class FFaplJFrame extends javax.swing.JFrame {
 				if (GUIPropertiesLogic.getInstance().getBooleanProperty(
 						IProperties.GUI_MAXIMIZED)) {
 					this.setExtendedState(Frame.MAXIMIZED_BOTH);
-				} else {
-					this.setSize(
-							GUIPropertiesLogic.getInstance()
-							.getIntegerProperty(IProperties.GUI_WIDTH),
-							GUIPropertiesLogic.getInstance()
-							.getIntegerProperty(
-									(IProperties.GUI_HEIGHT)));
 				}
-				// pack();
-				jSplitPane_main.setDividerLocation(GUIPropertiesLogic
-						.getInstance().getIntegerProperty(
-								IProperties.GUI_DIVIDER_CONSOLE));
-				jSplitPane_mainmain.setDividerLocation(GUIPropertiesLogic
-						.getInstance().getIntegerProperty(
-								IProperties.GUI_DIVIDER_API));
-
+				
+				this.setSize(
+						GUIPropertiesLogic.getInstance()
+						.getIntegerProperty(IProperties.GUI_WIDTH),
+						GUIPropertiesLogic.getInstance()
+						.getIntegerProperty(
+								(IProperties.GUI_HEIGHT)));
+				
+				jSplitPane_main.setDividerLocation((int)(this.getHeight()*0.55));
+				jSplitPane_mainmain.setDividerLocation((int)(this.getWidth()*0.7));
 			} catch (Exception ee) {
 				this.setSize(970, 600);
 				jSplitPane_main.setDividerLocation(380);
@@ -1127,14 +1124,6 @@ public class FFaplJFrame extends javax.swing.JFrame {
 				(JTabbedPaneCode) jTabbedPane_Code));
 		jMenuItem_snippet.addActionListener(new ActionListenerEditApiEntry(this, null));
 		jTextField_input.addActionListener(new ActionListenerInputField((JTabbedPaneCode) jTabbedPane_Code));
-		this.addWindowListener(new WindowAdapter() {
-		    public void windowActivated(WindowEvent e) {
-		    	JPanelCode currentCodePanel = getCurrentCodePanel(); 
-		    	if (currentCodePanel != null) {
-		    		currentCodePanel.getCodePane().requestFocusInWindow();
-		    	}
-		    }
-		});
 	}
 
 	private void initComponents() {
