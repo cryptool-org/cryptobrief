@@ -11,6 +11,7 @@ import javax.swing.text.Element;
 import sunset.gui.FFaplJFrame;
 import sunset.gui.search.interfaces.ISearchReplaceDialog;
 import sunset.gui.search.interfaces.ISearchReplaceLogic;
+import sunset.gui.search.advanced.exception.UndeclaredVariableException;
 import sunset.gui.search.interfaces.ISearchReplaceCoordinator;
 
 public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
@@ -105,17 +106,20 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 		if (FFaplJFrame.getCurrentCodePanel() != null) {
 			JTextPane textPaneCode = FFaplJFrame.getCurrentCodePanel().getCodePane();
 			String selectedText = textPaneCode.getSelectedText();
-			String pattern = _dialog.searchPattern();
-			boolean bMatchCase = _dialog.matchCase();
 			
 			if (selectedText == null) {
 				return false;
 			}
 			
+			String pattern = _dialog.searchPattern();
+			boolean bMatchCase = _dialog.matchCase();
+			
 			if (_dialog.useRegEx()) {		
 				boolean bDotAll = _dialog.dotMatchesNewLine();
 				
 				return _logic.matchesRegex(selectedText, pattern, bMatchCase, bDotAll);
+			} else if (_dialog.useAdvancedSearch()){
+				return _logic.matchesAdvanced(selectedText, pattern, bMatchCase);
 			} else {
 				return _logic.equals(selectedText, pattern, bMatchCase);
 			}
@@ -128,17 +132,23 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 	public boolean replaceText() {
 		if (FFaplJFrame.getCurrentCodePanel() != null) {
 			JTextPane textPaneCode = FFaplJFrame.getCurrentCodePanel().getCodePane();
+			String pattern = handleEscapes(_dialog.searchPattern());
 			String replaceText = handleEscapes(_dialog.replaceText());
+			String selectedText = textPaneCode.getSelectedText();
+			boolean bMatchCase = _dialog.matchCase();
 			
 			if (_dialog.useRegEx()) {
-				String pattern = handleEscapes(_dialog.searchPattern());
-				String selectedText = textPaneCode.getSelectedText();
 				try {
-					boolean bMatchCase = _dialog.matchCase();
 					boolean bDotAll = _dialog.dotMatchesNewLine();
-					
 					replaceText = _logic.replaceRegex(selectedText, pattern, replaceText, bMatchCase, bDotAll);
 				} catch (Exception e) {
+					setStatus(e.getMessage(), SearchStatus.FAILURE);
+					return false;
+				}
+			} else if (_dialog.useAdvancedSearch()) {
+				try {
+					replaceText = _logic.replaceAdvanced(selectedText, pattern, replaceText, bMatchCase);
+				} catch (UndeclaredVariableException e) {
 					setStatus(e.getMessage(), SearchStatus.FAILURE);
 					return false;
 				}

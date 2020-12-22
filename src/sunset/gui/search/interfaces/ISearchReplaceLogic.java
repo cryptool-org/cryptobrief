@@ -1,5 +1,7 @@
 package sunset.gui.search.interfaces;
 
+import sunset.gui.search.advanced.exception.UndeclaredVariableException;
+
 public interface ISearchReplaceLogic {
 	
 	/**
@@ -55,6 +57,8 @@ public interface ISearchReplaceLogic {
 	 */
 	public boolean matchesRegex(String text, String pattern, boolean bMatchCase, boolean bDotAll);
 	
+	public boolean matchesAdvanced(String text, String pattern, boolean bMatchCase);
+	
 	/**
 	 * Returns the start position of the match, -1 if match failed
 	 * @return the start position of the match, -1 if match failed
@@ -84,4 +88,6 @@ public interface ISearchReplaceLogic {
 	 * @return the result string of the replacement operation
 	 */
 	public String replaceRegex(String text, String pattern, String replaceWith, boolean bMatchCase, boolean bDotAll);
+	
+	public String replaceAdvanced(String text, String pattern, String replaceWith, boolean bMatchCase) throws UndeclaredVariableException;
 }

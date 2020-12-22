@@ -5,8 +5,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
+import sunset.gui.search.advanced.exception.InvalidPatternException;
 import sunset.gui.search.advanced.interfaces.IAdvancedSearch;
-import sunset.gui.search.exception.InvalidPatternException;
 
 class AdvancedSearchTest {
 	

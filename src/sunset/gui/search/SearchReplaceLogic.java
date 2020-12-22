@@ -6,16 +6,22 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import sunset.gui.search.advanced.AdvancedSearch;
+import sunset.gui.search.advanced.exception.InvalidPatternException;
+import sunset.gui.search.advanced.exception.UndeclaredVariableException;
 import sunset.gui.search.advanced.interfaces.IAdvancedSearch;
-import sunset.gui.search.exception.InvalidPatternException;
 import sunset.gui.search.interfaces.ISearchReplaceLogic;
 import sunset.gui.util.SunsetBundle;
 
 public class SearchReplaceLogic implements ISearchReplaceLogic {
 	
+	private IAdvancedSearch _advSearch;
 	private int _matchStart;
 	private int _matchEnd;
 	private String _message;
+	
+	public SearchReplaceLogic() {
+		_advSearch = new AdvancedSearch();
+	}
 	
 	@Override
 	public boolean search(String text, String pattern, int fromIndex, boolean bMatchCase, boolean bWrapAround) {
@@ -119,6 +125,12 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 	}
 
 	@Override
+	public boolean matchesAdvanced(String text, String pattern, boolean bMatchCase) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
 	public boolean equals(String text, String pattern, boolean bMatchCase) {
 		if (bMatchCase) {
 			return text.equals(pattern);
@@ -136,21 +148,19 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 
 	@Override
 	public boolean searchAdvanced(String text, String pattern, int fromIndex, boolean bMatchCase, boolean bWrapAround) {
-		IAdvancedSearch advSearch = new AdvancedSearch();	
-		
 		try {
-			boolean bFound = advSearch.find(text, pattern, fromIndex, bMatchCase);
+			boolean bFound = _advSearch.find(text, pattern, fromIndex, bMatchCase);
 			
 			// if not found starting fromIndex, fromIndex was not 0, and wrap around is activated, search again from 0
 			if (!bFound && fromIndex != 0 && bWrapAround) {
-				bFound = advSearch.find(text, pattern, 0, bMatchCase);
+				bFound = _advSearch.find(text, pattern, 0, bMatchCase);
 			}
 			
 			if (!bFound) {
 				return search(text, pattern, fromIndex, bMatchCase, bWrapAround);
 			} else {
-				_matchStart = advSearch.getStart();
-				_matchEnd = advSearch.getEnd();
+				_matchStart = _advSearch.getStart();
+				_matchEnd = _advSearch.getEnd();
 			}
 			
 			generateMessage(pattern, bFound);
@@ -160,5 +170,11 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 			_message = e.getMessage();
 			return false;
 		}
+	}
+
+	@Override
+	public String replaceAdvanced(String text, String pattern, String replaceWith, boolean bMatchCase) throws UndeclaredVariableException {
+		String replaceString = _advSearch.getReplaceString(replaceWith);
+		return replaceString;
 	}
 }
