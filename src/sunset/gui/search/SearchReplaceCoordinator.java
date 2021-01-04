@@ -111,7 +111,7 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 				return false;
 			}
 			
-			String pattern = _dialog.searchPattern();
+			String pattern = handleEscapes(_dialog.searchPattern());
 			boolean bMatchCase = _dialog.matchCase();
 			
 			if (_dialog.useRegEx()) {		

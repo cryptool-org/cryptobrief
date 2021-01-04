@@ -5,22 +5,22 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import sunset.gui.search.advanced.AdvancedSearch;
+import sunset.gui.search.advanced.AdvancedSearchReplace;
 import sunset.gui.search.advanced.exception.InvalidPatternException;
 import sunset.gui.search.advanced.exception.UndeclaredVariableException;
-import sunset.gui.search.advanced.interfaces.IAdvancedSearch;
+import sunset.gui.search.advanced.interfaces.IAdvancedSearchReplace;
 import sunset.gui.search.interfaces.ISearchReplaceLogic;
 import sunset.gui.util.SunsetBundle;
 
 public class SearchReplaceLogic implements ISearchReplaceLogic {
 	
-	private IAdvancedSearch _advSearch;
+	private IAdvancedSearchReplace _advSearchReplace;
 	private int _matchStart;
 	private int _matchEnd;
 	private String _message;
 	
 	public SearchReplaceLogic() {
-		_advSearch = new AdvancedSearch();
+		_advSearchReplace = new AdvancedSearchReplace();
 	}
 	
 	@Override
@@ -40,7 +40,7 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 			_matchEnd = _matchStart + pattern.length();
 		}
 		
-		generateMessage(pattern, _matchStart != -1);
+		_message = generateMessage(pattern, _matchStart != -1);
 		
 		return _matchStart != -1;
 	}
@@ -55,13 +55,40 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 				_matchEnd = m.end();
 			} else {
 				_matchStart = -1;
+				_matchEnd = -1;
 			}
 
-			generateMessage(pattern, _matchStart != -1);
+			_message = generateMessage(pattern, _matchStart != -1);
 			return _matchStart != -1;
 		}
 		
 		return false;
+	}
+	
+	@Override
+	public boolean searchAdvanced(String text, String pattern, int fromIndex, boolean bMatchCase, boolean bWrapAround) {
+		try {
+			boolean bFound = _advSearchReplace.find(text, pattern, fromIndex, bMatchCase);
+			
+			// if not found starting fromIndex, fromIndex was not 0, and wrap around is activated, search again from 0
+			if (!bFound && fromIndex != 0 && bWrapAround) {
+				bFound = _advSearchReplace.find(text, pattern, 0, bMatchCase);
+			}
+			
+			if (!bFound) {
+				return search(text, pattern, fromIndex, bMatchCase, bWrapAround);
+			} else {
+				_matchStart = _advSearchReplace.getStart();
+				_matchEnd = _advSearchReplace.getEnd();
+			}
+			
+			_message = generateMessage(pattern, bFound);
+			
+			return bFound;
+		} catch (InvalidPatternException e) {
+			_message = e.getMessage();
+			return false;
+		}
 	}
 	
 	/**
@@ -89,13 +116,18 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 	 * Generates a message depending on the search outcome (success/failure)
 	 * @param pattern the pattern to search for
 	 * @param bSuccess the flag indicating if the search was successful or not
+	 * @return the generated message
 	 */
-	private void generateMessage(String pattern, boolean bSuccess) {
+	private String generateMessage(String pattern, boolean bSuccess) {
+		String message = "";
+		
 		if (SunsetBundle.getInstance().getLocale().getLanguage().equals(new Locale("en").getLanguage())) {
-			_message = "\"" + pattern + "\"" + (bSuccess ? " found at line " : " not found from line ");
+			message = "\"" + pattern + "\"" + (bSuccess ? " found at line " : " not found from line ");
 		} else if (SunsetBundle.getInstance().getLocale().getLanguage().equals(new Locale("de").getLanguage())) {
-			_message = "\"" + pattern + "\"" + (bSuccess ? " gefunden in Zeile " : " nicht gefunden ab Zeile ");
+			message = "\"" + pattern + "\"" + (bSuccess ? " gefunden in Zeile " : " nicht gefunden ab Zeile ");
 		}
+		
+		return message;
 	}
 	
 	@Override
@@ -126,8 +158,14 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 
 	@Override
 	public boolean matchesAdvanced(String text, String pattern, boolean bMatchCase) {
-		// TODO Auto-generated method stub
-		return false;
+		try {
+			boolean bResult = _advSearchReplace.matches(text, pattern, bMatchCase);
+			
+			return bResult;
+		} catch (InvalidPatternException e) {
+			_message = e.getMessage();
+			return false;
+		}
 	}
 
 	@Override
@@ -142,39 +180,12 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 	@Override
 	public String replaceRegex(String text, String pattern, String replaceWith, boolean bMatchCase, boolean bDotAll) {
 		Matcher m = getMatcher(text, pattern, bMatchCase, bDotAll);
-		
 		return m.replaceAll(replaceWith);
 	}
 
 	@Override
-	public boolean searchAdvanced(String text, String pattern, int fromIndex, boolean bMatchCase, boolean bWrapAround) {
-		try {
-			boolean bFound = _advSearch.find(text, pattern, fromIndex, bMatchCase);
-			
-			// if not found starting fromIndex, fromIndex was not 0, and wrap around is activated, search again from 0
-			if (!bFound && fromIndex != 0 && bWrapAround) {
-				bFound = _advSearch.find(text, pattern, 0, bMatchCase);
-			}
-			
-			if (!bFound) {
-				return search(text, pattern, fromIndex, bMatchCase, bWrapAround);
-			} else {
-				_matchStart = _advSearch.getStart();
-				_matchEnd = _advSearch.getEnd();
-			}
-			
-			generateMessage(pattern, bFound);
-			
-			return bFound;
-		} catch (InvalidPatternException e) {
-			_message = e.getMessage();
-			return false;
-		}
-	}
-
-	@Override
 	public String replaceAdvanced(String text, String pattern, String replaceWith, boolean bMatchCase) throws UndeclaredVariableException {
-		String replaceString = _advSearch.getReplaceString(replaceWith);
+		String replaceString = _advSearchReplace.getReplaceString(replaceWith);
 		return replaceString;
 	}
 }

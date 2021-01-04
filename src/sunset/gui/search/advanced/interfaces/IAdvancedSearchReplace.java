@@ -3,7 +3,7 @@ package sunset.gui.search.advanced.interfaces;
 import sunset.gui.search.advanced.exception.InvalidPatternException;
 import sunset.gui.search.advanced.exception.UndeclaredVariableException;
 
-public interface IAdvancedSearch {
+public interface IAdvancedSearchReplace {
 	
 	/**
 	 * 
@@ -15,6 +15,8 @@ public interface IAdvancedSearch {
 	 * @throws InvalidPatternException
 	 */
 	public boolean find(String text, String pattern, int fromIndex, boolean bMatchCase) throws InvalidPatternException;
+	
+	public boolean matches(String text, String pattern, boolean bMatchCase) throws InvalidPatternException;
 	
 	public String getReplaceString(String replaceWith) throws UndeclaredVariableException;
 	

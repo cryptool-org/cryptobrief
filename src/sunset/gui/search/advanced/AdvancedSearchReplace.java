@@ -7,9 +7,9 @@ import java.util.regex.PatternSyntaxException;
 
 import sunset.gui.search.advanced.exception.InvalidPatternException;
 import sunset.gui.search.advanced.exception.UndeclaredVariableException;
-import sunset.gui.search.advanced.interfaces.IAdvancedSearch;
+import sunset.gui.search.advanced.interfaces.IAdvancedSearchReplace;
 
-public class AdvancedSearch implements IAdvancedSearch{
+public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 	private final static int MAX_VARS = 10;
 	private final static char VAR_START = '%';
 	private final static char VAR_ESC = '%';
@@ -75,8 +75,6 @@ public class AdvancedSearch implements IAdvancedSearch{
 		_matchEnd = -1;
 		_captures = null;
 		_captures = new String[MAX_VARS];
-		
-		System.out.println(convertArrayToString(_captures));
 	}
 	
 	/**
@@ -142,8 +140,7 @@ public class AdvancedSearch implements IAdvancedSearch{
 	 */
 	private boolean validatePattern(String pattern, ArrayList<Integer> varPositions) throws InvalidPatternException {
 		// check if there are two consecutive variables without delimiter, i.e. if the regex INVALID_PATTERN is found in the pattern
-		Pattern p = Pattern.compile(INVALID_PATTERN);
-		Matcher m = p.matcher(pattern);
+		Matcher m = getMatcher(pattern, INVALID_PATTERN, false, true);
 		
 		if (m.find()) {
 			String msg = "Missing delimiter between variables: ";
@@ -166,11 +163,9 @@ public class AdvancedSearch implements IAdvancedSearch{
 		}
 		
 		// check if the pattern includes at least one variable, i.e. if the pattern matches the regex SUPPORTED_PATTERN 
-		if (!pattern.matches(SUPPORTED_PATTERN)) {
-			return false;
-		}
+		m = getMatcher(pattern, SUPPORTED_PATTERN, false, true);
 		
-		return true;
+		return m.matches();
 	}
 	
 	/**
@@ -322,6 +317,8 @@ public class AdvancedSearch implements IAdvancedSearch{
 		replaceString.append(nextPattern);
 		
 		for (int i = 0; i < varPositions.size(); i++) {
+			currVarPosition = varPositions.get(i);			
+			
 			varIndex = getVarIndex(replaceWith, currVarPosition);
 			
 			if (_captures[varIndex] == null) {
@@ -329,12 +326,23 @@ public class AdvancedSearch implements IAdvancedSearch{
 			}
 			
 			replaceString.append(_captures[varIndex]);
-			currVarPosition = varPositions.get(i);			
+			
 			nextVarPosition = (i+1 < varPositions.size()) ? varPositions.get(i+1) : replaceWith.length();
 			nextPattern = removeEscapes(replaceWith.substring(currVarPosition+2, nextVarPosition));
 			replaceString.append(nextPattern);
 		}
 		
 		return replaceString.toString();
+	}
+
+	@Override
+	public boolean matches(String text, String pattern, boolean bMatchCase) throws InvalidPatternException {
+		ArrayList<Integer> varPositions = getVariablePositions(pattern);
+		
+		if (varPositions.isEmpty() || !validatePattern(pattern, varPositions) || !containsPattern(text, pattern, 0, bMatchCase)) {
+			return false;	// if no variables used, pattern is invalid or text does not contain pattern, return false
+		}
+		
+		return true;
 	}
 }
