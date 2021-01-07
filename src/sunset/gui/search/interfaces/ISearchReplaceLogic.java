@@ -87,7 +87,7 @@ public interface ISearchReplaceLogic {
 	 * @param bDotAll the flag to specify if a dot should also match newline characters
 	 * @return the result string of the replacement operation
 	 */
-	public String replaceRegex(String text, String pattern, String replaceWith, boolean bMatchCase, boolean bDotAll);
+	public String replaceRegex(String text, String pattern, String replaceWith, boolean bMatchCase, boolean bDotAll)  throws Exception;
 	
 	public String replaceAdvanced(String text, String pattern, String replaceWith, boolean bMatchCase) throws UndeclaredVariableException;
 }

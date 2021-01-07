@@ -20,10 +20,15 @@ public class ActionListenerReplaceAll implements ActionListener {
 		_coordinator.resetCaretPosition();
 		
 		while (_coordinator.findString(true)) {
-			_coordinator.replaceText();
-			count++;
+			if (_coordinator.replaceText()) {
+				count++;
+			} else {
+				break;
+			}
 		}
 		
-		_coordinator.setStatus("Replace All: " + count + " occurrences were replaced", SearchStatus.REPLACE_SUCCESS);
+		if (count > 0) {
+			_coordinator.setStatus("Replace All: " + count + " occurrence" + (count != 1 ? "s" : "") + " replaced", SearchStatus.REPLACE_SUCCESS);
+		}
 	}
 }

@@ -77,6 +77,7 @@ public class AdvancedReplaceTest {
 	void testNotAllVariables() {
 		try {
 			_searchReplace.find("aabbccdd", "%0c%1", 0, false);
+			Assert.assertEquals("", _searchReplace.getReplaceString(""));
 			Assert.assertEquals("x", _searchReplace.getReplaceString("x"));
 			Assert.assertEquals("cddx", _searchReplace.getReplaceString("%1x"));
 			Assert.assertEquals("xaabb", _searchReplace.getReplaceString("x%0"));
@@ -153,7 +154,65 @@ public class AdvancedReplaceTest {
 			Assert.assertEquals("$$%$$$%$$$%", _searchReplace.getReplaceString("%1%$%2"));
 			
 			_searchReplace.find("$$%$$$%$?$%", "$$%1%$?%2", 0, false);
-			Assert.assertEquals("", _searchReplace.getReplaceString(""));
+			Assert.assertEquals("%$$$%$$$$%", _searchReplace.getReplaceString("%1%1%2"));
+
+			_searchReplace.find("%5abc%6", "%0abc%1", 0, false);
+			Assert.assertEquals("%5", _searchReplace.getReplaceString("%0"));
+			Assert.assertEquals("%6", _searchReplace.getReplaceString("%1"));
+			Assert.assertEquals("%5%6%5%6", _searchReplace.getReplaceString("%0%1%0%1"));
+			
+		} catch (InvalidPatternException e) {
+			Assert.fail();
+		} catch (UndeclaredVariableException e) {
+			Assert.fail();
+		}
+	}
+	
+	@Test
+	void testEscapedVariables() {
+		try {			
+			_searchReplace.find("aab%1bcc", "%%1%1", 0, false);
+			Assert.assertEquals("bcc", _searchReplace.getReplaceString("%1"));
+			Assert.assertEquals("%1", _searchReplace.getReplaceString("%%1"));
+			Assert.assertEquals("%1bcc%1", _searchReplace.getReplaceString("%%1%1%%1"));
+			
+			_searchReplace.find("aab%1bcc", "%1%%1", 0, false);
+			Assert.assertEquals("%1aabaab%1", _searchReplace.getReplaceString("%%1%1%1%%1"));
+			Assert.assertEquals("aab%1%1aab", _searchReplace.getReplaceString("%1%%1%%1%1"));
+			Assert.assertEquals("aab%1aab%1", _searchReplace.getReplaceString("%1%%1%1%%1"));
+			Assert.assertEquals("%1aab%1aab", _searchReplace.getReplaceString("%%1%1%%1%1"));
+			
+			_searchReplace.find("aab%1bcc", "%1%%1%2", 0, false);
+			Assert.assertEquals("aab%9bcc", _searchReplace.getReplaceString("%1%%9%2"));
+			Assert.assertEquals("aab%%9bcc", _searchReplace.getReplaceString("%1%%%9%2"));
+			
+			_searchReplace.find("%1abc%1", "%%1a%1c%%1", 0, false);
+			Assert.assertEquals("%1abc%1", _searchReplace.getReplaceString("%%1a%1c%%1"));
+			Assert.assertEquals("ba%1cb", _searchReplace.getReplaceString("%1a%%1c%1"));
+			
+			_searchReplace.find("%1abc%1", "%%1%1%%1", 0, false);
+			Assert.assertEquals("%1abc%%1abc%1", _searchReplace.getReplaceString("%%1%1%%%1%1%%1"));
+			
+			_searchReplace.find("%1abc%1", "%0%%1%1%%1%2", 0, false);
+			Assert.assertEquals("%0%1abc%2", _searchReplace.getReplaceString("%%0%0%%1%1%%2%2"));
+			
+			_searchReplace.find("%1a%1c%1", "%%1%1%%1%2%%1", 0, false);
+			Assert.assertEquals("%1ac%1", _searchReplace.getReplaceString("%%1%1%2%%1"));
+			
+			_searchReplace.find("aab%1%2%3%4bcc", "%8%%1%%2%%3%%4%9", 0, false);
+			Assert.assertEquals("%8%9aabbcc%8%9", _searchReplace.getReplaceString("%%8%%9%8%9%%8%%9"));
+			
+			_searchReplace.find("aab%1%2%4bcc", "%8%%1%2b%9", 0, false);
+			Assert.assertEquals("%1%2%4%1", _searchReplace.getReplaceString("%%1%2%%1"));
+			
+			_searchReplace.find("aab%1%2%4bcc", "%8%%2%9", 0, false);
+			Assert.assertEquals("%4bcc%3aab%1", _searchReplace.getReplaceString("%9%%3%8"));
+			
+			_searchReplace.find("%1aaaaab", "%%1%1b", 0, false);
+			Assert.assertEquals("aaaaa%1aaaaa", _searchReplace.getReplaceString("%1%%1%1"));
+			
+			_searchReplace.find("aabbc%1d", "a%1%%1", 0, false);
+			Assert.assertEquals("%1abbc%1", _searchReplace.getReplaceString("%%1%1%%1"));
 			
 		} catch (InvalidPatternException e) {
 			Assert.fail();
@@ -209,6 +268,13 @@ public class AdvancedReplaceTest {
 		  });
 		
 		Assert.assertEquals(e.getMessage(), msg1 + "4" + msg2);
+		
+		e = Assert.assertThrows(UndeclaredVariableException.class, () -> {
+			_searchReplace.find("abcdefghi", "a%1c%2e%3g%4i", 0, false);
+		  	_searchReplace.getReplaceString("%1%2%3%4%5%6%7%8%9%0");
+		  });
+		
+		Assert.assertEquals(e.getMessage(), msg1 + "5" + msg2);
 	}
 	
 	@Test
@@ -245,6 +311,19 @@ public class AdvancedReplaceTest {
 			replaceText = "e = Assert.assertThrows(UndeclaredVariableException.class, () -> {"
 					+ "%1\n\t\t\t_searchReplace.getReplaceString(\"\")\n\t\t  });"
 					+ "%3Assert.assertEquals(e.getMessage(), msg1 + \"\" + msg2);";
+			
+			Assert.assertEquals(newText, _searchReplace.getReplaceString(replaceText));
+			
+			/* ______________________________ TEST ______________________________ */
+			
+			text = "Assert.assertTrue(_logic.search(\"abcdefghi\", \"def\", 0, false, false));";
+			
+			pattern = "Assert.assert%0(_logic.search(%1));";
+			
+			_searchReplace.find(text, pattern, 0, false);
+			
+			newText = "Assert.assertTrue(_logic.searchRegex(\"abcdefghi\", \"def\", 0, false, false, false));";
+			replaceText = "Assert.assert%0(_logic.searchRegex(%1, false));";
 			
 			Assert.assertEquals(newText, _searchReplace.getReplaceString(replaceText));
 			

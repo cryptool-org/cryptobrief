@@ -32,7 +32,7 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 	}
 	
 	@Override
-	public boolean findString(boolean bIgnoreWrapAroundFlag) {
+	public boolean findString(boolean ignoreWrapAroundFlag) {
 		if (FFaplJFrame.getCurrentCodePanel() != null) {
 			try {
 				JTextPane textPaneCode = FFaplJFrame.getCurrentCodePanel().getCodePane();
@@ -42,33 +42,34 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 				
 				String pattern = handleEscapes(_dialog.searchPattern());
 				
-				boolean bMatchCase = _dialog.matchCase();
-				boolean bWrapAround = _dialog.wrapAround() && !bIgnoreWrapAroundFlag;
-				boolean bDotAll = _dialog.dotMatchesNewLine();
-				boolean bFound;
+				boolean matchCase = _dialog.matchCase();
+				boolean wrapAround = _dialog.wrapAround() && !ignoreWrapAroundFlag;
+				boolean dotAll = _dialog.dotMatchesNewLine();
+				boolean found;
 				
 				if (_dialog.useRegEx()) {
-					bFound = _logic.searchRegex(text, pattern, caretPos, bMatchCase, bWrapAround, bDotAll);
+					found = _logic.searchRegex(text, pattern, caretPos, matchCase, wrapAround, dotAll);
 				} else if (_dialog.useAdvancedSearch()){
-					bFound = _logic.searchAdvanced(text, pattern, caretPos, bMatchCase, bWrapAround);
+					found = _logic.searchAdvanced(text, pattern, caretPos, matchCase, wrapAround);
 				} else {
-					bFound = _logic.search(text, pattern, caretPos, bMatchCase, bWrapAround);
+					found = _logic.search(text, pattern, caretPos, matchCase, wrapAround);
 				}
 				
-				if (bFound) {
+				if (found) {
+					textPaneCode.setCaretPosition(_logic.getStart());
+					
 					if (_logic.getStart() == _logic.getEnd()) {
-						setStatus("Zero length match!", SearchStatus.FAILURE);
+						setStatus("Zero length match", SearchStatus.FAILURE);
 						return false;
 					}
 					
-					textPaneCode.setCaretPosition(_logic.getStart());
 					textPaneCode.moveCaretPosition(_logic.getEnd());
 					
-					setStatus(_logic.getMessage() + " at line " + getLineNumber(doc, _logic.getStart()), SearchStatus.SEARCH_SUCCESS);
+					setStatus(_logic.getMessage() + getLineNumber(doc, _logic.getStart()), SearchStatus.SEARCH_SUCCESS);
 					
 					return true;
 				} else {
-					setStatus(_logic.getMessage() + " at line " + getLineNumber(doc, caretPos), SearchStatus.FAILURE);
+					setStatus(_logic.getMessage() + getLineNumber(doc, caretPos), SearchStatus.FAILURE);
 				}
 			} catch (BadLocationException e) {
 				setStatus(e.getMessage(), SearchStatus.FAILURE);
@@ -112,16 +113,16 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 			}
 			
 			String pattern = handleEscapes(_dialog.searchPattern());
-			boolean bMatchCase = _dialog.matchCase();
+			boolean matchCase = _dialog.matchCase();
 			
 			if (_dialog.useRegEx()) {		
-				boolean bDotAll = _dialog.dotMatchesNewLine();
+				boolean dotAll = _dialog.dotMatchesNewLine();
 				
-				return _logic.matchesRegex(selectedText, pattern, bMatchCase, bDotAll);
+				return _logic.matchesRegex(selectedText, pattern, matchCase, dotAll);
 			} else if (_dialog.useAdvancedSearch()){
-				return _logic.matchesAdvanced(selectedText, pattern, bMatchCase);
+				return _logic.matchesAdvanced(selectedText, pattern, matchCase);
 			} else {
-				return _logic.equals(selectedText, pattern, bMatchCase);
+				return _logic.equals(selectedText, pattern, matchCase);
 			}
 		}
 		
@@ -133,28 +134,38 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 		if (FFaplJFrame.getCurrentCodePanel() != null) {
 			JTextPane textPaneCode = FFaplJFrame.getCurrentCodePanel().getCodePane();
 			String pattern = handleEscapes(_dialog.searchPattern());
-			String replaceText = handleEscapes(_dialog.replaceText());
+			String replace = handleEscapes(_dialog.replaceText());
 			String selectedText = textPaneCode.getSelectedText();
-			boolean bMatchCase = _dialog.matchCase();
+			
+			if (selectedText == null) {
+				return false;
+			}
+			
+			boolean matchCase = _dialog.matchCase();
+			boolean dotAll = _dialog.dotMatchesNewLine();
 			
 			if (_dialog.useRegEx()) {
-				try {
-					boolean bDotAll = _dialog.dotMatchesNewLine();
-					replaceText = _logic.replaceRegex(selectedText, pattern, replaceText, bMatchCase, bDotAll);
+				try {		
+					replace = _logic.replaceRegex(selectedText, pattern, replace, matchCase, dotAll);
 				} catch (Exception e) {
 					setStatus(e.getMessage(), SearchStatus.FAILURE);
 					return false;
 				}
 			} else if (_dialog.useAdvancedSearch()) {
 				try {
-					replaceText = _logic.replaceAdvanced(selectedText, pattern, replaceText, bMatchCase);
+					replace = _logic.replaceAdvanced(selectedText, pattern, replace, matchCase);
 				} catch (UndeclaredVariableException e) {
 					setStatus(e.getMessage(), SearchStatus.FAILURE);
 					return false;
 				}
 			}
 			
-			textPaneCode.replaceSelection(replaceText);
+			if (replace == null) {
+				setStatus(_logic.getMessage(), SearchStatus.FAILURE);
+				return false;
+			}
+			
+			textPaneCode.replaceSelection(replace);
 			return true;
 		}
 		

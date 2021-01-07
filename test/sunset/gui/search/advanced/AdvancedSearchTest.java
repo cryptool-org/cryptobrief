@@ -88,18 +88,6 @@ class AdvancedSearchTest {
 	@Test
 	void testFalseCases() {
 		try {
-			// if pattern comprises no variable, false should be returned (normal search is done)
-			Assert.assertFalse(_searchReplace.find("aabbcc", "", 0, false));
-			Assert.assertFalse(_searchReplace.find("aabbcc", "b", 0, false));
-			Assert.assertFalse(_searchReplace.find("aabbcc", "aabbcc", 0, false));
-			Assert.assertFalse(_searchReplace.find("aabbcc", "", 0, false));
-			Assert.assertFalse(_searchReplace.find("aabbcc", "dd", 0, false));
-			Assert.assertFalse(_searchReplace.find("abc", "abc", 0, false));
-			Assert.assertFalse(_searchReplace.find("a", "a", 0, false));
-			Assert.assertFalse(_searchReplace.find("abc", "", 0, false));
-			Assert.assertFalse(_searchReplace.find("$%§", "%", 0, false));
-			Assert.assertFalse(_searchReplace.find("!\"§$%&\\()=", "abc", 0, false));
-			
 			Assert.assertFalse(_searchReplace.find("aabbcc", "a%1d", 0, false));
 			Assert.assertFalse(_searchReplace.find("aabbcc", "%1d", 0, false));
 			Assert.assertFalse(_searchReplace.find("aabbcc", "d%1", 0, false));
@@ -110,7 +98,6 @@ class AdvancedSearchTest {
 			Assert.assertFalse(_searchReplace.find("aabbcc", "%1aaa", 0, false));
 			Assert.assertFalse(_searchReplace.find("aabbcc", "aaa%2", 0, false));
 			Assert.assertFalse(_searchReplace.find("aabbcc", "%1c%2a", 0, false));
-			
 		} catch (InvalidPatternException e) {
 			Assert.fail();
 		}
@@ -388,44 +375,130 @@ class AdvancedSearchTest {
 		
 		Assert.assertEquals(e.getMessage(), msg + "%8");
 	}
+	
+	@Test
+	void testInvalidPattern3() {
+		InvalidPatternException e;
+		String msg = "Invalid search pattern! No variable used in the pattern";
+		
+		e = Assert.assertThrows(InvalidPatternException.class, () -> { 
+			_searchReplace.find("aabbcc", "", 0, false);
+		  });
+		Assert.assertEquals(e.getMessage(), msg);
+		
+		e = Assert.assertThrows(InvalidPatternException.class, () -> { 
+			_searchReplace.find("aabbcc", "b", 0, false);
+		  });
+		Assert.assertEquals(e.getMessage(), msg);
+		
+		e = Assert.assertThrows(InvalidPatternException.class, () -> { 
+			_searchReplace.find("aabbcc", "aabbcc", 0, false);
+		  });
+		Assert.assertEquals(e.getMessage(), msg);
+		
+		e = Assert.assertThrows(InvalidPatternException.class, () -> { 
+			_searchReplace.find("aabbcc", "", 0, false);
+		  });
+		Assert.assertEquals(e.getMessage(), msg);
+		
+		e = Assert.assertThrows(InvalidPatternException.class, () -> { 
+			_searchReplace.find("aabbcc", "dd", 0, false);
+		  });
+		Assert.assertEquals(e.getMessage(), msg);
+		
+		e = Assert.assertThrows(InvalidPatternException.class, () -> { 
+			_searchReplace.find("abc", "abc", 0, false);
+		  });
+		Assert.assertEquals(e.getMessage(), msg);
+		
+		e = Assert.assertThrows(InvalidPatternException.class, () -> { 
+			_searchReplace.find("a", "a", 0, false);
+		  });
+		Assert.assertEquals(e.getMessage(), msg);
+		
+		e = Assert.assertThrows(InvalidPatternException.class, () -> { 
+			_searchReplace.find("abc", "", 0, false);
+		  });
+		Assert.assertEquals(e.getMessage(), msg);
+		
+		e = Assert.assertThrows(InvalidPatternException.class, () -> { 
+			_searchReplace.find("$%§", "%", 0, false);
+		  });
+		Assert.assertEquals(e.getMessage(), msg);
+		
+		e = Assert.assertThrows(InvalidPatternException.class, () -> { 
+			_searchReplace.find("!\"§$%&\\()=", "abc", 0, false);
+		  });
+		Assert.assertEquals(e.getMessage(), msg);
+		
+		e = Assert.assertThrows(InvalidPatternException.class, () -> {
+			_searchReplace.find("aab%1bcc", "%%1", 0, false);
+		  });
+		Assert.assertEquals(e.getMessage(), msg);
+		
+		e = Assert.assertThrows(InvalidPatternException.class, () -> {
+			_searchReplace.find("aab%1%2%3%4bcc", "%%1%%2%%3%%4", 0, false);
+		  });
+		Assert.assertEquals(e.getMessage(), msg);
+		
+		e = Assert.assertThrows(InvalidPatternException.class, () -> {
+			_searchReplace.find("aab%1bcc", "a%%1", 0, false);
+		  });
+		Assert.assertEquals(e.getMessage(), msg);
+		
+		e = Assert.assertThrows(InvalidPatternException.class, () -> {
+			_searchReplace.find("aab%1bcc", "%%1b", 0, false);
+		  });
+		Assert.assertEquals(e.getMessage(), msg);
+		
+		e = Assert.assertThrows(InvalidPatternException.class, () -> {
+			_searchReplace.find("aab%1bcc", "a%%1c", 0, false);
+		  });
+		Assert.assertEquals(e.getMessage(), msg);
+		
+		e = Assert.assertThrows(InvalidPatternException.class, () -> {
+			_searchReplace.find("aab%1bcc", "a%%1c%%2", 0, false);
+		  });
+		Assert.assertEquals(e.getMessage(), msg);
+		
+		e = Assert.assertThrows(InvalidPatternException.class, () -> {
+			_searchReplace.find("aab%1bcc", "%%0a%%1c", 0, false);
+		  });
+		Assert.assertEquals(e.getMessage(), msg);
+		
+		e = Assert.assertThrows(InvalidPatternException.class, () -> {
+			_searchReplace.find("aab%1bcc", "%%0a%%1c%%2", 0, false);
+		  });
+		Assert.assertEquals(e.getMessage(), msg);
+	}
 
 	@Test
 	void testInvalidInputs() {
 		IndexOutOfBoundsException e;
-		String msg = "Illegal start index"; 
+		String msg = "Index out of range: "; 
 		
 		e = Assert.assertThrows(IndexOutOfBoundsException.class, () -> {
 			_searchReplace.find("abc", "%1a%2", -1, false);
 		  });
 		
-		Assert.assertEquals(e.getMessage(), msg);
+		Assert.assertEquals(e.getMessage(), msg + "-1");
 		
 		e = Assert.assertThrows(IndexOutOfBoundsException.class, () -> {
 			_searchReplace.find("abc", "%1b%2", 5, false);
 		  });
 		
-		Assert.assertEquals(e.getMessage(), msg);
+		Assert.assertEquals(e.getMessage(), msg + "5");
 		
 		e = Assert.assertThrows(IndexOutOfBoundsException.class, () -> {
 			_searchReplace.find("", "%1c%2", 1, false);
 		  });
 		
-		Assert.assertEquals(e.getMessage(), msg);
+		Assert.assertEquals(e.getMessage(), msg + "1");
 	}
 
 	@Test
 	void testEscapedVariables() {
-		try {
-			// variables are escaped, so find should return false (no variables used)
-			Assert.assertFalse(_searchReplace.find("aab%1bcc", "%%1", 0, false));
-			Assert.assertFalse(_searchReplace.find("aab%1%2%3%4bcc", "%%1%%2%%3%%4", 0, false));
-			Assert.assertFalse(_searchReplace.find("aab%1bcc", "a%%1", 0, false));
-			Assert.assertFalse(_searchReplace.find("aab%1bcc", "%%1b", 0, false));
-			Assert.assertFalse(_searchReplace.find("aab%1bcc", "a%%1c", 0, false));
-			Assert.assertFalse(_searchReplace.find("aab%1bcc", "a%%1c%%2", 0, false));
-			Assert.assertFalse(_searchReplace.find("aab%1bcc", "%%0a%%1c", 0, false));
-			Assert.assertFalse(_searchReplace.find("aab%1bcc", "%%0a%%1c%%2", 0, false));
-			
+		try {			
 			Assert.assertTrue(_searchReplace.find("aab%1bcc", "%%1%1", 0, false));
 			checkResult(3,8,new String[] {null, "bcc", null, null, null, null, null, null, null, null});
 			

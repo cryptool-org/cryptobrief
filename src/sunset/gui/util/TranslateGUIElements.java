@@ -12,8 +12,10 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
+import javax.swing.border.TitledBorder;
 
 import sunset.gui.tabbedpane.JTabbedPaneNamed;
 
@@ -206,4 +208,17 @@ public class TranslateGUIElements {
 		}
 	}
 
+	public static void translatePanel(JPanel panel) {
+		String name = panel.getName();
+		
+		if (name != null) {
+			String txt = SunsetBundle.getInstance().getProperty(name);
+			
+			if (txt != null) {
+				if (panel.getBorder() instanceof TitledBorder) {
+					((TitledBorder)panel.getBorder()).setTitle(txt);
+				}
+			}
+		}
+	}
 }
