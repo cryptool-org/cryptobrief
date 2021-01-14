@@ -192,7 +192,7 @@ class SearchReplaceLogicTest {
 			_logic.replaceAdvanced("abc", "%1b%2", "%1%2%3", false);
 		  });
 		
-		Assert.assertEquals(e1.getMessage(), "Variable %3 from replace text has not been used in search pattern!");
+		Assert.assertEquals("Variable %3 from replace text has not been used in search pattern!", e1.getMessage());
 		
 		Exception e2 = Assert.assertThrows(Exception.class, () -> {
 			Assert.assertTrue(_logic.searchRegex("abc", "a.*c", 0, false, false, false));
@@ -200,10 +200,10 @@ class SearchReplaceLogicTest {
 		  });
 		
 		Assert.assertFalse(_logic.searchAdvanced("abcdefghi", "d%1f", -4, false, false));
-		Assert.assertEquals(_logic.getMessage(), "Index out of range: -4");
+		Assert.assertEquals("Index out of range: -4", _logic.getMessage());
 		
 		Assert.assertFalse(_logic.searchAdvanced("abcdefghi", "d%1f", 15, false, false));
-		Assert.assertEquals(_logic.getMessage(), "Index out of range: 15");
+		Assert.assertEquals("Index out of range: 15", _logic.getMessage());
 	}
 	
 	@Test

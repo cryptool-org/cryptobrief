@@ -1,24 +1,21 @@
 package sunset.gui.search.advanced.interfaces;
 
 import sunset.gui.search.advanced.exception.InvalidPatternException;
+import sunset.gui.search.advanced.exception.MatchingPairConfigurationException;
+import sunset.gui.search.advanced.exception.UnbalancedStringException;
 import sunset.gui.search.advanced.exception.UndeclaredVariableException;
 
 public interface IAdvancedSearchReplace {
 	
-	/**
-	 * 
-	 * @param text
-	 * @param pattern
-	 * @param fromIndex
-	 * @param bMatchCase
-	 * @return
-	 * @throws InvalidPatternException
-	 */
-	public boolean find(String text, String pattern, int fromIndex, boolean bMatchCase) throws InvalidPatternException;
 	
-	public boolean matches(String text, String pattern, boolean bMatchCase) throws InvalidPatternException;
+	public boolean find(String text, String pattern, int fromIndex, boolean bMatchCase) 
+			throws InvalidPatternException, UnbalancedStringException;
 	
-	public String getReplaceString(String replaceWith) throws UndeclaredVariableException;
+	public boolean matches(String text, String pattern, boolean bMatchCase) 
+			throws InvalidPatternException;
+	
+	public String replaceVariables(String pattern, String[] contents) 
+			throws UndeclaredVariableException;
 	
 	/**
 	 * Returns the captures of the advanced search

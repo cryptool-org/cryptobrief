@@ -173,7 +173,7 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 	}
 	
 	private String handleEscapes(String s) {
-		return s.replace("\\n", "\n").replace("\\t", "\t").replace("\\r", "\r").replace("\\b",  "\b");
+		return s;//s.replace("\\n", "\n").replace("\\t", "\t").replace("\\r", "\r").replace("\\b",  "\b");
 	}
 	
 	@Override

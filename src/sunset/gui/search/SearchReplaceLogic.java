@@ -6,6 +6,8 @@ import java.util.regex.PatternSyntaxException;
 
 import sunset.gui.search.advanced.AdvancedSearchReplace;
 import sunset.gui.search.advanced.exception.InvalidPatternException;
+import sunset.gui.search.advanced.exception.MatchingPairConfigurationException;
+import sunset.gui.search.advanced.exception.UnbalancedStringException;
 import sunset.gui.search.advanced.exception.UndeclaredVariableException;
 import sunset.gui.search.advanced.interfaces.IAdvancedSearchReplace;
 import sunset.gui.search.interfaces.ISearchReplaceLogic;
@@ -79,10 +81,7 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 			_message = generateMessage(pattern, found);
 			
 			return found;
-		} catch (InvalidPatternException e) {
-			_message = e.getMessage();
-			return false;
-		} catch (IndexOutOfBoundsException e) {
+		} catch (InvalidPatternException | IndexOutOfBoundsException | UnbalancedStringException e) {
 			_message = e.getMessage();
 			return false;
 		}
@@ -175,10 +174,10 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 			if (advSearchReplace.find(text, pattern, 0, matchCase)) {
 				String prefix = text.substring(0, advSearchReplace.getStart());
 				String suffix = text.substring(advSearchReplace.getEnd(), text.length());
-				
-				return prefix + advSearchReplace.getReplaceString(replaceWith) + suffix;
+				String[] contents = advSearchReplace.getCaptures();
+				return prefix + advSearchReplace.replaceVariables(replaceWith, contents) + suffix;
 			}
-		} catch (InvalidPatternException e) {
+		} catch (InvalidPatternException | UnbalancedStringException e) {
 			_message = e.getMessage();
 		}
 		

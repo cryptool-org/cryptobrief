@@ -1,11 +1,18 @@
 package sunset.gui.search.advanced;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import sunset.gui.search.advanced.exception.InvalidPatternException;
+import sunset.gui.search.advanced.exception.MatchingPairConfigurationException;
+import sunset.gui.search.advanced.exception.UnbalancedStringException;
 import sunset.gui.search.advanced.exception.UndeclaredVariableException;
 import sunset.gui.search.advanced.interfaces.IAdvancedSearchReplace;
 
@@ -30,12 +37,53 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 	private String[] _captures = new String[MAX_VARS];
 	private int _matchStart = -1;
 	private int _matchEnd = -1;
+	private Map<String, String> _matchingPairTemplates = new HashMap<String, String>();
 	
 	public AdvancedSearchReplace() {
+		_matchingPairTemplates.clear();
+	}
+	
+	public AdvancedSearchReplace(String matchingPairs) throws MatchingPairConfigurationException {
+		_matchingPairTemplates.clear();
+		
+		if (matchingPairs != null && !matchingPairs.isEmpty()) {
+			final String pairDelim = "\\Q...\\E";
+			final String entryDelim = "\\Q,\\E";
+			
+			for (String pair : matchingPairs.split(entryDelim)) {
+				String[] pairValues = pair.trim().split(pairDelim);
+				String key = pairValues[1].trim();
+				String val = pairValues[0].trim();
+						
+				ArrayList<Integer> varPositionsKey = getVariablePositions(key);
+				ArrayList<Integer> varPositionsVal = getVariablePositions(val);
+				ArrayList<Integer> varIndexesVal = new ArrayList<Integer>();
+				
+				if (varPositionsKey.size() != varPositionsVal.size()) {
+					throw new MatchingPairConfigurationException(val + "..." + key);
+				}
+				
+				for (int varPosVal : varPositionsVal) {
+					int varIndex = getVariableIndex(val, varPosVal);
+					varIndexesVal.add(varIndex);
+				}
+				
+				for (int varPosKey : varPositionsKey) {
+					int varIndex = getVariableIndex(key, varPosKey);
+
+					if (!varIndexesVal.contains(varIndex)) {
+						throw new MatchingPairConfigurationException(val + "..." + key);
+					}
+				}
+				
+				_matchingPairTemplates.put(key, val);
+			}
+		}
 	}
 	
 	@Override
-	public boolean find(String text, String pattern, int fromIndex, boolean matchCase) throws InvalidPatternException {
+	public boolean find(String text, String pattern, int fromIndex, boolean matchCase) 
+			throws InvalidPatternException, UnbalancedStringException {
 		reset();
 		
 		if (fromIndex < 0 || fromIndex > text.length()) {
@@ -53,6 +101,8 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 			return false;
 		}
 		
+		Map<String, String> matchingPairs = resolveWildcards(text);
+		
 		int currVarPosition, nextVarPosition, prevMatch, varIndex;
 		currVarPosition = varPositions.get(0);
 		String nextPattern = removeEscapes(pattern.substring(0, currVarPosition));
@@ -62,10 +112,10 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 		for (int i = 0; i < varPositions.size(); i++) {
 			currVarPosition = varPositions.get(i);			
 			nextVarPosition = (i+1 < varPositions.size()) ? varPositions.get(i+1) : pattern.length();
-			varIndex = getVarIndex(pattern, currVarPosition);
+			varIndex = getVariableIndex(pattern, currVarPosition);
 			nextPattern = removeEscapes(pattern.substring(currVarPosition+2, nextVarPosition));
 			_matchEnd = getIndexOf(text, nextPattern, prevMatch, false, matchCase);
-			performMatch(text, prevMatch, _matchEnd, varIndex);
+			_matchEnd = performMatch(text, nextPattern, prevMatch, _matchEnd, varIndex, matchCase, matchingPairs);
 			_matchEnd += nextPattern.length();
 			prevMatch = _matchEnd;
 		}
@@ -92,10 +142,6 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 	 */
 	private String convertArrayToString(String[] array) {
 		String result = "";
-		
-		if (array.length == 0) {
-			return "";
-		}
 		
 		for (String s : array) {
 			result += s + ",";
@@ -160,11 +206,11 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 		int varIndex;
 		
 		for (int varPos : varPositions) {
-			varIndex = getVarIndex(pattern, varPos);
+			varIndex = getVariableIndex(pattern, varPos);
 			
 			if (varIndexes.contains(varIndex)) {
-				String msg = "Variable has been used more than once: ";
-				throw new InvalidPatternException(msg + "%" + varIndex);
+				String msg = "Variable has been used more than once: %";
+				throw new InvalidPatternException(msg + varIndex);
 			} else {
 				varIndexes.add(varIndex);
 			}
@@ -194,8 +240,8 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 		
 		Matcher m = getMatcher(text, patternRegex, matchCase);
 		
-		// use regex to check if text contains the converted pattern
-		return m != null ? m.find(fromIndex) : null;
+		// use regex to check if text contains the converted pattern		
+		return m.find(fromIndex);
 	}
 	
 	/**
@@ -204,11 +250,11 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 	 * @return a regex version of the pattern where all literals are escaped and variables are replaced by .*
 	 */
 	private String convertPatternToRegex(String pattern) {
-		// non escaped variables are replaced by .* (pattern starts with variable)
-		pattern = pattern.replaceAll("^" + VARIABLE, "\\\\E.*\\\\Q");
+		// non escaped variables are replaced by .*? (if pattern starts with variable)
+		pattern = pattern.replaceAll("^" + VARIABLE, "\\\\E(.*?)\\\\Q");
 		
-		// non escaped variables are replaced by .* (variables which are not at start of pattern)
-		pattern = pattern.replaceAll(NON_ESC_VAR, "$1\\\\E.*\\\\Q");
+		// non escaped variables are replaced by .*? (variables which are not at start of pattern)
+		pattern = pattern.replaceAll(NON_ESC_VAR, "$1\\\\E(.*?)\\\\Q");
 		
 		// escaped variables %%[0-9] are replaced by the string %[0-9]
 		pattern = pattern.replaceAll(VAR_ESC + "(" + VARIABLE + ")", "$1");
@@ -221,16 +267,13 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 	 * @param text the text the matcher is based on
 	 * @param pattern the pattern the matcher is based on
 	 * @param matchCase the flag indicating if case sensitive regular expression matching is required
-	 * @return a Matcher object corresponding to the given parameters, null if an invalid regular expression was specified
+	 * @return a Matcher object corresponding to the given parameters
 	 */
 	private Matcher getMatcher(String text, String pattern, boolean matchCase) {
-		try {
-			final int flags = (matchCase ? 0 : Pattern.CASE_INSENSITIVE) | Pattern.DOTALL;
-			Pattern p = Pattern.compile(pattern, flags);
-			return p.matcher(text);
-		} catch (PatternSyntaxException e) {	// bad regular expression pattern specified 
-			return null;
-		}
+		final int flags = (matchCase ? 0 : Pattern.CASE_INSENSITIVE) | Pattern.DOTALL;
+		Pattern p = Pattern.compile(pattern, flags);
+		// no exception needs to be handled as pattern syntax is ensured to be correct
+		return p.matcher(text);
 	}
 	
 	/**
@@ -267,25 +310,128 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 	 * @param varPosition the position of the variable in the pattern
 	 * @return the index of the variable, i.e. for variable %2 it returns 2
 	 */
-	private int getVarIndex(String pattern, int varPosition) {
+	private int getVariableIndex(String pattern, int varPosition) {
 		char cVarIndex = pattern.charAt(varPosition+1);
 		
 		return Character.getNumericValue(cVarIndex);
 	}
 	
-	/**
-	 * 
-	 * @param text
-	 * @param prevMatch
-	 * @param nextMatch
-	 * @param varIndex
-	 */
-	private void performMatch(String text, int prevMatch, int nextMatch, int varIndex) {
+	private int performMatch(String text, String next, int prevMatch, int nextMatch, int varIndex, boolean matchCase, Map<String, String> matchingPairs) 
+			throws UnbalancedStringException {
+		Deque<String> stack = new ArrayDeque<String>();
+		int startIndex = prevMatch;
+		String str = "";
+		
 		_captures[varIndex] = "";
 		
 		for (int i = prevMatch; i < nextMatch; i++) {
-			_captures[varIndex] += text.charAt(i);
+			char c = text.charAt(i);
+			
+			str = getLongestMatch(matchingPairs, str, c);
+			
+			if (matchingPairs.containsValue(str)) {			// opening
+				stack.push(str);
+			} else if (matchingPairs.containsKey(str)) {	// closing
+				try {
+					String top = stack.pop();
+					
+					if (!top.equals(matchingPairs.get(str))) {
+						throw new UnbalancedStringException(text.substring(startIndex, nextMatch));
+					}
+				} catch (NoSuchElementException e) {
+					throw new UnbalancedStringException(text.substring(startIndex, nextMatch));
+				}
+			}
+			
+			if ((i+1) == nextMatch && !stack.isEmpty()) {	// stay in loop if stack is not empty (unbalanced)
+				nextMatch = getIndexOf(text, next, nextMatch + next.length(), false, matchCase);
+
+				if (nextMatch == -1) {
+					throw new UnbalancedStringException(text.substring(startIndex, text.length()));
+				}
+			}
+			
+			_captures[varIndex] += c;
 		}
+		
+		return nextMatch;
+	}
+	
+	private Map<String, String> resolveWildcards(String text) {
+		Map<String, String> matchingPairs = new HashMap<String, String>();
+		String key, val, matchingKey, matchingVal;
+
+		for (Entry<String, String> entry : _matchingPairTemplates.entrySet()) {
+			key = entry.getKey();
+			val = entry.getValue();
+			
+			Matcher m = getMatcher(key, MIN_ONE_VAR, true);
+			
+			if (m.matches()) {	// at least one variable used in key
+				try {					
+					ArrayList<String[]> matchedContents = getVariableContents(text, key);
+					for (String[] contents : matchedContents) {
+						matchingKey = replaceVariables(key, contents);
+						matchingVal = replaceVariables(val, contents);
+						matchingPairs.put(matchingKey, matchingVal);
+					}
+					
+					matchedContents = getVariableContents(text, val);
+					for (String[] contents : matchedContents) {
+						matchingKey = replaceVariables(key, contents);
+						matchingVal = replaceVariables(val, contents);
+					
+						if (!matchingPairs.containsKey(matchingKey)) {
+							matchingPairs.put(matchingKey, matchingVal);
+						}
+					}
+				} catch (UndeclaredVariableException e) {
+					// can be ignored
+				}
+			} else {	// no variable used in key
+				matchingPairs.put(entry.getKey(), entry.getValue());
+			}
+		}
+		
+		return matchingPairs;
+	}
+	
+	private ArrayList<String[]> getVariableContents(String text, String pattern) {
+		String regexPattern = convertPatternToRegex(pattern);
+		ArrayList<Integer> varPositions = getVariablePositions(pattern);
+		ArrayList<String[]> matchedContents = new ArrayList<String[]>();
+		
+		Matcher m = getMatcher(text, regexPattern, true);
+		int pos = 0;
+		
+		while (m.find(pos)) {
+			pos = m.end();
+			
+			String[] contents = new String[MAX_VARS];
+			
+			for (int i = 0; i < m.groupCount(); i++) {
+				int varPos = varPositions.get(i);
+				int varIdx = getVariableIndex(pattern, varPos);
+				
+				contents[varIdx] = m.group(i+1);
+			}
+			
+			matchedContents.add(contents);
+		}
+		
+		return matchedContents;
+	}
+	
+	private String getLongestMatch(Map<String, String> pairs, String str, char c) {
+		str += c;
+		
+		for (Map.Entry<String, String> entry : pairs.entrySet()) {
+			if (entry.getKey().startsWith(str) || entry.getValue().startsWith(str)) {
+				return str;
+			}
+		}
+		
+		return String.valueOf(c);
 	}
 	
 	@Override
@@ -302,34 +448,36 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 	public int getEnd() {
 		return _matchEnd;
 	}
-
+	
 	@Override
-	public String getReplaceString(String replaceWith) throws UndeclaredVariableException {
+	public String replaceVariables(String pattern, String[] contents) throws UndeclaredVariableException {
 		StringBuilder replaceString = new StringBuilder();
-		ArrayList<Integer> varPositions = getVariablePositions(replaceWith);
+		ArrayList<Integer> varPositions = getVariablePositions(pattern);
 		
 		if (varPositions.isEmpty()) {
-			return removeEscapes(replaceWith);
+			return removeEscapes(pattern);
 		}
 		
 		int currVarPosition, nextVarPosition, varIndex;
 		currVarPosition = varPositions.get(0);
-		String nextPattern = removeEscapes(replaceWith.substring(0, currVarPosition));
+		String nextPattern = removeEscapes(pattern.substring(0, currVarPosition));
 		replaceString.append(nextPattern);
 		
 		for (int i = 0; i < varPositions.size(); i++) {
 			currVarPosition = varPositions.get(i);			
 			
-			varIndex = getVarIndex(replaceWith, currVarPosition);
+			varIndex = getVariableIndex(pattern, currVarPosition);
 			
-			if (_captures[varIndex] == null) {
+			String content = contents[varIndex];
+			
+			if (content == null) {
 				throw new UndeclaredVariableException(varIndex);
 			}
 			
-			replaceString.append(_captures[varIndex]);
+			replaceString.append(content);
 			
-			nextVarPosition = (i+1 < varPositions.size()) ? varPositions.get(i+1) : replaceWith.length();
-			nextPattern = removeEscapes(replaceWith.substring(currVarPosition+2, nextVarPosition));
+			nextVarPosition = (i+1 < varPositions.size()) ? varPositions.get(i+1) : pattern.length();
+			nextPattern = removeEscapes(pattern.substring(currVarPosition+2, nextVarPosition));
 			replaceString.append(nextPattern);
 		}
 		
@@ -342,6 +490,6 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 		
 		validatePattern(pattern, varPositions);
 		
-		return containsPattern(text, pattern, 0, matchCase) ? true : false;
+		return containsPattern(text, pattern, 0, matchCase);
 	}
 }
