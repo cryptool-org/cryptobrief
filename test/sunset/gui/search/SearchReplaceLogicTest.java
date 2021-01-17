@@ -100,31 +100,31 @@ class SearchReplaceLogicTest {
 	
 	@Test
 	void testSearchAdvanced() {
-		Assert.assertTrue(_logic.searchAdvanced("abcdefghi", "d%1f", 0, false, false));
+		Assert.assertTrue(_logic.searchAdvanced("abcdefghi", "d%1f", 0, false, false, true));
 		checkResult(3,6, "d%1f");
 		
-		Assert.assertTrue(_logic.searchAdvanced("abcdefghi", "d%2f", 3, false, false));
+		Assert.assertTrue(_logic.searchAdvanced("abcdefghi", "d%2f", 3, false, false, true));
 		checkResult(3,6, "d%2f");
 		
-		Assert.assertTrue(_logic.searchAdvanced("abcdEfghi", "dEf%5", 0, true, false));
+		Assert.assertTrue(_logic.searchAdvanced("abcdEfghi", "dEf%5", 0, true, false, true));
 		checkResult(3,9, "dEf%5");
 		
-		Assert.assertTrue(_logic.searchAdvanced("abcdefghi", "%8def", 4, false, true));
+		Assert.assertTrue(_logic.searchAdvanced("abcdefghi", "%8def", 4, false, true, true));
 		checkResult(0,6, "%8def");
 
-		Assert.assertTrue(_logic.searchAdvanced("abcdefghi", "d%1f", 0, false, false));
+		Assert.assertTrue(_logic.searchAdvanced("abcdefghi", "d%1f", 0, false, false, true));
 		checkResult(3,6, "d%1f");
 		
-		Assert.assertFalse(_logic.searchAdvanced("abcdefghi", "d%1f", 4, false, false));
+		Assert.assertFalse(_logic.searchAdvanced("abcdefghi", "d%1f", 4, false, false, true));
 		checkResult(-1,-1, "d%1f");
 		
-		Assert.assertFalse(_logic.searchAdvanced("abcdefghi", "dE%1f", 0, true, false));
+		Assert.assertFalse(_logic.searchAdvanced("abcdefghi", "dE%1f", 0, true, false, true));
 		checkResult(-1,-1, "dE%1f");
 		
-		Assert.assertFalse(_logic.searchAdvanced("abc", "%1d%2", 0, false, false));
+		Assert.assertFalse(_logic.searchAdvanced("abc", "%1d%2", 0, false, false, true));
 		checkResult(-1,-1, "%1d%2");
 		
-		Assert.assertFalse(_logic.searchAdvanced("abc", "%1%2", 0, false, false));
+		Assert.assertFalse(_logic.searchAdvanced("abc", "%1%2", 0, false, false, true));
 	}
 	
 	@Test
@@ -188,8 +188,8 @@ class SearchReplaceLogicTest {
 	@Test
 	void testErrorCases() {		
 		UndeclaredVariableException e1 = Assert.assertThrows(UndeclaredVariableException.class, () -> {
-			Assert.assertTrue(_logic.searchAdvanced("abc", "%1b%2", 0, false, false));
-			_logic.replaceAdvanced("abc", "%1b%2", "%1%2%3", false);
+			Assert.assertTrue(_logic.searchAdvanced("abc", "%1b%2", 0, false, false, true));
+			_logic.replaceAdvanced("abc", "%1b%2", "%1%2%3", false, true);
 		  });
 		
 		Assert.assertEquals("Variable %3 from replace text has not been used in search pattern!", e1.getMessage());
@@ -199,29 +199,29 @@ class SearchReplaceLogicTest {
 			_logic.replaceRegex("abc", "a.*c", "ab${name}c", false, false);
 		  });
 		
-		Assert.assertFalse(_logic.searchAdvanced("abcdefghi", "d%1f", -4, false, false));
+		Assert.assertFalse(_logic.searchAdvanced("abcdefghi", "d%1f", -4, false, false, true));
 		Assert.assertEquals("Index out of range: -4", _logic.getMessage());
 		
-		Assert.assertFalse(_logic.searchAdvanced("abcdefghi", "d%1f", 15, false, false));
+		Assert.assertFalse(_logic.searchAdvanced("abcdefghi", "d%1f", 15, false, false, true));
 		Assert.assertEquals("Index out of range: 15", _logic.getMessage());
 	}
 	
 	@Test
 	void testReplaceAdvanced() {
 		try {
-			Assert.assertEquals("aded", _logic.replaceAdvanced("abcd", "b%1c", "de", false));
-			Assert.assertEquals("aded", _logic.replaceAdvanced("abcd", "b%6c", "de", true));
-			Assert.assertEquals("abcaghi", _logic.replaceAdvanced("abcdefghi", "d%1f", "a", false));
-			Assert.assertEquals("abcaghi", _logic.replaceAdvanced("abcdefdeFghi", "d%1F", "a", true));
-			Assert.assertEquals("abcaghi", _logic.replaceAdvanced("abcd\ne\nfghi", "d%2f", "a", false));
-			Assert.assertEquals(null, _logic.replaceAdvanced("abcd", "a(b", "d", false));
-			Assert.assertEquals(null, _logic.replaceAdvanced("abcd", "a%1%1d", "d", false));
-			Assert.assertEquals(null, _logic.replaceAdvanced("abcd", "ac%1b", "d", false));
-			Assert.assertEquals(null, _logic.replaceAdvanced("abcd", "a%1%2b", "d", false));
-			Assert.assertEquals("bcdefgh", _logic.replaceAdvanced("abcdefghi", "a%2i", "%2", false));
-			Assert.assertEquals("abcaghi", _logic.replaceAdvanced("abcde\nfdeFghi", "d%3F", "a", true));
-			Assert.assertEquals("bcagh", _logic.replaceAdvanced("abcde\nfdeFghi", "a%1i", "bcagh", true));
-			Assert.assertEquals("bcaiagh", _logic.replaceAdvanced("abcde\nfdeFghi", "%0b%1h%2", "bc%0%2agh", true));
+			Assert.assertEquals("aded", _logic.replaceAdvanced("abcd", "b%1c", "de", false, true));
+			Assert.assertEquals("aded", _logic.replaceAdvanced("abcd", "b%6c", "de", true, true));
+			Assert.assertEquals("abcaghi", _logic.replaceAdvanced("abcdefghi", "d%1f", "a", false, true));
+			Assert.assertEquals("abcaghi", _logic.replaceAdvanced("abcdefdeFghi", "d%1F", "a", true, true));
+			Assert.assertEquals("abcaghi", _logic.replaceAdvanced("abcd\ne\nfghi", "d%2f", "a", false, true));
+			Assert.assertEquals(null, _logic.replaceAdvanced("abcd", "a(b", "d", false, true));
+			Assert.assertEquals(null, _logic.replaceAdvanced("abcd", "a%1%1d", "d", false, true));
+			Assert.assertEquals(null, _logic.replaceAdvanced("abcd", "ac%1b", "d", false, true));
+			Assert.assertEquals(null, _logic.replaceAdvanced("abcd", "a%1%2b", "d", false, true));
+			Assert.assertEquals("bcdefgh", _logic.replaceAdvanced("abcdefghi", "a%2i", "%2", false, true));
+			Assert.assertEquals("abcaghi", _logic.replaceAdvanced("abcde\nfdeFghi", "d%3F", "a", true, true));
+			Assert.assertEquals("bcagh", _logic.replaceAdvanced("abcde\nfdeFghi", "a%1i", "bcagh", true, true));
+			Assert.assertEquals("bcaiagh", _logic.replaceAdvanced("abcde\nfdeFghi", "%0b%1h%2", "bc%0%2agh", true, true));
 		} catch (UndeclaredVariableException e) {
 			Assert.fail();
 		}

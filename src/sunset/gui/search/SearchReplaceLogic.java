@@ -17,6 +17,7 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 	private int _matchStart;
 	private int _matchEnd;
 	private String _message;
+	private boolean _error;
 	
 	public SearchReplaceLogic() {
 	}
@@ -41,6 +42,7 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 		}
 		
 		_message = generateMessage(pattern, _matchStart != -1);
+		_error = false;
 		
 		return _matchStart != -1;
 	}
@@ -57,32 +59,35 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 				_matchStart = -1;
 				_matchEnd = -1;
 			}
-
+			
 			_message = generateMessage(pattern, _matchStart != -1);
+			_error = false;
 			return _matchStart != -1;
+		} else {
+			_error = true;
+			return false;
 		}
-		
-		return false;
 	}
 	
 	@Override
-	public boolean searchAdvanced(String text, String pattern, int fromIndex, boolean matchCase, boolean wrapAround) {
+	public boolean searchAdvanced(String text, String pattern, int fromIndex, boolean matchCase, boolean wrapAround, boolean showBalancingError) {
 		try {
 			IAdvancedSearchReplace advSearchReplace = new AdvancedSearchReplace();
-			boolean found = advSearchReplace.find(text, pattern, fromIndex, matchCase);
+			boolean found = advSearchReplace.find(text, pattern, fromIndex, matchCase, showBalancingError);
 			
 			// if not found starting fromIndex, fromIndex was not 0, and wrap around is activated, search again from 0
 			if (!found && fromIndex != 0 && wrapAround) {
-				found = advSearchReplace.find(text, pattern, 0, matchCase);
+				found = advSearchReplace.find(text, pattern, 0, matchCase, showBalancingError);
 			}
 
 			_matchStart = advSearchReplace.getStart();
 			_matchEnd = advSearchReplace.getEnd();
 			_message = generateMessage(pattern, found);
-			
+			_error = false;
 			return found;
 		} catch (InvalidPatternException | IndexOutOfBoundsException | UnbalancedStringException e) {
 			_message = e.getMessage();
+			_error = true;
 			return false;
 		}
 	}
@@ -134,6 +139,11 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 	public String getMessage() {
 		return _message;
 	}
+	
+	@Override
+	public boolean getError() {
+		return _error;
+	}
 
 	@Override
 	public boolean matchesRegex(String text, String pattern, boolean matchCase, boolean dotAll) {
@@ -146,10 +156,11 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 	public boolean matchesAdvanced(String text, String pattern, boolean matchCase) {
 		try {
 			IAdvancedSearchReplace advSearchReplace = new AdvancedSearchReplace();
-			
-			return advSearchReplace.matches(text, pattern, matchCase) ? true : equals(text, pattern, matchCase); 
+			_error = false;
+			return advSearchReplace.matches(text, pattern, matchCase);
 		} catch (InvalidPatternException e) {
 			_message = e.getMessage();
+			_error = true;
 			return false;
 		}
 	}
@@ -167,18 +178,20 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 	}
 
 	@Override
-	public String replaceAdvanced(String text, String pattern, String replaceWith, boolean matchCase) throws UndeclaredVariableException {
+	public String replaceAdvanced(String text, String pattern, String replaceWith, boolean matchCase, boolean showBalancingError) throws UndeclaredVariableException {
 		try {
 			IAdvancedSearchReplace advSearchReplace = new AdvancedSearchReplace();
-			
-			if (advSearchReplace.find(text, pattern, 0, matchCase)) {
+			_error = false;
+			if (advSearchReplace.find(text, pattern, 0, matchCase, showBalancingError)) {
 				String prefix = text.substring(0, advSearchReplace.getStart());
 				String suffix = text.substring(advSearchReplace.getEnd(), text.length());
 				String[] contents = advSearchReplace.getCaptures();
+
 				return prefix + advSearchReplace.replaceVariables(replaceWith, contents) + suffix;
 			}
 		} catch (InvalidPatternException | UnbalancedStringException e) {
 			_message = e.getMessage();
+			_error = true;
 		}
 		
 		return null;

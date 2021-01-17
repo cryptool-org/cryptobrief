@@ -63,6 +63,8 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 	private JRadioButton rdbtnStandardSearch;
 	private JRadioButton rdbtnAdvancedSearch;
 	private JRadioButton rdbtnRegularExpression;
+	private JCheckBox chckbxEscapeHandling;
+	private JCheckBox chckbxShowBalancingError;
 	private JCheckBox chckbxDotMatchNewLine;
 	private JLabel jLabel_status;
 	private JPanel panelOptions;
@@ -87,7 +89,7 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
-		setPreferredSize(new Dimension(500, 330));
+		setPreferredSize(new Dimension(500, 350));
 		contentPanel.setLayout(new BorderLayout(0, 0));
 		{
 			jTabbedPaneNamed_main = new JTabbedPaneNamed();
@@ -110,7 +112,7 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 				panelMode.setName("panel_mode");
 				panelMode.setLayout(null);
 				
-				panelMode.setBounds(10, 110, 140, 100);
+				panelMode.setBounds(10, 140, 140, 100);
 				
 				panelOptions.setBorder(new TitledBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, 
 						new Color(255, 255, 255), new Color(160, 160, 160)), "", TitledBorder.LEADING, 
@@ -119,7 +121,7 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 				panelOptions.setName("panel_options");
 				panelOptions.setLayout(null);
 				
-				panelOptions.setBounds(160, 110, 190, 100);
+				panelOptions.setBounds(160, 140, 190, 100);
 				
 				jLabel_searchfor = new JLabel("Search for:");
 				jLabel_searchfor.setBounds(10, 10, 74, 26);
@@ -170,14 +172,24 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 				}
 				
 				chckbxMatchCase = new JCheckBox("Match case");
-				chckbxMatchCase.setBounds(10, 20, 174, 21);
+				chckbxMatchCase.setBounds(10, 85, 174, 21);
 				chckbxMatchCase.setName("chckbx_matchcase");
-				panelOptions.add(chckbxMatchCase);
+				panelSearchReplaceMain.add(chckbxMatchCase);
 				
 				chckbxWrapAround = new JCheckBox("Wrap around");
-				chckbxWrapAround.setBounds(10, 42, 174, 21);
+				chckbxWrapAround.setBounds(10, 107, 174, 21);
 				chckbxWrapAround.setName("chckbx_wraparound");
-				panelOptions.add(chckbxWrapAround);
+				panelSearchReplaceMain.add(chckbxWrapAround);
+				
+				chckbxEscapeHandling = new JCheckBox("Handle escapes");
+				chckbxEscapeHandling.setBounds(10, 20, 174, 21);
+				chckbxEscapeHandling.setName("chckbx_handleescapes");
+				panelOptions.add(chckbxEscapeHandling);
+				
+				chckbxShowBalancingError = new JCheckBox("Show balancing error");
+				chckbxShowBalancingError.setBounds(10, 42, 174, 21);
+				chckbxShowBalancingError.setName("chckbx_showbalancingerror");
+				panelOptions.add(chckbxShowBalancingError);
 
 				chckbxDotMatchNewLine = new JCheckBox(". matches newline");
 				chckbxDotMatchNewLine.setBounds(10, 64, 174, 21);
@@ -388,6 +400,16 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 	public boolean dotMatchesNewLine() {
 		return chckbxDotMatchNewLine.isSelected();
 	}
+	
+	@Override
+	public boolean escapeHandling() {
+		return chckbxEscapeHandling.isSelected();
+	}
+	
+	@Override
+	public boolean showBalancingError() {
+		return chckbxShowBalancingError.isSelected();
+	}
 
 	@Override
 	public boolean useAdvancedSearch() {
@@ -402,27 +424,35 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 		jTextField_replacetext.setText(text);
 	}
 
-	public void setMatchCase(boolean matchCase) {
-		chckbxMatchCase.setSelected(matchCase);
+	public void setMatchCase(boolean value) {
+		chckbxMatchCase.setSelected(value);
 	}
 
-	public void setWrapAround(boolean wrapAround) {
-		chckbxWrapAround.setSelected(wrapAround);
+	public void setWrapAround(boolean value) {
+		chckbxWrapAround.setSelected(value);
 	}
 
-	public void setUseRegEx(boolean useRegex) {
-		rdbtnRegularExpression.setSelected(useRegex);
+	public void setUseRegEx(boolean value) {
+		rdbtnRegularExpression.setSelected(value);
 	}
 
-	public void setDotMatchesNewLine(boolean dotmatchesnewline) {
-		chckbxDotMatchNewLine.setSelected(dotmatchesnewline);
-	}
-
-	public void setUseAdvancedSearch(boolean advancedsearch) {
-		rdbtnAdvancedSearch.setSelected(advancedsearch);
+	public void setDotMatchesNewLine(boolean value) {
+		chckbxDotMatchNewLine.setSelected(value);
 	}
 	
-	public void setUseStandardSearch(boolean standardsearch) {
-		rdbtnStandardSearch.setSelected(standardsearch);
+	public void setEscapeHandling(boolean value) {
+		chckbxEscapeHandling.setSelected(value);
+	}
+	
+	public void setShowBalancingError(boolean value) {
+		chckbxShowBalancingError.setSelected(value);
+	}
+
+	public void setUseAdvancedSearch(boolean value) {
+		rdbtnAdvancedSearch.setSelected(value);
+	}
+	
+	public void setUseStandardSearch(boolean value) {
+		rdbtnStandardSearch.setSelected(value);
 	}
 }

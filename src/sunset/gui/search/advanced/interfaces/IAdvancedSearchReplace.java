@@ -8,7 +8,7 @@ import sunset.gui.search.advanced.exception.UndeclaredVariableException;
 public interface IAdvancedSearchReplace {
 	
 	
-	public boolean find(String text, String pattern, int fromIndex, boolean bMatchCase) 
+	public boolean find(String text, String pattern, int fromIndex, boolean bMatchCase, boolean showBalancingError) 
 			throws InvalidPatternException, UnbalancedStringException;
 	
 	public boolean matches(String text, String pattern, boolean bMatchCase) 

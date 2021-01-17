@@ -45,12 +45,13 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 				boolean matchCase = _dialog.matchCase();
 				boolean wrapAround = _dialog.wrapAround() && !ignoreWrapAroundFlag;
 				boolean dotAll = _dialog.dotMatchesNewLine();
+				boolean showBalancingError = _dialog.showBalancingError();
 				boolean found;
 				
 				if (_dialog.useRegEx()) {
 					found = _logic.searchRegex(text, pattern, caretPos, matchCase, wrapAround, dotAll);
 				} else if (_dialog.useAdvancedSearch()){
-					found = _logic.searchAdvanced(text, pattern, caretPos, matchCase, wrapAround);
+					found = _logic.searchAdvanced(text, pattern, caretPos, matchCase, wrapAround, showBalancingError);
 				} else {
 					found = _logic.search(text, pattern, caretPos, matchCase, wrapAround);
 				}
@@ -69,7 +70,11 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 					
 					return true;
 				} else {
-					setStatus(_logic.getMessage() + getLineNumber(doc, caretPos), SearchStatus.FAILURE);
+					if (_logic.getError()) {
+						setStatus(_logic.getMessage(), SearchStatus.FAILURE);
+					} else {
+						setStatus(_logic.getMessage() + getLineNumber(doc, caretPos), SearchStatus.FAILURE);
+					}
 				}
 			} catch (BadLocationException e) {
 				setStatus(e.getMessage(), SearchStatus.FAILURE);
@@ -143,6 +148,7 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 			
 			boolean matchCase = _dialog.matchCase();
 			boolean dotAll = _dialog.dotMatchesNewLine();
+			boolean showBalancingError = _dialog.showBalancingError();
 			
 			if (_dialog.useRegEx()) {
 				try {		
@@ -153,7 +159,7 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 				}
 			} else if (_dialog.useAdvancedSearch()) {
 				try {
-					replace = _logic.replaceAdvanced(selectedText, pattern, replace, matchCase);
+					replace = _logic.replaceAdvanced(selectedText, pattern, replace, matchCase, showBalancingError);
 				} catch (UndeclaredVariableException e) {
 					setStatus(e.getMessage(), SearchStatus.FAILURE);
 					return false;
@@ -173,7 +179,7 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 	}
 	
 	private String handleEscapes(String s) {
-		return s;//s.replace("\\n", "\n").replace("\\t", "\t").replace("\\r", "\r").replace("\\b",  "\b");
+		return _dialog.escapeHandling() ? s.replace("\\n", "\n").replace("\\t", "\t").replace("\\r", "\r").replace("\\b",  "\b") : s;
 	}
 	
 	@Override

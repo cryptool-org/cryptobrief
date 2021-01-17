@@ -36,7 +36,7 @@ public interface ISearchReplaceLogic {
 	 * @param wrapAround the flag to specify if wrap around search is used
 	 * @return true if the pattern was found in the text using advanced search and considering the options, otherwise false
 	 */
-	public boolean searchAdvanced(String text, String pattern, int fromIndex, boolean matchCase, boolean wrapAround);
+	public boolean searchAdvanced(String text, String pattern, int fromIndex, boolean matchCase, boolean wrapAround, boolean showBalancingError);
 	
 	/**
 	 * Compares two strings for equality considering the specified flags
@@ -77,6 +77,8 @@ public interface ISearchReplaceLogic {
 	 */
 	public String getMessage();
 	
+	public boolean getError();
+	
 	/**
 	 * Replaces all occurrences of the pattern in a given text with the replaceWith text,
 	 * starting from a specified position using regular expressions
@@ -89,5 +91,5 @@ public interface ISearchReplaceLogic {
 	 */
 	public String replaceRegex(String text, String pattern, String replaceWith, boolean matchCase, boolean dotAll)  throws Exception;
 	
-	public String replaceAdvanced(String text, String pattern, String replaceWith, boolean matchCase) throws UndeclaredVariableException;
+	public String replaceAdvanced(String text, String pattern, String replaceWith, boolean matchCase, boolean showBalancingError) throws UndeclaredVariableException;
 }
