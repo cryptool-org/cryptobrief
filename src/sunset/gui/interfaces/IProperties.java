@@ -33,6 +33,7 @@ public class IProperties {
 	public final static String GUI_DIVIDER_CONSOLE = "GUI.DIVIDER.CONSOLE";
 	public final static String GUI_DIVIDER_API = "GUI.DIVIDER.API";
 	public final static String GUI_MAXIMIZED = "GUI.MAXIMIZED";
+	public final static String GUI_SEARCH_PAIRS = "GUI.SEARCH.PAIRS";
 	public final static String LOGGER_MODE = "LOGGER.MODE";
 	public final static String SYSTEM = "SYSTEM";
 

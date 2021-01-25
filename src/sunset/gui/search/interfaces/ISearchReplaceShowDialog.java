@@ -1,15 +1,8 @@
 package sunset.gui.search.interfaces;
 
+import javax.swing.JFrame;
+
 public interface ISearchReplaceShowDialog {
-	/**
-	 * Prepares the JSearchReplaceDialog for the next search or replacement
-	 * @param replaceMode specifies if the dialog should be opened in replacement mode
-	 */
-	public void prepareDialog(boolean replaceMode);
-	
-	/**
-	 * Sets the visibility flag of the JDialog
-	 * @param visible the flag specifying if the dialog should be visible
-	 */
-	public void setVisible(boolean visible);
+	public void prepareAndShowDialog(boolean replaceMode, JFrame frame);
+	public void enableButtons(boolean enable);
 }

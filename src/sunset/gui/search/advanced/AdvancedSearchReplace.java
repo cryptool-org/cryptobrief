@@ -17,21 +17,25 @@ import sunset.gui.search.advanced.exception.UndeclaredVariableException;
 import sunset.gui.search.advanced.interfaces.IAdvancedSearchReplace;
 
 public class AdvancedSearchReplace implements IAdvancedSearchReplace{
+	
+	/*
+	 * Constants
+	 */
 	private final static int MAX_VARS = 10;
 	private final static char VAR_START_SYMBOL = '%';
 	private final static char VAR_ESC_SYMBOL = '%';
 	
-	// variable regex: %[0-9]
+	// variable regex: 				%[0-9]
 	private final static String VARIABLE = VAR_START_SYMBOL + "[0-9]";
 	
-	// escaped variable regex: %(%[0-9])
+	// escaped variable regex: 		%(%[0-9])
 	private final static String ESC_VAR = VAR_ESC_SYMBOL + "(" + VARIABLE + ")";
 	
-	// non escaped variable regex: 	([^%])%[0-9] - braces are needed for replacement (using $1)
+	// non escaped variable regex: 	([^%])%[0-9]
 	private final static String NON_ESC_VAR = 
 			"([^" + VAR_ESC_SYMBOL + "])" + VARIABLE;
 	
-	// minimum one variable regex: 	.*(^%[0-9]|[^%]%[0-9])((.+%[0-9])|.)*
+	// minimum one variable regex: 			.*(^%[0-9]|[^%]%[0-9])((.+%[0-9])|.)*
 	private final static String MIN_ONE_VAR = 
 			".*(^" + VARIABLE + "|" + NON_ESC_VAR + ")((.+" + VARIABLE + ")|.)*";
 	
@@ -39,6 +43,26 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 	private final static String TWO_CONSECUTIVE_VARS = 
 			"(^" + VARIABLE + VARIABLE + ")|(" + NON_ESC_VAR + VARIABLE + ")";
 	
+	private final static String PAIR_DELIM_SYMBOL = "...";
+	
+	// pair delimiter regex:	\Q...\E
+	private final static String PAIR_DELIM = "\\Q" + PAIR_DELIM_SYMBOL + "\\E";
+	
+	private final static String ENTRY_DELIM_SYMBOL = ",";
+	
+	// entry delimiter regex:	\Q,\E
+	private final static String ENTRY_DELIM = "\\Q" + ENTRY_DELIM_SYMBOL + "\\E";
+	
+	// valid part string regex:	[^...,]+
+	private final static String VALID_STRING = "[^" + PAIR_DELIM_SYMBOL + ENTRY_DELIM_SYMBOL + "]+";
+	
+	// valid matching pair config regex:	"([^...,]+\\Q...\\E[^...,]+\\Q,\\E)*[^...,]+\\Q...\\E[^...,]+"
+	private final static String VALID_MATCHING_PAIR_CONFIG = 
+			"(" + VALID_STRING + PAIR_DELIM + VALID_STRING + ENTRY_DELIM + ")*" + VALID_STRING + PAIR_DELIM + VALID_STRING;
+	
+	/*
+	 * member variables
+	 */
 	private String[] _captures = new String[MAX_VARS];
 	private int _matchStart = -1;
 	private int _matchEnd = -1;
@@ -52,11 +76,14 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 		_matchingPairTemplates.clear();
 		
 		if (matchingPairs != null && !matchingPairs.isEmpty()) {
-			final String pairDelim = "\\Q...\\E";
-			final String entryDelim = "\\Q,\\E";
+			Matcher m = getMatcher(matchingPairs, VALID_MATCHING_PAIR_CONFIG, true);
 			
-			for (String pair : matchingPairs.split(entryDelim)) {
-				String[] pairValues = pair.trim().split(pairDelim);
+			if (!m.matches()) {
+				throw new MatchingPairConfigurationException(matchingPairs);
+			}
+			
+			for (String pair : matchingPairs.split(ENTRY_DELIM)) {
+				String[] pairValues = pair.trim().split(PAIR_DELIM);
 				String key = pairValues[1].trim();
 				String val = pairValues[0].trim();
 						
@@ -65,7 +92,7 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 				ArrayList<Integer> varIndexesVal = new ArrayList<Integer>();
 				
 				if (varPositionsKey.size() != varPositionsVal.size()) {
-					throw new MatchingPairConfigurationException(val + "..." + key);
+					throw new MatchingPairConfigurationException(val + PAIR_DELIM_SYMBOL + key);
 				}
 				
 				for (int varPosVal : varPositionsVal) {
@@ -77,7 +104,7 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 					int varIndex = getVariableIndex(key, varPosKey);
 
 					if (!varIndexesVal.contains(varIndex)) {
-						throw new MatchingPairConfigurationException(val + "..." + key);
+						throw new MatchingPairConfigurationException(val + PAIR_DELIM_SYMBOL + key);
 					}
 				}
 				
@@ -269,6 +296,7 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 		pattern = pattern.replaceAll("^" + VARIABLE, "\\\\E(.*?)\\\\Q");
 		
 		// non escaped variables are replaced by .*? (variables which are not at start of pattern)
+		// $1 is needed to include the symbol before the (non escaped) variable ([^%])
 		pattern = pattern.replaceAll(NON_ESC_VAR, "$1\\\\E(.*?)\\\\Q");
 		
 		// escaped variables (i.e. %%[0-9]) are replaced by the string %[0-9]

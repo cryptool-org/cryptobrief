@@ -1117,7 +1117,7 @@ public class FFaplJFrame extends javax.swing.JFrame {
 		jMenuItem_Replace.addActionListener(new ActionListenerOpenReplaceDialog(searchReplaceDialogOwner));
 		jTabbedPane_Code.addChangeListener(new ChangeListenerSelectedTab(this,
 				jScrollPane_Console, jTextField_input, _undoComp, _redoComp, _saveComp,
-				_saveAllComp, _closeTabComp, _closeAllTabComp, jPanel_status));
+				_saveAllComp, _closeTabComp, _closeAllTabComp, jPanel_status, searchReplaceDialogOwner));
 		_lineColumnPosition.addMouseListener(new MouseListenerChooseLineNumber(
 				this, (JTabbedPaneCode) jTabbedPane_Code));
 		_lineColumnTxt.addMouseListener(new MouseListenerChooseLineNumber(this,

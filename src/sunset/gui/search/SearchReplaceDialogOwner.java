@@ -1,18 +1,24 @@
 package sunset.gui.search;
 
-import sunset.gui.FFaplJFrame;
+import javax.swing.JFrame;
+
 import sunset.gui.dialog.JDialogSearchReplace;
 import sunset.gui.search.interfaces.ISearchReplaceShowDialog;
 
 public class SearchReplaceDialogOwner {
 	private ISearchReplaceShowDialog _dialogSearchReplace;
+	private JFrame _owner;
 	
-	public SearchReplaceDialogOwner(FFaplJFrame frame) {
-		_dialogSearchReplace = new JDialogSearchReplace(frame);
+	public SearchReplaceDialogOwner(JFrame owner) {
+		_owner = owner;
+		_dialogSearchReplace = new JDialogSearchReplace(_owner);
+	}
+	
+	public void setFileOpened(boolean fileOpen) {
+		_dialogSearchReplace.enableButtons(fileOpen);
 	}
 	
 	public void showDialog(boolean replaceMode) {
-		_dialogSearchReplace.prepareDialog(replaceMode);
-		_dialogSearchReplace.setVisible(true);
+		_dialogSearchReplace.prepareAndShowDialog(replaceMode, _owner);
 	}
 }

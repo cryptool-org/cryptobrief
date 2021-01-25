@@ -895,39 +895,10 @@ class AdvancedSearchTest {
 	}
 	
 	@Test
-	void testMatchingPairConfigurationException() {
-		MatchingPairConfigurationException e;
-
-		e = Assert.assertThrows(MatchingPairConfigurationException.class, () -> {
-			AdvancedSearchReplace searchReplace = new AdvancedSearchReplace("{...}, \\begin{%3}...\\end{%3}, \\begin{%1}...\\end{}");
-		  });
-		
-		Assert.assertEquals("Bad matching pair configuration: \\begin{%1}...\\end{}", e.getMessage());
-
-		e = Assert.assertThrows(MatchingPairConfigurationException.class, () -> {
-			AdvancedSearchReplace searchReplace = new AdvancedSearchReplace("\\begin{}...\\end{%1}");
-		  });
-		
-		Assert.assertEquals("Bad matching pair configuration: \\begin{}...\\end{%1}", e.getMessage());
-		
-		e = Assert.assertThrows(MatchingPairConfigurationException.class, () -> {
-			AdvancedSearchReplace searchReplace = new AdvancedSearchReplace("\\begin{%0}...\\end{%1}");
-		  });
-		
-		Assert.assertEquals("Bad matching pair configuration: \\begin{%0}...\\end{%1}", e.getMessage());
-		
-		e = Assert.assertThrows(MatchingPairConfigurationException.class, () -> {
-			AdvancedSearchReplace searchReplace = new AdvancedSearchReplace("{...}, \\beg{%1-%2-%3}...\\end{%1-%2-%4}");
-		  });
-		
-		Assert.assertEquals("Bad matching pair configuration: \\beg{%1-%2-%3}...\\end{%1-%2-%4}", e.getMessage());
-	}
-	
-	@Test
 	void testComplexScenarios() {
 		try {
-			// todo
-			Assert.assertTrue(_searchReplace.find("abc", "a%1c", 0, false, true));
+			Assert.assertTrue(_searchReplace.find("Inline $a^2+b^2=c^2$ and centered eq. \\[x^2 \\geq 0\\] to be exchanged", "$%1$%2\\[%3\\]", 0, false, true));
+			checkResult(7,52,new String[] {null, "a^2+b^2=c^2", " and centered eq. ", "x^2 \\geq 0", null, null, null, null, null, null});
 		} catch (Exception e) {
 			Assert.fail();
 		}

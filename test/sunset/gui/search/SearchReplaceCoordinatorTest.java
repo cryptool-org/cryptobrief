@@ -30,10 +30,6 @@ class SearchReplaceCoordinatorTest {
 		.setText("$this$ is %a complex %$§1 text\nnew line\n\t%453!\"\n\t\t§$%&/()=?\nend of text.");
 	}
 
-	@AfterEach
-	void tearDown() throws Exception {
-	}
-
 	@Test
 	void testSimpleSearch() {
 		_dialog.setSearchPattern("this");
@@ -108,6 +104,59 @@ class SearchReplaceCoordinatorTest {
 		_dialog.setSearchPattern("new l%5e");
 		Assert.assertTrue(_coordinator.findString(false));
 		Assert.assertFalse(_coordinator.findString(true));
+	}
+	
+	@Test
+	void testEscapeOption() {
+		// standard search
+		_frame.getCurrentCodePanel().getCodePane()
+		.setText("$this$ is %a complex %$§1 text\nnew line\n\t%453!\"\n\t\t§$%&/()=?\nend of text.");
+		_coordinator.resetCaretPosition();
+		_dialog.setEscapeHandling(true);
+		_dialog.setUseStandardSearch(true);
+		
+		_dialog.setSearchPattern("\\n");
+		Assert.assertTrue(_coordinator.findString(false));
+		
+		_coordinator.resetCaretPosition();
+		_dialog.setEscapeHandling(false);
+		Assert.assertFalse(_coordinator.findString(false));
+		
+		_frame.getCurrentCodePanel().getCodePane()
+		.setText("$this$ is %a complex %$§1 text\\nnew line\\n\t%453!\"\\t\t§$%&/()=?end of text.");
+		
+		_coordinator.resetCaretPosition();
+		_dialog.setEscapeHandling(true);
+		Assert.assertFalse(_coordinator.findString(false));
+		
+		_coordinator.resetCaretPosition();
+		_dialog.setEscapeHandling(false);
+		Assert.assertTrue(_coordinator.findString(false));
+		
+		// advanced search
+		_frame.getCurrentCodePanel().getCodePane()
+		.setText("$this$ is %a complex %$§1 text\nnew line\n\t%453!\"\n\t\t§$%&/()=?\nend of text.");
+		_coordinator.resetCaretPosition();
+		_dialog.setEscapeHandling(true);
+		_dialog.setUseAdvancedSearch(true);
+		
+		_dialog.setSearchPattern("\\n%1 ");
+		Assert.assertTrue(_coordinator.findString(false));
+		
+		_coordinator.resetCaretPosition();
+		_dialog.setEscapeHandling(false);
+		Assert.assertFalse(_coordinator.findString(false));
+		
+		_frame.getCurrentCodePanel().getCodePane()
+		.setText("$this$ is %a complex %$§1 text\\nnew line\\n\t%453!\"\\t\t§$%&/()=?end of text.");
+		
+		_coordinator.resetCaretPosition();
+		_dialog.setEscapeHandling(true);
+		Assert.assertFalse(_coordinator.findString(false));
+		
+		_coordinator.resetCaretPosition();
+		_dialog.setEscapeHandling(false);
+		Assert.assertTrue(_coordinator.findString(false));
 	}
 	
 	@Test

@@ -25,62 +25,56 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 	
 	@Override
 	public void resetCaretPosition() {
-		if (FFaplJFrame.getCurrentCodePanel() != null) {
-			JTextPane textPaneCode = FFaplJFrame.getCurrentCodePanel().getCodePane();
-			textPaneCode.setCaretPosition(0);
-		}
+		JTextPane textPaneCode = FFaplJFrame.getCurrentCodePanel().getCodePane();
+		textPaneCode.setCaretPosition(0);
 	}
 	
 	@Override
 	public boolean findString(boolean ignoreWrapAroundFlag) {
-		if (FFaplJFrame.getCurrentCodePanel() != null) {
-			try {
-				JTextPane textPaneCode = FFaplJFrame.getCurrentCodePanel().getCodePane();
-				Document doc = textPaneCode.getDocument();
-				String text = doc.getText(0, doc.getLength());
-				int caretPos = textPaneCode.getCaretPosition();
-				
-				String pattern = handleEscapes(_dialog.searchPattern());
-				
-				boolean matchCase = _dialog.matchCase();
-				boolean wrapAround = _dialog.wrapAround() && !ignoreWrapAroundFlag;
-				boolean dotAll = _dialog.dotMatchesNewLine();
-				boolean showBalancingError = _dialog.showBalancingError();
-				boolean found;
-				
-				if (_dialog.useRegEx()) {
-					found = _logic.searchRegex(text, pattern, caretPos, matchCase, wrapAround, dotAll);
-				} else if (_dialog.useAdvancedSearch()){
-					found = _logic.searchAdvanced(text, pattern, caretPos, matchCase, wrapAround, showBalancingError);
-				} else {
-					found = _logic.search(text, pattern, caretPos, matchCase, wrapAround);
-				}
-				
-				if (found) {
-					textPaneCode.setCaretPosition(_logic.getStart());
-					
-					if (_logic.getStart() == _logic.getEnd()) {
-						setStatus("Zero length match", SearchStatus.FAILURE);
-						return false;
-					}
-					
-					textPaneCode.moveCaretPosition(_logic.getEnd());
-					
-					setStatus(_logic.getMessage() + getLineNumber(doc, _logic.getStart()), SearchStatus.SEARCH_SUCCESS);
-					
-					return true;
-				} else {
-					if (_logic.getError()) {
-						setStatus(_logic.getMessage(), SearchStatus.FAILURE);
-					} else {
-						setStatus(_logic.getMessage() + getLineNumber(doc, caretPos), SearchStatus.FAILURE);
-					}
-				}
-			} catch (BadLocationException e) {
-				setStatus(e.getMessage(), SearchStatus.FAILURE);
+		try {
+			JTextPane textPaneCode = FFaplJFrame.getCurrentCodePanel().getCodePane();
+			Document doc = textPaneCode.getDocument();
+			String text = doc.getText(0, doc.getLength());
+			int caretPos = textPaneCode.getCaretPosition();
+			
+			String pattern = handleEscapes(_dialog.searchPattern());
+			
+			boolean matchCase = _dialog.matchCase();
+			boolean wrapAround = _dialog.wrapAround() && !ignoreWrapAroundFlag;
+			boolean dotAll = _dialog.dotMatchesNewLine();
+			boolean showBalancingError = _dialog.showBalancingError();
+			boolean found;
+			
+			if (_dialog.useRegEx()) {
+				found = _logic.searchRegex(text, pattern, caretPos, matchCase, wrapAround, dotAll);
+			} else if (_dialog.useAdvancedSearch()){
+				found = _logic.searchAdvanced(text, pattern, caretPos, matchCase, wrapAround, showBalancingError);
+			} else {
+				found = _logic.search(text, pattern, caretPos, matchCase, wrapAround);
 			}
-		} else {
-			setStatus("No file opened", SearchStatus.FAILURE);
+			
+			if (found) {
+				textPaneCode.setCaretPosition(_logic.getStart());
+				
+				if (_logic.getStart() == _logic.getEnd()) {
+					setStatus("Zero length match", SearchStatus.FAILURE);
+					return false;
+				}
+				
+				textPaneCode.moveCaretPosition(_logic.getEnd());
+				
+				setStatus(_logic.getMessage() + getLineNumber(doc, _logic.getStart()), SearchStatus.SEARCH_SUCCESS);
+				
+				return true;
+			} else {
+				if (_logic.getError()) {
+					setStatus(_logic.getMessage(), SearchStatus.FAILURE);
+				} else {
+					setStatus(_logic.getMessage() + getLineNumber(doc, caretPos), SearchStatus.FAILURE);
+				}
+			}
+		} catch (BadLocationException e) {
+			setStatus(e.getMessage(), SearchStatus.FAILURE);
 		}
 		
 		return false;
@@ -109,73 +103,65 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 	
 	@Override
 	public boolean isSearchPatternSelected() {
-		if (FFaplJFrame.getCurrentCodePanel() != null) {
-			JTextPane textPaneCode = FFaplJFrame.getCurrentCodePanel().getCodePane();
-			String selectedText = textPaneCode.getSelectedText();
-			
-			if (selectedText == null) {
-				return false;
-			}
-			
-			String pattern = handleEscapes(_dialog.searchPattern());
-			boolean matchCase = _dialog.matchCase();
-			
-			if (_dialog.useRegEx()) {		
-				boolean dotAll = _dialog.dotMatchesNewLine();
-				
-				return _logic.matchesRegex(selectedText, pattern, matchCase, dotAll);
-			} else if (_dialog.useAdvancedSearch()){
-				return _logic.matchesAdvanced(selectedText, pattern, matchCase);
-			} else {
-				return _logic.equals(selectedText, pattern, matchCase);
-			}
+		JTextPane textPaneCode = FFaplJFrame.getCurrentCodePanel().getCodePane();
+		String selectedText = textPaneCode.getSelectedText();
+		
+		if (selectedText == null) {
+			return false;
 		}
 		
-		return false;
+		String pattern = handleEscapes(_dialog.searchPattern());
+		boolean matchCase = _dialog.matchCase();
+		
+		if (_dialog.useRegEx()) {		
+			boolean dotAll = _dialog.dotMatchesNewLine();
+			
+			return _logic.matchesRegex(selectedText, pattern, matchCase, dotAll);
+		} else if (_dialog.useAdvancedSearch()){
+			return _logic.matchesAdvanced(selectedText, pattern, matchCase);
+		} else {
+			return _logic.equals(selectedText, pattern, matchCase);
+		}
 	}
 	
 	@Override
 	public boolean replaceText() {
-		if (FFaplJFrame.getCurrentCodePanel() != null) {
-			JTextPane textPaneCode = FFaplJFrame.getCurrentCodePanel().getCodePane();
-			String pattern = handleEscapes(_dialog.searchPattern());
-			String replace = handleEscapes(_dialog.replaceText());
-			String selectedText = textPaneCode.getSelectedText();
-			
-			if (selectedText == null) {
-				return false;
-			}
-			
-			boolean matchCase = _dialog.matchCase();
-			boolean dotAll = _dialog.dotMatchesNewLine();
-			boolean showBalancingError = _dialog.showBalancingError();
-			
-			if (_dialog.useRegEx()) {
-				try {		
-					replace = _logic.replaceRegex(selectedText, pattern, replace, matchCase, dotAll);
-				} catch (Exception e) {
-					setStatus(e.getMessage(), SearchStatus.FAILURE);
-					return false;
-				}
-			} else if (_dialog.useAdvancedSearch()) {
-				try {
-					replace = _logic.replaceAdvanced(selectedText, pattern, replace, matchCase, showBalancingError);
-				} catch (UndeclaredVariableException e) {
-					setStatus(e.getMessage(), SearchStatus.FAILURE);
-					return false;
-				}
-			}
-			
-			if (replace == null) {
-				setStatus(_logic.getMessage(), SearchStatus.FAILURE);
-				return false;
-			}
-			
-			textPaneCode.replaceSelection(replace);
-			return true;
+		JTextPane textPaneCode = FFaplJFrame.getCurrentCodePanel().getCodePane();
+		String pattern = handleEscapes(_dialog.searchPattern());
+		String replace = handleEscapes(_dialog.replaceText());
+		String selectedText = textPaneCode.getSelectedText();
+		
+		if (selectedText == null) {
+			return false;
 		}
 		
-		return false;
+		boolean matchCase = _dialog.matchCase();
+		boolean dotAll = _dialog.dotMatchesNewLine();
+		boolean showBalancingError = _dialog.showBalancingError();
+		
+		if (_dialog.useRegEx()) {
+			try {		
+				replace = _logic.replaceRegex(selectedText, pattern, replace, matchCase, dotAll);
+			} catch (Exception e) {
+				setStatus(e.getMessage(), SearchStatus.FAILURE);
+				return false;
+			}
+		} else if (_dialog.useAdvancedSearch()) {
+			try {
+				replace = _logic.replaceAdvanced(selectedText, pattern, replace, matchCase, showBalancingError);
+			} catch (UndeclaredVariableException e) {
+				setStatus(e.getMessage(), SearchStatus.FAILURE);
+				return false;
+			}
+		}
+		
+		if (replace == null) {
+			setStatus(_logic.getMessage(), SearchStatus.FAILURE);
+			return false;
+		}
+		
+		textPaneCode.replaceSelection(replace);
+		return true;
 	}
 	
 	private String handleEscapes(String s) {
