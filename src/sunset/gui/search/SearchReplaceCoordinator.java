@@ -9,6 +9,8 @@ import javax.swing.text.Document;
 import javax.swing.text.Element;
 
 import sunset.gui.FFaplJFrame;
+import sunset.gui.interfaces.IProperties;
+import sunset.gui.logic.GUIPropertiesLogic;
 import sunset.gui.search.interfaces.ISearchReplaceDialog;
 import sunset.gui.search.interfaces.ISearchReplaceLogic;
 import sunset.gui.search.advanced.exception.UndeclaredVariableException;
@@ -41,14 +43,17 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 			
 			boolean matchCase = _dialog.matchCase();
 			boolean wrapAround = _dialog.wrapAround() && !ignoreWrapAroundFlag;
-			boolean dotAll = _dialog.dotMatchesNewLine();
-			boolean showBalancingError = _dialog.showBalancingError();
 			boolean found;
 			
 			if (_dialog.useRegEx()) {
+				boolean dotAll = _dialog.dotMatchesNewLine();
+				
 				found = _logic.searchRegex(text, pattern, caretPos, matchCase, wrapAround, dotAll);
 			} else if (_dialog.useAdvancedSearch()){
-				found = _logic.searchAdvanced(text, pattern, caretPos, matchCase, wrapAround, showBalancingError);
+				String matchingPairs = getMatchingPairs();
+				boolean showBalancingError = _dialog.showBalancingError();
+				
+				found = _logic.searchAdvanced(text, pattern, matchingPairs, caretPos, matchCase, wrapAround, showBalancingError);
 			} else {
 				found = _logic.search(text, pattern, caretPos, matchCase, wrapAround);
 			}
@@ -118,7 +123,9 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 			
 			return _logic.matchesRegex(selectedText, pattern, matchCase, dotAll);
 		} else if (_dialog.useAdvancedSearch()){
-			return _logic.matchesAdvanced(selectedText, pattern, matchCase);
+			String matchingPairs = getMatchingPairs();
+			
+			return _logic.matchesAdvanced(selectedText, pattern, matchingPairs, matchCase);
 		} else {
 			return _logic.equals(selectedText, pattern, matchCase);
 		}
@@ -148,7 +155,8 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 			}
 		} else if (_dialog.useAdvancedSearch()) {
 			try {
-				replace = _logic.replaceAdvanced(selectedText, pattern, replace, matchCase, showBalancingError);
+				String matchingPairs = getMatchingPairs();
+				replace = _logic.replaceAdvanced(selectedText, pattern, replace, matchingPairs, matchCase, showBalancingError);
 			} catch (UndeclaredVariableException e) {
 				setStatus(e.getMessage(), SearchStatus.FAILURE);
 				return false;
@@ -164,8 +172,12 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 		return true;
 	}
 	
+	private String getMatchingPairs() {
+		return GUIPropertiesLogic.getInstance().getProperty(IProperties.GUI_SEARCH_PAIRS);
+	}
+	
 	private String handleEscapes(String s) {
-		return _dialog.escapeHandling() ? s.replace("\\n", "\n").replace("\\t", "\t").replace("\\r", "\r").replace("\\b",  "\b") : s;
+		return _dialog.useSpecialSymbols() ? s.replace("\\r", "\r").replace("\\n", "\n").replace("\\t", "\t") : s;
 	}
 	
 	@Override

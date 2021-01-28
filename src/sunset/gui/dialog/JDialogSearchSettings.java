@@ -47,7 +47,7 @@ public class JDialogSearchSettings extends JDialog {
 	}
 	
 	private void initGUI() {
-		setTitle("Search");
+		setTitle("Search Settings");
 		setName("dialog_searchsettings");		
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -60,7 +60,7 @@ public class JDialogSearchSettings extends JDialog {
 			panelMain.setLayout(null);
 			
 			jTextField_matchingpairs = new JTextField();
-			jTextField_matchingpairs.setBounds(105, 10, 462, 19);
+			jTextField_matchingpairs.setBounds(94, 10, 473, 19);
 			panelMain.add(jTextField_matchingpairs);
 			jTextField_matchingpairs.setColumns(10);
 			

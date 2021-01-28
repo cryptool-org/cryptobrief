@@ -70,9 +70,10 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 	}
 	
 	@Override
-	public boolean searchAdvanced(String text, String pattern, int fromIndex, boolean matchCase, boolean wrapAround, boolean showBalancingError) {
+	public boolean searchAdvanced(String text, String pattern, String matchingPairs, 
+			int fromIndex, boolean matchCase, boolean wrapAround, boolean showBalancingError) {
 		try {
-			IAdvancedSearchReplace advSearchReplace = new AdvancedSearchReplace();
+			IAdvancedSearchReplace advSearchReplace = new AdvancedSearchReplace(matchingPairs);
 			boolean found = advSearchReplace.find(text, pattern, fromIndex, matchCase, showBalancingError);
 			
 			// if not found starting fromIndex, fromIndex was not 0, and wrap around is activated, search again from 0
@@ -85,7 +86,7 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 			_message = generateMessage(pattern, found);
 			_error = false;
 			return found;
-		} catch (InvalidPatternException | IndexOutOfBoundsException | UnbalancedStringException e) {
+		} catch (InvalidPatternException | IndexOutOfBoundsException | UnbalancedStringException | MatchingPairConfigurationException e) {
 			_message = e.getMessage();
 			_error = true;
 			return false;
@@ -153,12 +154,12 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 	}
 
 	@Override
-	public boolean matchesAdvanced(String text, String pattern, boolean matchCase) {
+	public boolean matchesAdvanced(String text, String pattern, String matchingPairs, boolean matchCase) {
 		try {
-			IAdvancedSearchReplace advSearchReplace = new AdvancedSearchReplace();
+			IAdvancedSearchReplace advSearchReplace = new AdvancedSearchReplace(matchingPairs);
 			_error = false;
 			return advSearchReplace.matches(text, pattern, matchCase);
-		} catch (InvalidPatternException e) {
+		} catch (InvalidPatternException | MatchingPairConfigurationException e) {
 			_message = e.getMessage();
 			_error = true;
 			return false;
@@ -178,9 +179,10 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 	}
 
 	@Override
-	public String replaceAdvanced(String text, String pattern, String replaceWith, boolean matchCase, boolean showBalancingError) throws UndeclaredVariableException {
+	public String replaceAdvanced(String text, String pattern, String replaceWith, String matchingPairs, 
+			boolean matchCase, boolean showBalancingError) throws UndeclaredVariableException {
 		try {
-			IAdvancedSearchReplace advSearchReplace = new AdvancedSearchReplace();
+			IAdvancedSearchReplace advSearchReplace = new AdvancedSearchReplace(matchingPairs);
 			_error = false;
 			if (advSearchReplace.find(text, pattern, 0, matchCase, showBalancingError)) {
 				String prefix = text.substring(0, advSearchReplace.getStart());
@@ -189,7 +191,7 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 
 				return prefix + advSearchReplace.replaceVariables(replaceWith, contents) + suffix;
 			}
-		} catch (InvalidPatternException | UnbalancedStringException e) {
+		} catch (InvalidPatternException | UnbalancedStringException | MatchingPairConfigurationException e) {
 			_message = e.getMessage();
 			_error = true;
 		}

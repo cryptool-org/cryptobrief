@@ -673,6 +673,29 @@ class AdvancedSearchTest {
 	}
 	
 	@Test
+	void testCorrectBalancing6() {
+		try {
+			Assert.assertTrue(_searchReplace.find("(((()((())()))))", "(%1)", 0, false, true));
+			checkResult(0,16,new String[] {null, "((()((())())))", null, null, null, null, null, null, null, null});
+			
+			Assert.assertTrue(_searchReplace.find("(({[\\(\\)\\{\\}\\[\\]]}))", "(%1)", 0, false, true));
+			checkResult(0,20,new String[] {null, "({[\\(\\)\\{\\}\\[\\]]})", null, null, null, null, null, null, null, null});
+			
+			Assert.assertTrue(_searchReplace.find("(({[\\(\\{\\[\\]\\}\\)]}))", "(%1)", 0, false, true));
+			checkResult(0,20,new String[] {null, "({[\\(\\{\\[\\]\\}\\)]})", null, null, null, null, null, null, null, null});
+			
+			Assert.assertTrue(_searchReplace.find("\\(\\(\\{\\[(){}[]\\]\\}\\)\\)", "\\(%1\\)", 0, false, true));
+			checkResult(0,22,new String[] {null, "\\(\\{\\[(){}[]\\]\\}\\)", null, null, null, null, null, null, null, null});
+			
+			Assert.assertTrue(_searchReplace.find("\\((\\({\\{[\\[\\]]\\}}\\))\\)", "\\(%1\\)", 0, false, true));
+			checkResult(0,22,new String[] {null, "(\\({\\{[\\[\\]]\\}}\\))", null, null, null, null, null, null, null, null});
+			
+		} catch (Exception e) {
+			Assert.fail();
+		}
+	}
+	
+	@Test
 	void testConstructor() {
 		try {
 			IAdvancedSearchReplace searchReplace;
@@ -845,6 +868,34 @@ class AdvancedSearchTest {
 	}
 	
 	@Test
+	void testInorrectBalancing6() {
+		try {
+			UnbalancedStringException e;
+
+			e = Assert.assertThrows(UnbalancedStringException.class, () -> {
+				_searchReplace.find("a(((()())))())())b", "a%1b", 0, false, true);
+			  });
+			
+			Assert.assertEquals("Matched string is unbalanced: (((()())))())())", e.getMessage());
+			
+			e = Assert.assertThrows(UnbalancedStringException.class, () -> {
+				_searchReplace.find("(({[\\(\\{\\)\\}\\[\\]]}))", "(%1)", 0, false, true);
+			  });
+			
+			Assert.assertEquals("Matched string is unbalanced: ({[\\(\\{\\)\\}\\[\\]]}", e.getMessage());
+			
+			e = Assert.assertThrows(UnbalancedStringException.class, () -> {
+				_searchReplace.find("(({[\\(\\{\\)\\}\\[\\]]})", "(%1)", 0, false, true);
+			  });
+			
+			Assert.assertEquals("Matched string is unbalanced: ({[\\(\\{\\)\\}\\[\\]]}", e.getMessage());
+			
+		} catch (Exception e) {
+			Assert.fail();
+		}
+	}
+	
+	@Test
 	void testIgnoreBalancingError() {
 		try {
 			Assert.assertTrue(_searchReplace.find("a(a))aa", "a%1a", 0, false, false));
@@ -899,6 +950,9 @@ class AdvancedSearchTest {
 		try {
 			Assert.assertTrue(_searchReplace.find("Inline $a^2+b^2=c^2$ and centered eq. \\[x^2 \\geq 0\\] to be exchanged", "$%1$%2\\[%3\\]", 0, false, true));
 			checkResult(7,52,new String[] {null, "a^2+b^2=c^2", " and centered eq. ", "x^2 \\geq 0", null, null, null, null, null, null});
+			
+			Assert.assertTrue(_searchReplace.find("while (c1) {if (c2) {if (c3) {if (c4) {stmt;}}}}", "if (%1) {%2}", 0, false, true));
+			checkResult(12,47,new String[] {null, "c2", "if (c3) {if (c4) {stmt;}}", null, null, null, null, null, null, null});
 		} catch (Exception e) {
 			Assert.fail();
 		}

@@ -46,7 +46,7 @@ public interface ISearchReplaceDialog {
 	 */
 	public boolean dotMatchesNewLine();	
 
-	public boolean escapeHandling();
+	public boolean useSpecialSymbols();
 	
 	public boolean showBalancingError();
 	

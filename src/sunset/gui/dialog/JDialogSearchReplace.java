@@ -65,8 +65,8 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 	private JRadioButton rdbtnStandardSearch;
 	private JRadioButton rdbtnAdvancedSearch;
 	private JRadioButton rdbtnRegularExpression;
-	private JCheckBox chckbxEscapeHandling;
-	private JCheckBox chckbxShowBalancingError;
+	private JCheckBox chckbxUseSpecialSymbols;
+	private JCheckBox chckbxShowBalancingErrors;
 	private JCheckBox chckbxDotMatchNewLine;
 	private JLabel jLabel_status;
 	private JPanel panelOptions;
@@ -187,16 +187,16 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 				chckbxWrapAround.setName("chckbx_wraparound");
 				panelSearchReplaceMain.add(chckbxWrapAround);
 				
-				chckbxEscapeHandling = new JCheckBox("Use symbols: \\n, \\r, \\t, \\b");
-				chckbxEscapeHandling.setBounds(10, 20, 174, 21);
-				chckbxEscapeHandling.setName("chckbx_handleescapes");
-				panelOptions.add(chckbxEscapeHandling);
+				chckbxUseSpecialSymbols = new JCheckBox("Use symbols: \\r, \\n, \\t");
+				chckbxUseSpecialSymbols.setBounds(10, 20, 174, 21);
+				chckbxUseSpecialSymbols.setName("chckbx_handleescapes");
+				panelOptions.add(chckbxUseSpecialSymbols);
 				
-				chckbxShowBalancingError = new JCheckBox("Show balancing errors");
-				chckbxShowBalancingError.setBounds(10, 42, 174, 21);
-				chckbxShowBalancingError.setName("chckbx_showbalancingerror");
-				chckbxShowBalancingError.setEnabled(false);
-				panelOptions.add(chckbxShowBalancingError);
+				chckbxShowBalancingErrors = new JCheckBox("Show balancing errors");
+				chckbxShowBalancingErrors.setBounds(10, 42, 174, 21);
+				chckbxShowBalancingErrors.setName("chckbx_showbalancingerror");
+				chckbxShowBalancingErrors.setEnabled(false);
+				panelOptions.add(chckbxShowBalancingErrors);
 
 				chckbxDotMatchNewLine = new JCheckBox(". matches newline");
 				chckbxDotMatchNewLine.setBounds(10, 64, 174, 21);
@@ -291,7 +291,7 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				chckbxDotMatchNewLine.setEnabled(rdbtnRegularExpression.isSelected());
-				chckbxShowBalancingError.setEnabled(rdbtnAdvancedSearch.isSelected());
+				chckbxShowBalancingErrors.setEnabled(rdbtnAdvancedSearch.isSelected());
 			}
 		};
 		
@@ -330,6 +330,8 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 		TranslateGUIElements.translateRadioButton(rdbtnStandardSearch);
 		TranslateGUIElements.translateRadioButton(rdbtnAdvancedSearch);
 		TranslateGUIElements.translateRadioButton(rdbtnRegularExpression);
+		TranslateGUIElements.translateCheckbox(chckbxUseSpecialSymbols);
+		TranslateGUIElements.translateCheckbox(chckbxShowBalancingErrors);
 		TranslateGUIElements.translateCheckbox(chckbxDotMatchNewLine);
 		TranslateGUIElements.translatePanel(panelOptions);
 		TranslateGUIElements.translatePanel(panelMode);
@@ -400,13 +402,13 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 	}
 	
 	@Override
-	public boolean escapeHandling() {
-		return chckbxEscapeHandling.isSelected();
+	public boolean useSpecialSymbols() {
+		return chckbxUseSpecialSymbols.isSelected();
 	}
 	
 	@Override
 	public boolean showBalancingError() {
-		return chckbxShowBalancingError.isSelected();
+		return chckbxShowBalancingErrors.isSelected();
 	}
 
 	@Override
@@ -438,12 +440,12 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 		chckbxDotMatchNewLine.setSelected(value);
 	}
 	
-	public void setEscapeHandling(boolean value) {
-		chckbxEscapeHandling.setSelected(value);
+	public void setUseSpecialSymbols(boolean value) {
+		chckbxUseSpecialSymbols.setSelected(value);
 	}
 	
 	public void setShowBalancingError(boolean value) {
-		chckbxShowBalancingError.setSelected(value);
+		chckbxShowBalancingErrors.setSelected(value);
 	}
 
 	public void setUseAdvancedSearch(boolean value) {
@@ -455,7 +457,7 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 	}
 
 	@Override
-	public void enableButtons(boolean enable) {
+	public void enableDisableButtons(boolean enable) {
 		jButton_find.setEnabled(enable);
 		jButton_replace.setEnabled(enable);
 		jButton_replaceall.setEnabled(enable);

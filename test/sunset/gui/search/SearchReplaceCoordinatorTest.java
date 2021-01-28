@@ -112,50 +112,50 @@ class SearchReplaceCoordinatorTest {
 		_frame.getCurrentCodePanel().getCodePane()
 		.setText("$this$ is %a complex %$§1 text\nnew line\n\t%453!\"\n\t\t§$%&/()=?\nend of text.");
 		_coordinator.resetCaretPosition();
-		_dialog.setEscapeHandling(true);
+		_dialog.setUseSpecialSymbols(true);
 		_dialog.setUseStandardSearch(true);
 		
 		_dialog.setSearchPattern("\\n");
 		Assert.assertTrue(_coordinator.findString(false));
 		
 		_coordinator.resetCaretPosition();
-		_dialog.setEscapeHandling(false);
+		_dialog.setUseSpecialSymbols(false);
 		Assert.assertFalse(_coordinator.findString(false));
 		
 		_frame.getCurrentCodePanel().getCodePane()
 		.setText("$this$ is %a complex %$§1 text\\nnew line\\n\t%453!\"\\t\t§$%&/()=?end of text.");
 		
 		_coordinator.resetCaretPosition();
-		_dialog.setEscapeHandling(true);
+		_dialog.setUseSpecialSymbols(true);
 		Assert.assertFalse(_coordinator.findString(false));
 		
 		_coordinator.resetCaretPosition();
-		_dialog.setEscapeHandling(false);
+		_dialog.setUseSpecialSymbols(false);
 		Assert.assertTrue(_coordinator.findString(false));
 		
 		// advanced search
 		_frame.getCurrentCodePanel().getCodePane()
 		.setText("$this$ is %a complex %$§1 text\nnew line\n\t%453!\"\n\t\t§$%&/()=?\nend of text.");
 		_coordinator.resetCaretPosition();
-		_dialog.setEscapeHandling(true);
+		_dialog.setUseSpecialSymbols(true);
 		_dialog.setUseAdvancedSearch(true);
 		
 		_dialog.setSearchPattern("\\n%1 ");
 		Assert.assertTrue(_coordinator.findString(false));
 		
 		_coordinator.resetCaretPosition();
-		_dialog.setEscapeHandling(false);
+		_dialog.setUseSpecialSymbols(false);
 		Assert.assertFalse(_coordinator.findString(false));
 		
 		_frame.getCurrentCodePanel().getCodePane()
 		.setText("$this$ is %a complex %$§1 text\\nnew line\\n\t%453!\"\\t\t§$%&/()=?end of text.");
 		
 		_coordinator.resetCaretPosition();
-		_dialog.setEscapeHandling(true);
+		_dialog.setUseSpecialSymbols(true);
 		Assert.assertFalse(_coordinator.findString(false));
 		
 		_coordinator.resetCaretPosition();
-		_dialog.setEscapeHandling(false);
+		_dialog.setUseSpecialSymbols(false);
 		Assert.assertTrue(_coordinator.findString(false));
 	}
 	

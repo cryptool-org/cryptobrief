@@ -405,7 +405,7 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 		for (Entry<String, String> entry : _matchingPairTemplates.entrySet()) {
 			key = entry.getKey();
 			val = entry.getValue();
-			
+
 			Matcher m = getMatcher(key, MIN_ONE_VAR, false);
 			
 			if (m.matches()) {	// at least one variable used in key

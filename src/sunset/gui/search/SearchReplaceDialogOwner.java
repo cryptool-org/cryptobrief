@@ -15,7 +15,7 @@ public class SearchReplaceDialogOwner {
 	}
 	
 	public void setFileOpened(boolean fileOpen) {
-		_dialogSearchReplace.enableButtons(fileOpen);
+		_dialogSearchReplace.enableDisableButtons(fileOpen);
 	}
 	
 	public void showDialog(boolean replaceMode) {
