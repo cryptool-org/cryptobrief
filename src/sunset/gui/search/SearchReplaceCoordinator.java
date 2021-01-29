@@ -1,7 +1,6 @@
 package sunset.gui.search;
 
 import java.awt.Color;
-import java.util.regex.Matcher;
 
 import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
@@ -27,8 +26,10 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 	
 	@Override
 	public void resetCaretPosition() {
-		JTextPane textPaneCode = FFaplJFrame.getCurrentCodePanel().getCodePane();
-		textPaneCode.setCaretPosition(0);
+		if (_dialog.replaceAllFromStart()) {
+			JTextPane textPaneCode = FFaplJFrame.getCurrentCodePanel().getCodePane();
+			textPaneCode.setCaretPosition(0);
+		}
 	}
 	
 	@Override
@@ -73,6 +74,10 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 				return true;
 			} else {
 				if (_logic.getError()) {
+					if (_logic.getStart() != -1 && _logic.getEnd() != -1) {
+						textPaneCode.setCaretPosition(_logic.getStart());
+						textPaneCode.moveCaretPosition(_logic.getEnd());
+					}
 					setStatus(_logic.getMessage(), SearchStatus.FAILURE);
 				} else {
 					setStatus(_logic.getMessage() + getLineNumber(doc, caretPos), SearchStatus.FAILURE);
@@ -169,6 +174,7 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 		}
 		
 		textPaneCode.replaceSelection(replace);
+		
 		return true;
 	}
 	

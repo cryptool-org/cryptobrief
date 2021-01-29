@@ -12,11 +12,17 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import javax.swing.JCheckBox;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.SwingConstants;
 
 import sunset.gui.listener.ActionListenerCloseWindow;
 import sunset.gui.search.SearchReplaceCoordinator;
@@ -30,20 +36,14 @@ import sunset.gui.search.listener.ActionListenerOpenSettingsDialog;
 import sunset.gui.tabbedpane.JTabbedPaneNamed;
 import sunset.gui.util.TranslateGUIElements;
 
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Vector;
-
-import javax.swing.SwingConstants;
 import java.awt.Font;
-import javax.swing.JCheckBox;
+
+import java.util.Vector;
 
 @SuppressWarnings("serial")
 public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialog, ISearchReplaceShowDialog {
@@ -62,6 +62,7 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 	private Vector<Component> replaceComp = new Vector<Component>();
 	private JCheckBox chckbxMatchCase;
 	private JCheckBox chckbxWrapAround;
+	private JCheckBox chckbxReplaceAllFromStart;
 	private JRadioButton rdbtnStandardSearch;
 	private JRadioButton rdbtnAdvancedSearch;
 	private JRadioButton rdbtnRegularExpression;
@@ -104,19 +105,13 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 				panelOptions = new JPanel();
 				
 				panelMode = new JPanel();
-				panelMode.setBorder(new TitledBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, 
-						new Color(255, 255, 255), new Color(160, 160, 160)), "", TitledBorder.LEADING, 
-						TitledBorder.TOP, null, new Color(0, 0, 0)), "Search Mode", TitledBorder.LEADING, 
-						TitledBorder.TOP, null, null));
+				panelMode.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Search Mode", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 				panelMode.setName("panel_mode");
 				panelMode.setLayout(null);
 				
 				panelMode.setBounds(10, 140, 140, 100);
 				
-				panelOptions.setBorder(new TitledBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, 
-						new Color(255, 255, 255), new Color(160, 160, 160)), "", TitledBorder.LEADING, 
-						TitledBorder.TOP, null, new Color(0, 0, 0)), "Options", TitledBorder.LEADING, 
-						TitledBorder.TOP, null, null));
+				panelOptions.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Options", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 				panelOptions.setName("panel_options");
 				panelOptions.setLayout(null);
 				
@@ -162,12 +157,24 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 					replaceComp.add(jButton_replace);
 				}
 				
-				{
+				{					
+					JPanel panelReplaceAll = new JPanel();
+					panelReplaceAll.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+					panelReplaceAll.setBounds(260, 80, 210, 40);
+					panelReplaceAll.setLayout(null);
+					
+					chckbxReplaceAllFromStart = new JCheckBox("From start");
+					chckbxReplaceAllFromStart.setBounds(10, 10, 80, 21);
+					chckbxReplaceAllFromStart.setName("chckbx_replaceallfromstart");
+					panelReplaceAll.add(chckbxReplaceAllFromStart);
+					
 					jButton_replaceall = new JButton("Replace All");
-					jButton_replaceall.setBounds(360, 85, 101, 21);
+					jButton_replaceall.setBounds(100, 9, 101, 21);
 					jButton_replaceall.setName("button_replaceall");
-					panelSearchReplaceMain.add(jButton_replaceall);
-					replaceComp.add(jButton_replaceall);
+					panelReplaceAll.add(jButton_replaceall);
+					
+					panelSearchReplaceMain.add(panelReplaceAll);
+					replaceComp.add(panelReplaceAll);
 				}
 				
 				{
@@ -327,6 +334,7 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 		TranslateGUIElements.translateLabel(jLabel_replacewith);
 		TranslateGUIElements.translateCheckbox(chckbxMatchCase);
 		TranslateGUIElements.translateCheckbox(chckbxWrapAround);
+		TranslateGUIElements.translateCheckbox(chckbxReplaceAllFromStart);
 		TranslateGUIElements.translateRadioButton(rdbtnStandardSearch);
 		TranslateGUIElements.translateRadioButton(rdbtnAdvancedSearch);
 		TranslateGUIElements.translateRadioButton(rdbtnRegularExpression);
@@ -349,20 +357,9 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 		
 		pack();
 		this.setLocationRelativeTo(owner);
-		resetFields();
+		jLabel_status.setText("");
 		translate();
 		setVisible(true);
-	}
-	
-	public void resetFields() {
-		jTextField_searchtext.setText("");
-		jTextField_replacetext.setText("");
-		chckbxMatchCase.setSelected(false);
-		rdbtnStandardSearch.setSelected(true);
-		chckbxDotMatchNewLine.setSelected(false);
-		chckbxDotMatchNewLine.setEnabled(false);
-		chckbxWrapAround.setSelected(false);
-		jLabel_status.setText("");
 	}
 
 	@Override
@@ -379,6 +376,10 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 	public void setStatus(String status, Color color) {
 		jLabel_status.setText(status);
 		jLabel_status.setForeground(color);
+		
+		if (status.length() > 70) {
+			JOptionPane.showMessageDialog(this, status, "Information", JOptionPane.INFORMATION_MESSAGE);
+		}
 	}
 
 	@Override
@@ -389,6 +390,11 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 	@Override
 	public boolean wrapAround() {
 		return chckbxWrapAround.isSelected();
+	}
+
+	@Override
+	public boolean replaceAllFromStart() {
+		return chckbxReplaceAllFromStart.isSelected();
 	}
 
 	@Override
@@ -430,6 +436,10 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 
 	public void setWrapAround(boolean value) {
 		chckbxWrapAround.setSelected(value);
+	}
+	
+	public void setReplaceAllFromStart(boolean value) {
+		chckbxReplaceAllFromStart.setSelected(value);
 	}
 
 	public void setUseRegEx(boolean value) {

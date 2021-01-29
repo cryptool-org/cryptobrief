@@ -34,6 +34,8 @@ public interface ISearchReplaceDialog {
 	 */
 	public boolean wrapAround();
 	
+	public boolean replaceAllFromStart();
+	
 	/**
 	 * Returns the value of the use regular expression flag, i.e. if regular expression search should be used
 	 * @return status of regular expression checkbox

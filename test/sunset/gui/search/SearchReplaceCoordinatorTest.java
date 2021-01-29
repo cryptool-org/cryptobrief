@@ -1,5 +1,7 @@
 package sunset.gui.search;
 
+import javax.swing.JTextPane;
+
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -28,6 +30,7 @@ class SearchReplaceCoordinatorTest {
 	void beforeEach() throws Exception {
 		_frame.getCurrentCodePanel().getCodePane()
 		.setText("$this$ is %a complex %$§1 text\nnew line\n\t%453!\"\n\t\t§$%&/()=?\nend of text.");
+		_dialog.setReplaceAllFromStart(true);
 	}
 
 	@Test
@@ -107,7 +110,58 @@ class SearchReplaceCoordinatorTest {
 	}
 	
 	@Test
-	void testEscapeOption() {
+	void testReplaceAllFromStart() {
+		_frame.getCurrentCodePanel().getCodePane()
+		.setText("abcabcabc");
+		
+		_dialog.setSearchPattern("a%1c");
+		_dialog.setUseAdvancedSearch(true);
+		_dialog.setReplaceText("e%1f");
+		
+		_coordinator.findString(false);
+		
+		_dialog.setReplaceAllFromStart(false);
+		
+		_coordinator.resetCaretPosition();
+		
+		int count = 0;
+		while (_coordinator.findString(true)) {
+			if (_coordinator.replaceText()) {
+				count++;
+			} else {
+				break;
+			}
+		}
+		
+		Assert.assertEquals(2, count);
+		String text = _frame.getCurrentCodePanel().getCodePane().getText();
+		Assert.assertEquals("abcebfebf", text);
+		
+		_frame.getCurrentCodePanel().getCodePane()
+		.setText("abcabcabc");
+		
+		_coordinator.findString(false);
+		
+		_dialog.setReplaceAllFromStart(true);
+		
+		_coordinator.resetCaretPosition();
+		
+		count = 0;
+		while (_coordinator.findString(true)) {
+			if (_coordinator.replaceText()) {
+				count++;
+			} else {
+				break;
+			}
+		}
+		
+		Assert.assertEquals(3, count);
+		text = _frame.getCurrentCodePanel().getCodePane().getText();
+		Assert.assertEquals("ebfebfebf", text);
+	}
+	
+	@Test
+	void testUseSpecialSymbols() {
 		// standard search
 		_frame.getCurrentCodePanel().getCodePane()
 		.setText("$this$ is %a complex %$§1 text\nnew line\n\t%453!\"\n\t\t§$%&/()=?\nend of text.");
@@ -230,6 +284,21 @@ class SearchReplaceCoordinatorTest {
 		Assert.assertTrue(_coordinator.findString(false));
 		Assert.assertTrue(_coordinator.isSearchPatternSelected());
 		Assert.assertTrue(_coordinator.replaceText());
+	}
+	
+	@Test
+	void testIncorrectBalancing() {
+		_frame.getCurrentCodePanel().getCodePane().setText("a({])b");
+		
+		_dialog.setSearchPattern("a%1b");
+		_dialog.setUseAdvancedSearch(true);
+		_dialog.setShowBalancingError(true);
+		
+		Assert.assertFalse(_coordinator.findString(false));
+		
+		String selectedText = _frame.getCurrentCodePanel().getCodePane().getSelectedText();
+		
+		Assert.assertEquals("a({])", selectedText);
 	}
 	
 	@Test

@@ -72,8 +72,10 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 	@Override
 	public boolean searchAdvanced(String text, String pattern, String matchingPairs, 
 			int fromIndex, boolean matchCase, boolean wrapAround, boolean showBalancingError) {
+		IAdvancedSearchReplace advSearchReplace = null;
+		
 		try {
-			IAdvancedSearchReplace advSearchReplace = new AdvancedSearchReplace(matchingPairs);
+			advSearchReplace = new AdvancedSearchReplace(matchingPairs);
 			boolean found = advSearchReplace.find(text, pattern, fromIndex, matchCase, showBalancingError);
 			
 			// if not found starting fromIndex, fromIndex was not 0, and wrap around is activated, search again from 0
@@ -87,6 +89,10 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 			_error = false;
 			return found;
 		} catch (InvalidPatternException | IndexOutOfBoundsException | UnbalancedStringException | MatchingPairConfigurationException e) {
+			if (advSearchReplace != null) {
+				_matchStart = advSearchReplace.getStart();
+				_matchEnd = advSearchReplace.getEnd();
+			}
 			_message = e.getMessage();
 			_error = true;
 			return false;

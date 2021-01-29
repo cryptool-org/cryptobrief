@@ -320,7 +320,7 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 	}
 	
 	/**
-	 * Removes the escaping character from the given pattern
+	 * Removes the escaping character from the given pattern, e.g. %%1 is changed to %1
 	 * @param pattern the pattern from which the escaping character should be removed
 	 * @return the pattern with all escaped variables replaced by variables
 	 */
