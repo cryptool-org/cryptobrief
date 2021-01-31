@@ -220,15 +220,16 @@ class SearchReplaceCoordinatorTest {
 		
 		_dialog.setSearchPattern("");
 		_dialog.setUseStandardSearch(true);
-		Assert.assertFalse(_coordinator.findString(false));
+		Assert.assertTrue(_coordinator.findString(false));
 		
 		_dialog.setSearchPattern("^");
 		_dialog.setUseRegEx(true);
-		Assert.assertFalse(_coordinator.findString(false));
+		Assert.assertTrue(_coordinator.findString(false));
 		
-		_dialog.setSearchPattern("");
+		_frame.getCurrentCodePanel().getCodePane().setText("");
+		_dialog.setSearchPattern("%1");
 		_dialog.setUseAdvancedSearch(true);
-		Assert.assertFalse(_coordinator.findString(false));
+		Assert.assertTrue(_coordinator.findString(false));
 	}
 	
 	@Test

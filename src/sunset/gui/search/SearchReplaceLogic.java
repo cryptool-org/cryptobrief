@@ -41,7 +41,7 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 			_matchEnd = -1;
 		}
 		
-		_message = generateMessage(pattern, _matchStart != -1);
+		_message = generateMessage(pattern);
 		_error = false;
 		
 		return _matchStart != -1;
@@ -60,7 +60,7 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 				_matchEnd = -1;
 			}
 			
-			_message = generateMessage(pattern, _matchStart != -1);
+			_message = generateMessage(pattern);
 			_error = false;
 			return _matchStart != -1;
 		} else {
@@ -85,7 +85,7 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 
 			_matchStart = advSearchReplace.getStart();
 			_matchEnd = advSearchReplace.getEnd();
-			_message = generateMessage(pattern, found);
+			_message = generateMessage(pattern);
 			_error = false;
 			return found;
 		} catch (InvalidPatternException | IndexOutOfBoundsException | UnbalancedStringException | MatchingPairConfigurationException e) {
@@ -118,14 +118,14 @@ public class SearchReplaceLogic implements ISearchReplaceLogic {
 		}
 	}
 	
-	/**
-	 * Generates a message depending on the search outcome (success/failure)
-	 * @param pattern the pattern to search for
-	 * @param success the flag indicating if the search was successful or not
-	 * @return the generated message
-	 */
-	private String generateMessage(String pattern, boolean success) {
-		return "\"" + handleEscapes(pattern) + "\"" + (success ? " found at line " : " not found from line ");
+	private String generateMessage(String pattern) {
+		boolean found = _matchStart != -1;
+		
+		if (found && _matchStart == _matchEnd) {
+			return "Zero length match at line ";
+		}
+		
+		return "\"" + handleEscapes(pattern) + "\"" + (found ? " found at line " : " not found from line ");
 	}
 	
 	private String handleEscapes(String s) {

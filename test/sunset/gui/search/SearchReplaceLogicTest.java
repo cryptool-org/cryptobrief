@@ -1,7 +1,5 @@
 package sunset.gui.search;
 
-import java.util.regex.PatternSyntaxException;
-
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

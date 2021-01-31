@@ -27,21 +27,23 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 	@Override
 	public void resetCaretPosition() {
 		if (_dialog.replaceAllFromStart()) {
-			JTextPane textPaneCode = FFaplJFrame.getCurrentCodePanel().getCodePane();
-			textPaneCode.setCaretPosition(0);
+			getTextPane().setCaretPosition(0);
 		}
+	}
+	
+	private JTextPane getTextPane() {
+		return FFaplJFrame.getCurrentCodePanel().getCodePane();
 	}
 	
 	@Override
 	public boolean findString(boolean ignoreWrapAroundFlag) {
 		try {
-			JTextPane textPaneCode = FFaplJFrame.getCurrentCodePanel().getCodePane();
-			Document doc = textPaneCode.getDocument();
+			JTextPane textPane = getTextPane();
+			Document doc = textPane.getDocument();
 			String text = doc.getText(0, doc.getLength());
-			int caretPos = textPaneCode.getCaretPosition();
+			int caretPos = textPane.getCaretPosition();
 			
 			String pattern = handleEscapes(_dialog.searchPattern());
-			
 			boolean matchCase = _dialog.matchCase();
 			boolean wrapAround = _dialog.wrapAround() && !ignoreWrapAroundFlag;
 			boolean found;
@@ -60,14 +62,8 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 			}
 			
 			if (found) {
-				textPaneCode.setCaretPosition(_logic.getStart());
-				
-				if (_logic.getStart() == _logic.getEnd()) {
-					setStatus("Zero length match", SearchStatus.FAILURE);
-					return false;
-				}
-				
-				textPaneCode.moveCaretPosition(_logic.getEnd());
+				textPane.setCaretPosition(_logic.getStart());
+				textPane.moveCaretPosition(_logic.getEnd());
 				
 				setStatus(_logic.getMessage() + getLineNumber(doc, _logic.getStart()), SearchStatus.SEARCH_SUCCESS);
 				
@@ -75,8 +71,8 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 			} else {
 				if (_logic.getError()) {
 					if (_logic.getStart() != -1 && _logic.getEnd() != -1) {
-						textPaneCode.setCaretPosition(_logic.getStart());
-						textPaneCode.moveCaretPosition(_logic.getEnd());
+						textPane.setCaretPosition(_logic.getStart());
+						textPane.moveCaretPosition(_logic.getEnd());
 					}
 					setStatus(_logic.getMessage(), SearchStatus.FAILURE);
 				} else {
@@ -113,8 +109,7 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 	
 	@Override
 	public boolean isSearchPatternSelected() {
-		JTextPane textPaneCode = FFaplJFrame.getCurrentCodePanel().getCodePane();
-		String selectedText = textPaneCode.getSelectedText();
+		String selectedText = getTextPane().getSelectedText();
 		
 		if (selectedText == null) {
 			return false;
@@ -138,21 +133,21 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 	
 	@Override
 	public boolean replaceText() {
-		JTextPane textPaneCode = FFaplJFrame.getCurrentCodePanel().getCodePane();
-		String pattern = handleEscapes(_dialog.searchPattern());
-		String replace = handleEscapes(_dialog.replaceText());
-		String selectedText = textPaneCode.getSelectedText();
+		JTextPane textPane = getTextPane();
+		String selectedText = textPane.getSelectedText();
 		
 		if (selectedText == null) {
 			return false;
 		}
 		
+		String pattern = handleEscapes(_dialog.searchPattern());
+		String replace = handleEscapes(_dialog.replaceText());
 		boolean matchCase = _dialog.matchCase();
 		boolean dotAll = _dialog.dotMatchesNewLine();
 		boolean showBalancingError = _dialog.showBalancingError();
 		
 		if (_dialog.useRegEx()) {
-			try {		
+			try {
 				replace = _logic.replaceRegex(selectedText, pattern, replace, matchCase, dotAll);
 			} catch (Exception e) {
 				setStatus(e.getMessage(), SearchStatus.FAILURE);
@@ -173,7 +168,7 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 			return false;
 		}
 		
-		textPaneCode.replaceSelection(replace);
+		textPane.replaceSelection(replace);
 		
 		return true;
 	}

@@ -29,6 +29,8 @@ public class ActionListenerReplaceAll implements ActionListener {
 		
 		if (count > 0) {
 			_coordinator.setStatus("Replace All: " + count + " occurrence" + (count != 1 ? "s" : "") + " replaced", SearchStatus.REPLACE_SUCCESS);
+		} else {
+			_coordinator.setStatus("No replacement done", SearchStatus.FAILURE);
 		}
 	}
 }
