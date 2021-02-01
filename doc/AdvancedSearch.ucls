@@ -13,7 +13,7 @@
   </interface>  
   <class id="2" language="java" name="sunset.gui.search.advanced.AdvancedSearchReplace" project="Sunset" 
     file="/Sunset/src/sunset/gui/search/advanced/AdvancedSearchReplace.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="382" y="354"/>    
+    <position height="-1" width="-1" x="321" y="351"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="false" static="true"/>      
@@ -22,7 +22,7 @@
   </class>  
   <class id="3" language="java" name="sunset.gui.search.logic.SearchLogic" project="Sunset" 
     file="/Sunset/src/sunset/gui/search/logic/SearchLogic.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="792" y="309"/>    
+    <position height="-1" width="-1" x="825" y="325"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="false" static="true"/>      

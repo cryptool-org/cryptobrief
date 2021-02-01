@@ -13,7 +13,8 @@ import sunset.gui.search.logic.interfaces.IReplaceLogic;
 public class ReplaceLogic extends BaseLogic implements IReplaceLogic {	
 	
 	@Override
-	public String replaceRegex(String text, String pattern, String replaceWith, boolean matchCase, boolean dotAll) throws Exception {
+	public String replaceRegex(String text, String pattern, String replaceWith, boolean matchCase, 
+			boolean dotAll) throws Exception {
 		Matcher m = getMatcher(text, pattern, matchCase, dotAll);
 		
 		return m != null ? m.replaceAll(replaceWith) : null;

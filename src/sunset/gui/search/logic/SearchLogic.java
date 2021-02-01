@@ -1,14 +1,11 @@
 package sunset.gui.search.logic;
 
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import sunset.gui.search.advanced.AdvancedSearchReplace;
 import sunset.gui.search.advanced.exception.InvalidPatternException;
 import sunset.gui.search.advanced.exception.MatchingPairConfigurationException;
 import sunset.gui.search.advanced.exception.UnbalancedStringException;
-import sunset.gui.search.advanced.exception.UndeclaredVariableException;
 import sunset.gui.search.advanced.interfaces.IAdvancedSearchReplace;
 import sunset.gui.search.logic.interfaces.ISearchLogic;
 
@@ -18,8 +15,12 @@ public class SearchLogic extends BaseLogic implements ISearchLogic {
 	private int _matchEnd;
 	
 	@Override
-	public boolean search(String text, String pattern, int fromIndex, boolean matchCase, boolean wrapAround) {
-		if (matchCase) {
+	public boolean search(SearchContext context, boolean wrapAround) {
+		String text = context.getText();
+		String pattern = context.getPattern();
+		int fromIndex = context.getFromIndex();
+		
+		if (context.isMatchCase()) {
 			_matchStart = text.indexOf(pattern, fromIndex);
 		} else {
 			_matchStart = text.toLowerCase().indexOf(pattern.toLowerCase(), fromIndex);
@@ -27,7 +28,7 @@ public class SearchLogic extends BaseLogic implements ISearchLogic {
 		
 		// if not found starting fromIndex, fromIndex was not 0, and wrap around is activated, search again from 0
 		if (_matchStart == -1 && fromIndex != 0 && wrapAround) {
-			return search(text, pattern, 0, matchCase, wrapAround);
+			return search(new SearchContext(text, pattern, 0, context.isMatchCase()), wrapAround);
 		}
 		
 		if (_matchStart != -1) {
@@ -43,11 +44,11 @@ public class SearchLogic extends BaseLogic implements ISearchLogic {
 	}
 	
 	@Override
-	public boolean searchRegex(String text, String pattern, int fromIndex, boolean matchCase, boolean wrapAround, boolean dotAll) {
-		Matcher m = getMatcher(text, pattern, matchCase, dotAll);
+	public boolean searchRegex(SearchContext context, boolean wrapAround, boolean dotAll) {
+		Matcher m = getMatcher(context.getText(), context.getPattern(), context.isMatchCase(), dotAll);
 		
 		if (m != null) {
-			if (m.find(fromIndex) || wrapAround && fromIndex != 0 && m.find(0)) {
+			if (m.find(context.getFromIndex()) || wrapAround && context.getFromIndex() != 0 && m.find(0)) {
 				_matchStart = m.start();
 				_matchEnd = m.end();
 			} else {
@@ -55,7 +56,7 @@ public class SearchLogic extends BaseLogic implements ISearchLogic {
 				_matchEnd = -1;
 			}
 			
-			_message = generateMessage(pattern);
+			_message = generateMessage(context.getPattern());
 			_error = false;
 			return _matchStart != -1;
 		} else {
@@ -65,17 +66,17 @@ public class SearchLogic extends BaseLogic implements ISearchLogic {
 	}
 	
 	@Override
-	public boolean searchAdvanced(String text, String pattern, String matchingPairs, 
-			int fromIndex, boolean matchCase, boolean wrapAround, boolean showBalancingError) {
+	public boolean searchAdvanced(SearchContext context, boolean wrapAround, String matchingPairs, boolean showBalancingError) {
+		String pattern = context.getPattern();
 		IAdvancedSearchReplace advSearchReplace = null;
 		
 		try {
 			advSearchReplace = new AdvancedSearchReplace(matchingPairs);
-			boolean found = advSearchReplace.find(text, pattern, fromIndex, matchCase, showBalancingError);
+			boolean found = advSearchReplace.find(context.getText(), pattern, context.getFromIndex(), context.isMatchCase(), showBalancingError);
 			
 			// if not found starting fromIndex, fromIndex was not 0, and wrap around is activated, search again from 0
-			if (!found && fromIndex != 0 && wrapAround) {
-				found = advSearchReplace.find(text, pattern, 0, matchCase, showBalancingError);
+			if (!found && context.getFromIndex() != 0 && wrapAround) {
+				found = advSearchReplace.find(context.getText(), pattern, 0, context.isMatchCase(), showBalancingError);
 			}
 
 			_matchStart = advSearchReplace.getStart();

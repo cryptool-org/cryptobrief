@@ -13,6 +13,7 @@ import sunset.gui.logic.GUIPropertiesLogic;
 import sunset.gui.search.interfaces.ISearchReplaceDialog;
 import sunset.gui.search.logic.MatcherLogic;
 import sunset.gui.search.logic.ReplaceLogic;
+import sunset.gui.search.logic.SearchContext;
 import sunset.gui.search.logic.SearchLogic;
 import sunset.gui.search.logic.interfaces.IMatcherLogic;
 import sunset.gui.search.logic.interfaces.IReplaceLogic;
@@ -53,19 +54,20 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 			String pattern = handleEscapes(_dialog.searchPattern());
 			boolean matchCase = _dialog.matchCase();
 			boolean wrapAround = _dialog.wrapAround() && !ignoreWrapAroundFlag;
+			SearchContext context = new SearchContext(text, pattern, caretPos, matchCase);
 			boolean found;
 			
 			if (_dialog.useRegEx()) {
 				boolean dotAll = _dialog.dotMatchesNewLine();
 				
-				found = searchLogic.searchRegex(text, pattern, caretPos, matchCase, wrapAround, dotAll);
+				found = searchLogic.searchRegex(context, wrapAround, dotAll);
 			} else if (_dialog.useAdvancedSearch()){
 				String matchingPairs = getMatchingPairs();
 				boolean showBalancingError = _dialog.showBalancingError();
 				
-				found = searchLogic.searchAdvanced(text, pattern, matchingPairs, caretPos, matchCase, wrapAround, showBalancingError);
+				found = searchLogic.searchAdvanced(context, wrapAround, matchingPairs, showBalancingError);
 			} else {
-				found = searchLogic.search(text, pattern, caretPos, matchCase, wrapAround);
+				found = searchLogic.search(context, wrapAround);
 			}
 			
 			if (found) {
