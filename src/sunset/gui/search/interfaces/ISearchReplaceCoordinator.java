@@ -5,7 +5,7 @@ import javax.swing.JTextPane;
 public interface ISearchReplaceCoordinator {
 	/**
 	 * Gets the text from the {@link JTextPane} and the inputs using the {@link ISearchReplaceDialog}.
-	 * Afterwards the {@link ISearchReplaceLogic} is used to perform the search operation.
+	 * Afterwards the {@link ISearchLogic} is used to perform the search operation.
 	 * Depending on the result, the caret position in the {@link JTextPane} and the dialog status are set.
 	 * @param bIgnoreWrapAroundFlag if true, the wrap around flag is ignored
 	 * @return true if the search string from the dialog was found in the code pane considering the options of the {@link JSearchReplaceDialog}, false otherwise

@@ -11,23 +11,29 @@ import sunset.gui.FFaplJFrame;
 import sunset.gui.interfaces.IProperties;
 import sunset.gui.logic.GUIPropertiesLogic;
 import sunset.gui.search.interfaces.ISearchReplaceDialog;
-import sunset.gui.search.interfaces.ISearchReplaceLogic;
+import sunset.gui.search.logic.MatcherLogic;
+import sunset.gui.search.logic.ReplaceLogic;
+import sunset.gui.search.logic.SearchLogic;
+import sunset.gui.search.logic.interfaces.IMatcherLogic;
+import sunset.gui.search.logic.interfaces.IReplaceLogic;
+import sunset.gui.search.logic.interfaces.ISearchLogic;
 import sunset.gui.search.advanced.exception.UndeclaredVariableException;
 import sunset.gui.search.interfaces.ISearchReplaceCoordinator;
 
 public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 	private ISearchReplaceDialog _dialog;
-	private ISearchReplaceLogic  _logic;
 	
 	public SearchReplaceCoordinator(ISearchReplaceDialog dialogSearchReplace) {
 		_dialog = dialogSearchReplace;
-		_logic = new SearchReplaceLogic();
 	}
 	
 	@Override
 	public void resetCaretPosition() {
 		if (_dialog.replaceAllFromStart()) {
 			getTextPane().setCaretPosition(0);
+		} else {
+			int start = getTextPane().getSelectionStart();
+			getTextPane().setCaretPosition(start);
 		}
 	}
 	
@@ -43,6 +49,7 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 			String text = doc.getText(0, doc.getLength());
 			int caretPos = textPane.getCaretPosition();
 			
+			ISearchLogic searchLogic = new SearchLogic();
 			String pattern = handleEscapes(_dialog.searchPattern());
 			boolean matchCase = _dialog.matchCase();
 			boolean wrapAround = _dialog.wrapAround() && !ignoreWrapAroundFlag;
@@ -51,32 +58,32 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 			if (_dialog.useRegEx()) {
 				boolean dotAll = _dialog.dotMatchesNewLine();
 				
-				found = _logic.searchRegex(text, pattern, caretPos, matchCase, wrapAround, dotAll);
+				found = searchLogic.searchRegex(text, pattern, caretPos, matchCase, wrapAround, dotAll);
 			} else if (_dialog.useAdvancedSearch()){
 				String matchingPairs = getMatchingPairs();
 				boolean showBalancingError = _dialog.showBalancingError();
 				
-				found = _logic.searchAdvanced(text, pattern, matchingPairs, caretPos, matchCase, wrapAround, showBalancingError);
+				found = searchLogic.searchAdvanced(text, pattern, matchingPairs, caretPos, matchCase, wrapAround, showBalancingError);
 			} else {
-				found = _logic.search(text, pattern, caretPos, matchCase, wrapAround);
+				found = searchLogic.search(text, pattern, caretPos, matchCase, wrapAround);
 			}
 			
 			if (found) {
-				textPane.setCaretPosition(_logic.getStart());
-				textPane.moveCaretPosition(_logic.getEnd());
+				textPane.setCaretPosition(searchLogic.getStart());
+				textPane.moveCaretPosition(searchLogic.getEnd());
 				
-				setStatus(_logic.getMessage() + getLineNumber(doc, _logic.getStart()), SearchStatus.SEARCH_SUCCESS);
+				setStatus(searchLogic.getMessage() + getLineNumber(doc, searchLogic.getStart()), SearchStatus.SEARCH_SUCCESS);
 				
 				return true;
 			} else {
-				if (_logic.getError()) {
-					if (_logic.getStart() != -1 && _logic.getEnd() != -1) {
-						textPane.setCaretPosition(_logic.getStart());
-						textPane.moveCaretPosition(_logic.getEnd());
+				if (searchLogic.getError()) {
+					if (searchLogic.getStart() != -1 && searchLogic.getEnd() != -1) {
+						textPane.setCaretPosition(searchLogic.getStart());
+						textPane.moveCaretPosition(searchLogic.getEnd());
 					}
-					setStatus(_logic.getMessage(), SearchStatus.FAILURE);
+					setStatus(searchLogic.getMessage(), SearchStatus.FAILURE);
 				} else {
-					setStatus(_logic.getMessage() + getLineNumber(doc, caretPos), SearchStatus.FAILURE);
+					setStatus(searchLogic.getMessage() + getLineNumber(doc, caretPos), SearchStatus.FAILURE);
 				}
 			}
 		} catch (BadLocationException e) {
@@ -115,19 +122,20 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 			return false;
 		}
 		
+		IMatcherLogic matcherLogic = new MatcherLogic();
 		String pattern = handleEscapes(_dialog.searchPattern());
 		boolean matchCase = _dialog.matchCase();
 		
 		if (_dialog.useRegEx()) {		
 			boolean dotAll = _dialog.dotMatchesNewLine();
 			
-			return _logic.matchesRegex(selectedText, pattern, matchCase, dotAll);
+			return matcherLogic.matchesRegex(selectedText, pattern, matchCase, dotAll);
 		} else if (_dialog.useAdvancedSearch()){
 			String matchingPairs = getMatchingPairs();
 			
-			return _logic.matchesAdvanced(selectedText, pattern, matchingPairs, matchCase);
+			return matcherLogic.matchesAdvanced(selectedText, pattern, matchingPairs, matchCase);
 		} else {
-			return _logic.equals(selectedText, pattern, matchCase);
+			return matcherLogic.equals(selectedText, pattern, matchCase);
 		}
 	}
 	
@@ -140,6 +148,7 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 			return false;
 		}
 		
+		IReplaceLogic replaceLogic = new ReplaceLogic();
 		String pattern = handleEscapes(_dialog.searchPattern());
 		String replace = handleEscapes(_dialog.replaceText());
 		boolean matchCase = _dialog.matchCase();
@@ -148,7 +157,7 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 		
 		if (_dialog.useRegEx()) {
 			try {
-				replace = _logic.replaceRegex(selectedText, pattern, replace, matchCase, dotAll);
+				replace = replaceLogic.replaceRegex(selectedText, pattern, replace, matchCase, dotAll);
 			} catch (Exception e) {
 				setStatus(e.getMessage(), SearchStatus.FAILURE);
 				return false;
@@ -156,7 +165,7 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 		} else if (_dialog.useAdvancedSearch()) {
 			try {
 				String matchingPairs = getMatchingPairs();
-				replace = _logic.replaceAdvanced(selectedText, pattern, replace, matchingPairs, matchCase, showBalancingError);
+				replace = replaceLogic.replaceAdvanced(selectedText, pattern, replace, matchingPairs, matchCase, showBalancingError);
 			} catch (UndeclaredVariableException e) {
 				setStatus(e.getMessage(), SearchStatus.FAILURE);
 				return false;
@@ -164,7 +173,7 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 		}
 		
 		if (replace == null) {
-			setStatus(_logic.getMessage(), SearchStatus.FAILURE);
+			setStatus(replaceLogic.getMessage(), SearchStatus.FAILURE);
 			return false;
 		}
 		

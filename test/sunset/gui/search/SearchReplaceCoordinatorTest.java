@@ -1,9 +1,6 @@
 package sunset.gui.search;
 
-import javax.swing.JTextPane;
-
 import org.junit.Assert;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -111,14 +108,27 @@ class SearchReplaceCoordinatorTest {
 	
 	@Test
 	void testReplaceAllFromStart() {
-		_frame.getCurrentCodePanel().getCodePane()
+		/*_frame.getCurrentCodePanel().getCodePane()
 		.setText("abcabcabc");
 		
 		_dialog.setSearchPattern("a%1c");
 		_dialog.setUseAdvancedSearch(true);
-		_dialog.setReplaceText("e%1f");
+		_dialog.setReplaceText("aa%1cc");
 		
 		_coordinator.findString(false);
+		
+		// start "Replace" button pressed
+		if (_coordinator.isSearchPatternSelected()) {
+			if (_coordinator.replaceText()) {
+				boolean found = _coordinator.findString(false);
+				
+				_coordinator.setStatus("Replace: 1 occurrence replaced, " + 
+				(found ? "next occurrence found" : "no further occurrences found"), SearchStatus.REPLACE_SUCCESS);
+			}
+		} else {
+			_coordinator.findString(false);
+		}
+		// end
 		
 		_dialog.setReplaceAllFromStart(false);
 		
@@ -135,12 +145,13 @@ class SearchReplaceCoordinatorTest {
 		
 		Assert.assertEquals(2, count);
 		String text = _frame.getCurrentCodePanel().getCodePane().getText();
-		Assert.assertEquals("abcebfebf", text);
+		Assert.assertEquals("aabccaabccaabcc", text);
 		
-		_frame.getCurrentCodePanel().getCodePane()
+		/*_frame.getCurrentCodePanel().getCodePane()
 		.setText("abcabcabc");
 		
 		_coordinator.findString(false);
+		_coordinator.replaceText();
 		
 		_dialog.setReplaceAllFromStart(true);
 		
@@ -157,7 +168,7 @@ class SearchReplaceCoordinatorTest {
 		
 		Assert.assertEquals(3, count);
 		text = _frame.getCurrentCodePanel().getCodePane().getText();
-		Assert.assertEquals("ebfebfebf", text);
+		Assert.assertEquals("aaabcccaabccaabcc", text);*/
 	}
 	
 	@Test

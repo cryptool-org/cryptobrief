@@ -82,6 +82,7 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 		setFont(new Font("Dialog", Font.PLAIN, 10));
 		initGUI();
 		initListener();
+		setInitialStatus();
 	}
 	
 	private void initGUI() {
@@ -202,13 +203,11 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 				chckbxShowBalancingErrors = new JCheckBox("Show balancing errors");
 				chckbxShowBalancingErrors.setBounds(10, 42, 174, 21);
 				chckbxShowBalancingErrors.setName("chckbx_showbalancingerror");
-				chckbxShowBalancingErrors.setEnabled(false);
 				panelOptions.add(chckbxShowBalancingErrors);
 
 				chckbxDotMatchNewLine = new JCheckBox(". matches newline");
 				chckbxDotMatchNewLine.setBounds(10, 64, 174, 21);
 				chckbxDotMatchNewLine.setName("chckbx_dotall");
-				chckbxDotMatchNewLine.setEnabled(false);
 				panelOptions.add(chckbxDotMatchNewLine);
 				
 				rdbtnStandardSearch = new JRadioButton("Standard search");
@@ -307,6 +306,12 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 		rdbtnRegularExpression.addActionListener(radioButtonListener);
 		
 		this.addEscapeListener(this);
+	}
+	
+	private void setInitialStatus() {
+		rdbtnStandardSearch.setSelected(true);
+		chckbxShowBalancingErrors.setEnabled(false);
+		chckbxDotMatchNewLine.setEnabled(false);
 	}
 	
 	private void addEscapeListener(final JDialog dialog) {
