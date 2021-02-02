@@ -12,6 +12,7 @@ import sunset.gui.interfaces.IProperties;
 import sunset.gui.logic.GUIPropertiesLogic;
 import sunset.gui.search.interfaces.ISearchReplaceDialog;
 import sunset.gui.search.logic.MatcherLogic;
+import sunset.gui.search.logic.ReplaceContext;
 import sunset.gui.search.logic.ReplaceLogic;
 import sunset.gui.search.logic.SearchContext;
 import sunset.gui.search.logic.SearchLogic;
@@ -156,26 +157,21 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 		boolean matchCase = _dialog.matchCase();
 		boolean dotAll = _dialog.dotMatchesNewLine();
 		boolean showBalancingError = _dialog.showBalancingError();
+		ReplaceContext context = new ReplaceContext(selectedText, pattern, replace, matchCase);
 		
-		if (_dialog.useRegEx()) {
-			try {
-				replace = replaceLogic.replaceRegex(selectedText, pattern, replace, matchCase, dotAll);
-			} catch (Exception e) {
-				setStatus(e.getMessage(), SearchStatus.FAILURE);
-				return false;
-			}
-		} else if (_dialog.useAdvancedSearch()) {
-			try {
+		try {
+			if (_dialog.useRegEx()) {
+				replace = replaceLogic.replaceRegex(context, dotAll);
+			} else if (_dialog.useAdvancedSearch()) {
 				String matchingPairs = getMatchingPairs();
-				replace = replaceLogic.replaceAdvanced(selectedText, pattern, replace, matchingPairs, matchCase, showBalancingError);
-			} catch (UndeclaredVariableException e) {
-				setStatus(e.getMessage(), SearchStatus.FAILURE);
-				return false;
+				replace = replaceLogic.replaceAdvanced(context, matchingPairs, showBalancingError);
 			}
+		} catch (Exception e) {
+			setStatus(e.getMessage(), SearchStatus.FAILURE);
+			return false;
 		}
 		
 		if (replace == null) {
-			setStatus(replaceLogic.getMessage(), SearchStatus.FAILURE);
 			return false;
 		}
 		
