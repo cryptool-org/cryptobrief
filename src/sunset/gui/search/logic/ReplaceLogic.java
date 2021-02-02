@@ -27,7 +27,7 @@ public class ReplaceLogic extends BaseLogic implements IReplaceLogic {
 			IAdvancedSearchReplace advSearchReplace = new AdvancedSearchReplace(matchingPairs);
 			_error = false;
 			
-			if (advSearchReplace.find(text, pattern, 0, matchCase, showBalancingError)) {
+			if (advSearchReplace.find(new SearchContext(text, pattern, 0, matchCase), showBalancingError)) {
 				String prefix = text.substring(0, advSearchReplace.getStart());
 				String suffix = text.substring(advSearchReplace.getEnd(), text.length());
 				String[] contents = advSearchReplace.getCaptures();

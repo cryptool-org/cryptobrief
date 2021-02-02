@@ -4,12 +4,12 @@ import sunset.gui.search.advanced.exception.InvalidPatternException;
 import sunset.gui.search.advanced.exception.MatchingPairConfigurationException;
 import sunset.gui.search.advanced.exception.UnbalancedStringException;
 import sunset.gui.search.advanced.exception.UndeclaredVariableException;
+import sunset.gui.search.logic.SearchContext;
 
 public interface IAdvancedSearchReplace {
 	
 	
-	public boolean find(String text, String pattern, int fromIndex, boolean bMatchCase, boolean showBalancingError) 
-			throws InvalidPatternException, UnbalancedStringException;
+	public boolean find(SearchContext context, boolean showBalancingError) throws InvalidPatternException, UnbalancedStringException;
 	
 	public boolean matches(String text, String pattern, boolean bMatchCase) 
 			throws InvalidPatternException;

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import sunset.gui.FFaplJFrame;
 import sunset.gui.dialog.JDialogSearchReplace;
 import sunset.gui.search.interfaces.ISearchReplaceCoordinator;
+import sunset.gui.search.logic.SearchContext;
 
 class SearchReplaceCoordinatorTest {
 
@@ -108,25 +109,21 @@ class SearchReplaceCoordinatorTest {
 	
 	@Test
 	void testReplaceAllFromStart() {
-		/*_frame.getCurrentCodePanel().getCodePane()
-		.setText("abcabcabc");
+		/*_frame.getCurrentCodePanel().getCodePane().setText("abc   abc   abc");
 		
 		_dialog.setSearchPattern("a%1c");
 		_dialog.setUseAdvancedSearch(true);
-		_dialog.setReplaceText("aa%1cc");
+		_dialog.setReplaceText("ea%1cd");
 		
 		_coordinator.findString(false);
 		
 		// start "Replace" button pressed
 		if (_coordinator.isSearchPatternSelected()) {
 			if (_coordinator.replaceText()) {
-				boolean found = _coordinator.findString(false);
-				
-				_coordinator.setStatus("Replace: 1 occurrence replaced, " + 
-				(found ? "next occurrence found" : "no further occurrences found"), SearchStatus.REPLACE_SUCCESS);
+				Assert.assertTrue(_coordinator.findString(false));
 			}
 		} else {
-			_coordinator.findString(false);
+			Assert.fail();
 		}
 		// end
 		
@@ -145,13 +142,21 @@ class SearchReplaceCoordinatorTest {
 		
 		Assert.assertEquals(2, count);
 		String text = _frame.getCurrentCodePanel().getCodePane().getText();
-		Assert.assertEquals("aabccaabccaabcc", text);
+		Assert.assertEquals("aabc   aabc   aabc", text);
 		
-		/*_frame.getCurrentCodePanel().getCodePane()
-		.setText("abcabcabc");
+		_frame.getCurrentCodePanel().getCodePane().setText("abc   abc   abc");
 		
 		_coordinator.findString(false);
-		_coordinator.replaceText();
+		
+		// start "Replace" button pressed
+		if (_coordinator.isSearchPatternSelected()) {
+			if (_coordinator.replaceText()) {
+				Assert.assertTrue(_coordinator.findString(false));
+			}
+		} else {
+			Assert.fail();
+		}
+		// end
 		
 		_dialog.setReplaceAllFromStart(true);
 		
@@ -168,7 +173,7 @@ class SearchReplaceCoordinatorTest {
 		
 		Assert.assertEquals(3, count);
 		text = _frame.getCurrentCodePanel().getCodePane().getText();
-		Assert.assertEquals("aaabcccaabccaabcc", text);*/
+		Assert.assertEquals("aaabccc   aabcc   aabcc", text);*/
 	}
 	
 	@Test
@@ -355,5 +360,50 @@ class SearchReplaceCoordinatorTest {
 		Assert.assertTrue(_coordinator.findString(false));
 		Assert.assertTrue(_coordinator.isSearchPatternSelected());
 		Assert.assertFalse(_coordinator.replaceText());
+	}
+	
+	@Test
+	void testComplexCases() {
+		_frame.getCurrentCodePanel().getCodePane()
+		.setText("_searchReplace.find(\"aabccdeefgg\", \"%1b%2d%3f%4\", 0, false, true);\n" +
+				"_searchReplace.find(\"%1abc%1\", \"%%1%1%%1\", 0, false, true);\n" +
+				"_searchReplace.find(\"$$%$$$%$$$%\", \"%1%$%2\", 0, false, true);\n" +
+				"_searchReplace.find(\"!\"§$%&()=\", \"\"%1\\\", 0, false, true);\n" +
+				"_searchReplace.find(\"a({({a})({a})})a\", \"a%1a\", 0, false, true);\n" +
+				"_searchReplace.find(\"a(\\begin{center}{a}{(a)}\\end{center}{a})a\", \"a%1a\", 0, false, true);\n" +
+				"_searchReplace.find(\"\\((\\({\\{[\\[\\]]\\}}\\))\\)\", \"\\(%1\\)\", 0, false, true);\n" +
+				"_searchReplace.find(\"\\begin{center}(\\begin{center}{}\\end{center})\\end{center}\", \"\\begin{center}%1\\end{center}\", 0, false, true);");
+		
+		_dialog.setSearchPattern("_searchReplace.find(%1,%2,%3,%4,");
+		_dialog.setReplaceText("_searchReplace.find(new SearchContext(%1,%2,%3,%4),");
+		_dialog.setUseAdvancedSearch(true);
+		_dialog.setReplaceAllFromStart(true);
+		
+		int count = 0;
+		
+		_coordinator.resetCaretPosition();
+		
+		while (_coordinator.findString(true)) {
+			if (_coordinator.replaceText()) {
+				count++;
+			} else {
+				break;
+			}
+		}
+		
+		Assert.assertEquals(8, count);
+		
+		String result = _frame.getCurrentCodePanel().getCodePane().getText();
+		
+		String expected = "_searchReplace.find(new SearchContext(\"aabccdeefgg\", \"%1b%2d%3f%4\", 0, false), true);\n" +
+				"_searchReplace.find(new SearchContext(\"%1abc%1\", \"%%1%1%%1\", 0, false), true);\n" +
+				"_searchReplace.find(new SearchContext(\"$$%$$$%$$$%\", \"%1%$%2\", 0, false), true);\n" +
+				"_searchReplace.find(new SearchContext(\"!\"§$%&()=\", \"\"%1\\\", 0, false), true);\n" +
+				"_searchReplace.find(new SearchContext(\"a({({a})({a})})a\", \"a%1a\", 0, false), true);\n" +
+				"_searchReplace.find(new SearchContext(\"a(\\begin{center}{a}{(a)}\\end{center}{a})a\", \"a%1a\", 0, false), true);\n" +
+				"_searchReplace.find(new SearchContext(\"\\((\\({\\{[\\[\\]]\\}}\\))\\)\", \"\\(%1\\)\", 0, false), true);\n" +
+				"_searchReplace.find(new SearchContext(\"\\begin{center}(\\begin{center}{}\\end{center})\\end{center}\", \"\\begin{center}%1\\end{center}\", 0, false), true);";
+		
+		Assert.assertEquals(expected, result);
 	}
 }

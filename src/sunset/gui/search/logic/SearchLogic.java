@@ -28,7 +28,8 @@ public class SearchLogic extends BaseLogic implements ISearchLogic {
 		
 		// if not found starting fromIndex, fromIndex was not 0, and wrap around is activated, search again from 0
 		if (_matchStart == -1 && fromIndex != 0 && wrapAround) {
-			return search(new SearchContext(text, pattern, 0, context.isMatchCase()), wrapAround);
+			context.setFromIndex(0);
+			return search(context, wrapAround);
 		}
 		
 		if (_matchStart != -1) {
@@ -67,21 +68,21 @@ public class SearchLogic extends BaseLogic implements ISearchLogic {
 	
 	@Override
 	public boolean searchAdvanced(SearchContext context, boolean wrapAround, String matchingPairs, boolean showBalancingError) {
-		String pattern = context.getPattern();
 		IAdvancedSearchReplace advSearchReplace = null;
 		
 		try {
 			advSearchReplace = new AdvancedSearchReplace(matchingPairs);
-			boolean found = advSearchReplace.find(context.getText(), pattern, context.getFromIndex(), context.isMatchCase(), showBalancingError);
+			boolean found = advSearchReplace.find(context, showBalancingError);
 			
 			// if not found starting fromIndex, fromIndex was not 0, and wrap around is activated, search again from 0
 			if (!found && context.getFromIndex() != 0 && wrapAround) {
-				found = advSearchReplace.find(context.getText(), pattern, 0, context.isMatchCase(), showBalancingError);
+				context.setFromIndex(0);
+				found = advSearchReplace.find(context, showBalancingError);
 			}
 
 			_matchStart = advSearchReplace.getStart();
 			_matchEnd = advSearchReplace.getEnd();
-			_message = generateMessage(pattern);
+			_message = generateMessage(context.getPattern());
 			_error = false;
 			return found;
 		} catch (InvalidPatternException | IndexOutOfBoundsException | UnbalancedStringException | MatchingPairConfigurationException e) {

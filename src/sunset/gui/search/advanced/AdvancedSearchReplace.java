@@ -15,6 +15,7 @@ import sunset.gui.search.advanced.exception.MatchingPairConfigurationException;
 import sunset.gui.search.advanced.exception.UnbalancedStringException;
 import sunset.gui.search.advanced.exception.UndeclaredVariableException;
 import sunset.gui.search.advanced.interfaces.IAdvancedSearchReplace;
+import sunset.gui.search.logic.SearchContext;
 
 public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 	
@@ -114,16 +115,18 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 	}
 	
 	@Override
-	public boolean find(String text, String pattern, int fromIndex, boolean matchCase, boolean showBalancingError) 
-			throws InvalidPatternException, UnbalancedStringException {
+	public boolean find(SearchContext context, boolean showBalancingError) throws InvalidPatternException, UnbalancedStringException {
 		reset();
+		String text = context.getText();
+		String pattern = context.getPattern();
+		int fromIndex = context.getFromIndex();
+		boolean matchCase = context.isMatchCase();
 		
 		if (fromIndex < 0 || fromIndex > text.length()) {
 			throw new IndexOutOfBoundsException(fromIndex);
 		}
 		
-		System.out.println("\nFind executed:\t" + (text.length() < 20 ? "Text: " + text : "") 
-				+ " Pattern: " + pattern + " fromIndex: " + fromIndex + " matchCase: " + matchCase);
+		System.out.println("\nFind executed:\t" + context.toString());
 		
 		ArrayList<Integer> varPositions = getVariablePositions(pattern);
 		Map<String, String> matchingPairs = resolveWildcards(text);
