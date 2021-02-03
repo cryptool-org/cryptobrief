@@ -382,7 +382,7 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 		jLabel_status.setText(status);
 		jLabel_status.setForeground(color);
 		
-		if (status.length() > 70) {
+		if (status.length() > 75) {
 			JOptionPane.showMessageDialog(this, status, "Information", JOptionPane.INFORMATION_MESSAGE);
 		}
 	}

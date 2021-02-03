@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 
 import sunset.gui.search.SearchStatus;
 import sunset.gui.search.interfaces.ISearchReplaceCoordinator;
+import sunset.gui.search.util.SearchReplaceMessageHandler;
 
 public class ActionListenerReplaceAll implements ActionListener {
 	private ISearchReplaceCoordinator _coordinator;
@@ -28,9 +29,9 @@ public class ActionListenerReplaceAll implements ActionListener {
 		}
 		
 		if (count > 0) {
-			_coordinator.setStatus("Replace All: " + count + " occurrence" + (count != 1 ? "s" : "") + " replaced", SearchStatus.REPLACE_SUCCESS);
-		} else {
-			_coordinator.setStatus("No replacement done", SearchStatus.FAILURE);
+			// if at least one replacement was done, overwrite the last message from search/replace with according information
+			String msg = SearchReplaceMessageHandler.getInstance().getMessage("replaceall_success", String.valueOf(count));
+			_coordinator.setStatus(msg, SearchStatus.REPLACE_SUCCESS);
 		}
 	}
 }

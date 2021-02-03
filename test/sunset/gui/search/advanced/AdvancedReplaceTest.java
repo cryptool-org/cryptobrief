@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import sunset.gui.search.advanced.exception.*;
 import sunset.gui.search.advanced.interfaces.IAdvancedSearchReplace;
 import sunset.gui.search.logic.SearchContext;
+import sunset.gui.search.util.SearchReplaceMessageHandler;
 
 public class AdvancedReplaceTest {
 
@@ -217,57 +218,55 @@ public class AdvancedReplaceTest {
 	@Test
 	void testUndeclaredVariables() {
 		UndeclaredVariableException e;
-		String msg1 = "Variable %";
-		String msg2 = " from replace text has not been used in search pattern!"; 
 		
 		e = Assert.assertThrows(UndeclaredVariableException.class, () -> {
 			_searchReplace.find(new SearchContext("abc", "%1b%2", 0, false), true);
 			_searchReplace.replaceVariables("%3", _searchReplace.getCaptures());
 		  });
 		
-		Assert.assertEquals(e.getMessage(), msg1 + "3" + msg2);
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_undeclaredvariable", "3"), e.getMessage());
 		
 		e = Assert.assertThrows(UndeclaredVariableException.class, () -> {
 			_searchReplace.find(new SearchContext("abc", "a%1c%2", 0, false), true);
 		  	_searchReplace.replaceVariables("%1%2%3", _searchReplace.getCaptures());
 		  });
 		
-		Assert.assertEquals(e.getMessage(), msg1 + "3" + msg2);
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_undeclaredvariable", "3"), e.getMessage());
 		
 		e = Assert.assertThrows(UndeclaredVariableException.class, () -> {
 			_searchReplace.find(new SearchContext("abc", "%1b%2", 0, false), true);
 		  	_searchReplace.replaceVariables("%0%1%2", _searchReplace.getCaptures());
 		  });
 		
-		Assert.assertEquals(e.getMessage(), msg1 + "0" + msg2);
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_undeclaredvariable", "0"), e.getMessage());
 		
 		e = Assert.assertThrows(UndeclaredVariableException.class, () -> {
 			_searchReplace.find(new SearchContext("abc", "a%1b%2c%3", 0, false), true);
 		  	_searchReplace.replaceVariables("%0", _searchReplace.getCaptures());
 		  });
 		
-		Assert.assertEquals(e.getMessage(), msg1 + "0" + msg2);
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_undeclaredvariable", "0"), e.getMessage());
 		
 		e = Assert.assertThrows(UndeclaredVariableException.class, () -> {
 			_searchReplace.find(new SearchContext("abc", "%0a%1c%2", 0, false), true);
 		  	_searchReplace.replaceVariables("%1%9", _searchReplace.getCaptures());
 		  });
 		
-		Assert.assertEquals(e.getMessage(), msg1 + "9" + msg2);
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_undeclaredvariable", "9"), e.getMessage());
 		
 		e = Assert.assertThrows(UndeclaredVariableException.class, () -> {
 			_searchReplace.find(new SearchContext("abc", "%0b%1c%2", 0, false), true);
 		  	_searchReplace.replaceVariables("%1%4", _searchReplace.getCaptures());
 		  });
 		
-		Assert.assertEquals(e.getMessage(), msg1 + "4" + msg2);
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_undeclaredvariable", "4"), e.getMessage());
 		
 		e = Assert.assertThrows(UndeclaredVariableException.class, () -> {
 			_searchReplace.find(new SearchContext("abcdefghi", "a%1c%2e%3g%4i", 0, false), true);
 		  	_searchReplace.replaceVariables("%1%2%3%4%5%6%7%8%9%0", _searchReplace.getCaptures());
 		  });
 		
-		Assert.assertEquals(e.getMessage(), msg1 + "5" + msg2);
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_undeclaredvariable", "5"), e.getMessage());
 	}
 	
 	@Test

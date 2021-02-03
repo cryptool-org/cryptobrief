@@ -311,11 +311,11 @@ class SearchReplaceCoordinatorTest {
 		_dialog.setUseAdvancedSearch(true);
 		_dialog.setShowBalancingError(true);
 		
-		Assert.assertFalse(_coordinator.findString(false));
+		Assert.assertTrue(_coordinator.findString(false));
 		
 		String selectedText = _frame.getCurrentCodePanel().getCodePane().getSelectedText();
 		
-		Assert.assertEquals("a({])", selectedText);
+		Assert.assertEquals("a({])b", selectedText);
 	}
 	
 	@Test

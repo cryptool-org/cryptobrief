@@ -19,7 +19,9 @@ import sunset.gui.search.logic.SearchLogic;
 import sunset.gui.search.logic.interfaces.IMatcherLogic;
 import sunset.gui.search.logic.interfaces.IReplaceLogic;
 import sunset.gui.search.logic.interfaces.ISearchLogic;
+import sunset.gui.search.util.SearchReplaceMessageHandler;
 import sunset.gui.search.advanced.exception.UndeclaredVariableException;
+import sunset.gui.search.exception.SearchIndexOutOfBoundsException;
 import sunset.gui.search.interfaces.ISearchReplaceCoordinator;
 
 public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
@@ -80,16 +82,18 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 				return true;
 			} else {
 				if (searchLogic.getError()) {
+					// search pattern not found and an error occurred
 					if (searchLogic.getStart() != -1 && searchLogic.getEnd() != -1) {
+						// if the error was an unbalanced string error, select the unbalanced string
 						textPane.setCaretPosition(searchLogic.getStart());
 						textPane.moveCaretPosition(searchLogic.getEnd());
 					}
 					setStatus(searchLogic.getMessage(), SearchStatus.FAILURE);
-				} else {
+				} else {	// search pattern not found and no error occurred
 					setStatus(searchLogic.getMessage() + getLineNumber(doc, caretPos), SearchStatus.FAILURE);
 				}
 			}
-		} catch (BadLocationException e) {
+		} catch (BadLocationException | SearchIndexOutOfBoundsException e) {
 			setStatus(e.getMessage(), SearchStatus.FAILURE);
 		}
 		

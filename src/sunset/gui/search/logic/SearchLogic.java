@@ -3,11 +3,9 @@ package sunset.gui.search.logic;
 import java.util.regex.Matcher;
 
 import sunset.gui.search.advanced.AdvancedSearchReplace;
-import sunset.gui.search.advanced.exception.InvalidPatternException;
-import sunset.gui.search.advanced.exception.MatchingPairConfigurationException;
-import sunset.gui.search.advanced.exception.UnbalancedStringException;
 import sunset.gui.search.advanced.interfaces.IAdvancedSearchReplace;
 import sunset.gui.search.logic.interfaces.ISearchLogic;
+import sunset.gui.search.util.SearchReplaceMessageHandler;
 
 public class SearchLogic extends BaseLogic implements ISearchLogic {
 	
@@ -38,7 +36,7 @@ public class SearchLogic extends BaseLogic implements ISearchLogic {
 			_matchEnd = -1;
 		}
 		
-		_message = generateMessage(pattern);
+		_message = generateMessage();
 		_error = false;
 		
 		return _matchStart != -1;
@@ -57,7 +55,7 @@ public class SearchLogic extends BaseLogic implements ISearchLogic {
 				_matchEnd = -1;
 			}
 			
-			_message = generateMessage(context.getPattern());
+			_message = generateMessage();
 			_error = false;
 			return _matchStart != -1;
 		} else {
@@ -82,10 +80,10 @@ public class SearchLogic extends BaseLogic implements ISearchLogic {
 
 			_matchStart = advSearchReplace.getStart();
 			_matchEnd = advSearchReplace.getEnd();
-			_message = generateMessage(context.getPattern());
+			_message = generateMessage();
 			_error = false;
 			return found;
-		} catch (InvalidPatternException | IndexOutOfBoundsException | UnbalancedStringException | MatchingPairConfigurationException e) {
+		} catch (Exception e) {
 			if (advSearchReplace != null) {
 				_matchStart = advSearchReplace.getStart();
 				_matchEnd = advSearchReplace.getEnd();
@@ -96,16 +94,18 @@ public class SearchLogic extends BaseLogic implements ISearchLogic {
 		}
 	}
 	
-	private String generateMessage(String pattern) {
-		boolean found = _matchStart != -1;
+	private String generateMessage() {
+		String msg_key = "";
 		
-		if (found && _matchStart == _matchEnd) {
-			return "Zero length match at line ";
+		if (_matchStart != -1 && _matchStart == _matchEnd) {
+			msg_key = "search_zerolengthmatch";
+		} else if (_matchStart != -1) {
+			msg_key = "search_success";
+		} else {
+			msg_key = "search_nosuccess";
 		}
 		
-		pattern = pattern.replace("\n", "\\n").replace("\t", "\\t").replace("\r", "\\r");
-		
-		return "\"" + pattern + "\"" + (found ? " found at line " : " not found from line ");
+		return SearchReplaceMessageHandler.getInstance().getMessage(msg_key);
 	}
 	
 	@Override

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import sunset.gui.search.advanced.exception.MatchingPairConfigurationException;
+import sunset.gui.search.util.SearchReplaceMessageHandler;
 
 class AdvancedConstructorTest {
 
@@ -44,97 +45,97 @@ class AdvancedConstructorTest {
 			new AdvancedSearchReplace(",");
 		  });
 		
-		Assert.assertEquals("Bad matching pair configuration: ,", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_matchingpairconfig", ","), e.getMessage());
 		
 		e = Assert.assertThrows(MatchingPairConfigurationException.class, () -> {
 			AdvancedSearchReplace inst = new AdvancedSearchReplace("abcd");
 		  });
 		
-		Assert.assertEquals("Bad matching pair configuration: abcd", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_matchingpairconfig", "abcd"), e.getMessage());
 		
 		e = Assert.assertThrows(MatchingPairConfigurationException.class, () -> {
 			new AdvancedSearchReplace("a...");
 		  });
 		
-		Assert.assertEquals("Bad matching pair configuration: a...", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_matchingpairconfig", "a..."), e.getMessage());
 		
 		e = Assert.assertThrows(MatchingPairConfigurationException.class, () -> {
 			new AdvancedSearchReplace("...b");
 		  });
 		
-		Assert.assertEquals("Bad matching pair configuration: ...b", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_matchingpairconfig", "...b"), e.getMessage());
 		
 		e = Assert.assertThrows(MatchingPairConfigurationException.class, () -> {
 			new AdvancedSearchReplace(".....");
 		  });
 		
-		Assert.assertEquals("Bad matching pair configuration: .....", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_matchingpairconfig", "....."), e.getMessage());
 		
 		e = Assert.assertThrows(MatchingPairConfigurationException.class, () -> {
 			new AdvancedSearchReplace(",...,");
 		  });
 		
-		Assert.assertEquals("Bad matching pair configuration: ,...,", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_matchingpairconfig", ",...,"), e.getMessage());
 		
 		e = Assert.assertThrows(MatchingPairConfigurationException.class, () -> {
 			new AdvancedSearchReplace("{...},");
 		  });
 		
-		Assert.assertEquals("Bad matching pair configuration: {...},", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_matchingpairconfig", "{...},"), e.getMessage());
 		
 		e = Assert.assertThrows(MatchingPairConfigurationException.class, () -> {
 			new AdvancedSearchReplace("{...,");
 		  });
 		
-		Assert.assertEquals("Bad matching pair configuration: {...,", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_matchingpairconfig", "{...,"), e.getMessage());
 		
 		e = Assert.assertThrows(MatchingPairConfigurationException.class, () -> {
 			new AdvancedSearchReplace("...)");
 		  });
 		
-		Assert.assertEquals("Bad matching pair configuration: ...)", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_matchingpairconfig", "...)"), e.getMessage());
 		
 		e = Assert.assertThrows(MatchingPairConfigurationException.class, () -> {
 			new AdvancedSearchReplace(",");
 		  });
 		
-		Assert.assertEquals("Bad matching pair configuration: ,", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_matchingpairconfig", ","), e.getMessage());
 		
 		e = Assert.assertThrows(MatchingPairConfigurationException.class, () -> {
 			new AdvancedSearchReplace("(),%&$...?)!\"%");
 		  });
 		
-		Assert.assertEquals("Bad matching pair configuration: (),%&$...?)!\"%", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_matchingpairconfig", "(),%&$...?)!\"%"), e.getMessage());
 		
 		e = Assert.assertThrows(MatchingPairConfigurationException.class, () -> {
 			new AdvancedSearchReplace("()%&$...?)!\",%");
 		  });
 		
-		Assert.assertEquals("Bad matching pair configuration: ()%&$...?)!\",%", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_matchingpairconfig", "()%&$...?)!\",%"), e.getMessage());
 
 		e = Assert.assertThrows(MatchingPairConfigurationException.class, () -> {
 			new AdvancedSearchReplace("{...}, \\begin{%3}...\\end{%3}, \\begin{%1}...\\end{}");
 		  });
 		
-		Assert.assertEquals("Bad matching pair configuration: \\begin{%1}...\\end{}", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_matchingpairconfig", "\\begin{%1}...\\end{}"), e.getMessage());
 
 		e = Assert.assertThrows(MatchingPairConfigurationException.class, () -> {
 			new AdvancedSearchReplace("\\begin{}...\\end{%1}");
 		  });
 		
-		Assert.assertEquals("Bad matching pair configuration: \\begin{}...\\end{%1}", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_matchingpairconfig", "\\begin{}...\\end{%1}"), e.getMessage());
 		
 		e = Assert.assertThrows(MatchingPairConfigurationException.class, () -> {
 			new AdvancedSearchReplace("\\begin{%0}...\\end{%1}");
 		  });
 		
-		Assert.assertEquals("Bad matching pair configuration: \\begin{%0}...\\end{%1}", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_matchingpairconfig", "\\begin{%0}...\\end{%1}"), e.getMessage());
 		
 		e = Assert.assertThrows(MatchingPairConfigurationException.class, () -> {
 			new AdvancedSearchReplace("{...}, \\beg{%1-%2-%3}...\\end{%1-%2-%4}");
 		  });
 		
-		Assert.assertEquals("Bad matching pair configuration: \\beg{%1-%2-%3}...\\end{%1-%2-%4}", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_matchingpairconfig", "\\beg{%1-%2-%3}...\\end{%1-%2-%4}"), e.getMessage());
 	}
 
 }

@@ -16,6 +16,7 @@ import sunset.gui.search.advanced.exception.UnbalancedStringException;
 import sunset.gui.search.advanced.exception.UndeclaredVariableException;
 import sunset.gui.search.advanced.interfaces.IAdvancedSearchReplace;
 import sunset.gui.search.logic.SearchContext;
+import sunset.gui.search.util.SearchReplaceMessageHandler;
 
 public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 	
@@ -80,7 +81,9 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 			Matcher m = getMatcher(matchingPairs, VALID_MATCHING_PAIR_CONFIG, true);
 			
 			if (!m.matches()) {
-				throw new MatchingPairConfigurationException(matchingPairs);
+				String msg = SearchReplaceMessageHandler.getInstance().
+						getMessage("exception_matchingpairconfig", matchingPairs);
+				throw new MatchingPairConfigurationException(msg);
 			}
 			
 			for (String pair : matchingPairs.split(ENTRY_DELIM)) {
@@ -93,7 +96,9 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 				ArrayList<Integer> varIndexesVal = new ArrayList<Integer>();
 				
 				if (varPositionsKey.size() != varPositionsVal.size()) {
-					throw new MatchingPairConfigurationException(val + PAIR_DELIM_SYMBOL + key);
+					String msg = SearchReplaceMessageHandler.getInstance().
+							getMessage("exception_matchingpairconfig", val + PAIR_DELIM_SYMBOL + key);
+					throw new MatchingPairConfigurationException(msg);
 				}
 				
 				for (int varPosVal : varPositionsVal) {
@@ -105,7 +110,9 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 					int varIndex = getVariableIndex(key, varPosKey);
 
 					if (!varIndexesVal.contains(varIndex)) {
-						throw new MatchingPairConfigurationException(val + PAIR_DELIM_SYMBOL + key);
+						String msg = SearchReplaceMessageHandler.getInstance().
+								getMessage("exception_matchingpairconfig", val + PAIR_DELIM_SYMBOL + key);
+						throw new MatchingPairConfigurationException(msg);
 					}
 				}
 				
@@ -122,10 +129,6 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 		int fromIndex = context.getFromIndex();
 		boolean matchCase = context.isMatchCase();
 		
-		if (fromIndex < 0 || fromIndex > text.length()) {
-			throw new IndexOutOfBoundsException(fromIndex);
-		}
-		
 		System.out.println("\nFind executed:\t" + context.toString());
 		
 		ArrayList<Integer> varPositions = getVariablePositions(pattern);
@@ -141,7 +144,7 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 			
 			int currVarPosition, nextVarPosition, prevMatch, varIndex;
 			currVarPosition = varPositions.get(0);
-			String nextPattern = removeEscapes(pattern.substring(0, currVarPosition));
+			String nextPattern = removeAdvancedEscapeSymbol(pattern.substring(0, currVarPosition));
 			_matchStart = getIndexOf(text, nextPattern, fromIndex, true, matchCase);
 			prevMatch = _matchStart + nextPattern.length();
 			
@@ -149,7 +152,7 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 				currVarPosition = varPositions.get(i);			
 				nextVarPosition = (i+1 < varPositions.size()) ? varPositions.get(i+1) : pattern.length();
 				varIndex = getVariableIndex(pattern, currVarPosition);
-				nextPattern = removeEscapes(pattern.substring(currVarPosition+2, nextVarPosition));
+				nextPattern = removeAdvancedEscapeSymbol(pattern.substring(currVarPosition+2, nextVarPosition));
 				_matchEnd = getIndexOf(text, nextPattern, prevMatch, false, matchCase);
 				try {
 					_matchEnd = performMatch(text, nextPattern, prevMatch, _matchEnd, varIndex, matchCase, matchingPairs);
@@ -243,8 +246,9 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 		Matcher m = getMatcher(pattern, TWO_CONSECUTIVE_VARS, false);
 		
 		if (m.find()) {
-			String msg = "Missing delimiter between variables: ";
-			throw new InvalidPatternException(msg + pattern.substring(m.end()-4, m.end()));
+			String msg = SearchReplaceMessageHandler.getInstance().
+					getMessage("exception_invalidpattern_missingdelim", pattern.substring(m.end()-4, m.end()));
+			throw new InvalidPatternException(msg);
 		}
 		
 		// check if a variable is used more than once
@@ -254,8 +258,9 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 			int varIndex = getVariableIndex(pattern, varPos);
 			
 			if (varIndexes.contains(varIndex)) {
-				String msg = "Variable has been used more than once: %";
-				throw new InvalidPatternException(msg + varIndex);
+				String msg = SearchReplaceMessageHandler.getInstance().
+						getMessage("exception_invalidpattern_varmorethanonce", String.valueOf(varIndex));
+				throw new InvalidPatternException(msg);
 			} else {
 				varIndexes.add(varIndex);
 			}
@@ -265,7 +270,8 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 		m = getMatcher(pattern, MIN_ONE_VAR, false);
 		
 		if (!m.matches()) {
-			String msg = "No variable used in the pattern";
+			String msg = SearchReplaceMessageHandler.getInstance().
+					getMessage("exception_invalidpattern_novarused");
 			throw new InvalidPatternException(msg);
 		}
 	}
@@ -303,7 +309,7 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 		pattern = pattern.replaceAll(NON_ESC_VAR, "$1\\\\E(.*?)\\\\Q");
 		
 		// escaped variables (i.e. %%[0-9]) are replaced by the string %[0-9]
-		pattern = pattern.replaceAll(ESC_VAR, "$1");
+		pattern = removeAdvancedEscapeSymbol(pattern);
 		
 		return "\\Q" + pattern + "\\E";
 	}
@@ -327,7 +333,7 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 	 * @param pattern the pattern from which the escaping character should be removed
 	 * @return the pattern with all escaped variables replaced by variables
 	 */
-	private String removeEscapes(String pattern) {
+	private String removeAdvancedEscapeSymbol(String pattern) {
 		return pattern.replaceAll(ESC_VAR, "$1");
 	}
 	
@@ -380,10 +386,14 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 					String top = stack.pop();
 					
 					if (!top.equals(matchingPairs.get(str))) {
-						throw new UnbalancedStringException(text.substring(startIndex, nextMatch));
+						String msg = SearchReplaceMessageHandler.getInstance().
+								getMessage("exception_unbalancedstring", text.substring(startIndex, nextMatch));
+						throw new UnbalancedStringException(msg);
 					}
 				} catch (NoSuchElementException e) {
-					throw new UnbalancedStringException(text.substring(startIndex, nextMatch));
+					String msg = SearchReplaceMessageHandler.getInstance().
+							getMessage("exception_unbalancedstring", text.substring(startIndex, nextMatch));
+					throw new UnbalancedStringException(msg);
 				}
 			}
 			
@@ -391,7 +401,9 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 				nextMatch = getIndexOf(text, next, nextMatch + next.length(), false, matchCase);
 
 				if (nextMatch == -1) {
-					throw new UnbalancedStringException(text.substring(startIndex, text.length()));
+					String msg = SearchReplaceMessageHandler.getInstance().
+							getMessage("exception_unbalancedstring", text.substring(startIndex, text.length()));
+					throw new UnbalancedStringException(msg);
 				}
 			}
 			
@@ -498,12 +510,12 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 		ArrayList<Integer> varPositions = getVariablePositions(pattern);
 		
 		if (varPositions.isEmpty()) {
-			return removeEscapes(pattern);
+			return removeAdvancedEscapeSymbol(pattern);
 		}
 		
 		int currVarPosition, nextVarPosition, varIndex;
 		currVarPosition = varPositions.get(0);
-		String nextPattern = removeEscapes(pattern.substring(0, currVarPosition));
+		String nextPattern = removeAdvancedEscapeSymbol(pattern.substring(0, currVarPosition));
 		replaceString.append(nextPattern);
 		
 		for (int i = 0; i < varPositions.size(); i++) {
@@ -512,12 +524,14 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 			String content = contents[varIndex];
 			
 			if (content == null) {
-				throw new UndeclaredVariableException(varIndex);
+				String msg = SearchReplaceMessageHandler.getInstance().
+						getMessage("exception_undeclaredvariable", String.valueOf(varIndex));
+				throw new UndeclaredVariableException(msg);
 			}
 			
 			replaceString.append(content);
 			nextVarPosition = (i+1 < varPositions.size()) ? varPositions.get(i+1) : pattern.length();
-			nextPattern = removeEscapes(pattern.substring(currVarPosition+2, nextVarPosition));
+			nextPattern = removeAdvancedEscapeSymbol(pattern.substring(currVarPosition+2, nextVarPosition));
 			replaceString.append(nextPattern);
 		}
 		

@@ -7,7 +7,9 @@ import org.junit.jupiter.api.Test;
 
 import sunset.gui.search.advanced.exception.*;
 import sunset.gui.search.advanced.interfaces.IAdvancedSearchReplace;
+import sunset.gui.search.exception.SearchIndexOutOfBoundsException;
 import sunset.gui.search.logic.SearchContext;
+import sunset.gui.search.util.SearchReplaceMessageHandler;
 
 class AdvancedSearchTest {
 	
@@ -285,217 +287,213 @@ class AdvancedSearchTest {
 	@Test
 	void testInvalidPattern1() {
 		InvalidPatternException e;
-		String msg = "Invalid search pattern! Missing delimiter between variables: "; 
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> {
 			_searchReplace.find(new SearchContext("abc", "%1%2", 0, false), true);
 		  });
 		
-		Assert.assertEquals(msg + "%1%2", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_missingdelim", "%1%2"), e.getMessage());
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> {
 			_searchReplace.find(new SearchContext("abc", "a%1%2", 0, false), true);
 		  });
 		
-		Assert.assertEquals(msg + "%1%2", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_missingdelim", "%1%2"), e.getMessage());
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> {
 			_searchReplace.find(new SearchContext("abc", "%1%2b", 0, false), true);
 		  });
 		
-		Assert.assertEquals(msg + "%1%2", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_missingdelim", "%1%2"), e.getMessage());
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> {
 			_searchReplace.find(new SearchContext("abc", "a%1b%2%3", 0, false), true);
 		  });
 		
-		Assert.assertEquals(msg + "%2%3", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_missingdelim", "%2%3"), e.getMessage());
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> {
 			_searchReplace.find(new SearchContext("abc", "%0%1c%2", 0, false), true);
 		  });
 		
-		Assert.assertEquals(msg + "%0%1", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_missingdelim", "%0%1"), e.getMessage());
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> {
 			_searchReplace.find(new SearchContext("abc", "%0%1%2", 0, false), true);
 		  });
 		
-		Assert.assertEquals(msg + "%0%1", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_missingdelim", "%0%1"), e.getMessage());
 	}
 	
 	@Test
 	void testInvalidPattern2() {
 		InvalidPatternException e;
-		String msg = "Invalid search pattern! Variable has been used more than once: ";
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> {
 			_searchReplace.find(new SearchContext("abc", "%0a%0c%0", 0, false), true);
 		  });
 		
-		Assert.assertEquals(msg + "%0", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_varmorethanonce", "0"), e.getMessage());
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> {
 			_searchReplace.find(new SearchContext("abc", "%0b%1c%0", 0, false), true);
 		  });
 		
-		Assert.assertEquals(msg + "%0", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_varmorethanonce", "0"), e.getMessage());
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> {
 			_searchReplace.find(new SearchContext("abc", "a%0b%2c%2", 0, false), true);
 		  });
 		
-		Assert.assertEquals(msg + "%2", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_varmorethanonce", "2"), e.getMessage());
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> {
 			_searchReplace.find(new SearchContext("abc", "%1a%1b%2", 0, false), true);
 		  });
 		
-		Assert.assertEquals(msg + "%1", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_varmorethanonce", "1"), e.getMessage());
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> {
 			_searchReplace.find(new SearchContext("aabbccdd", "%0c%0", 0, false), true);
 		  });
 		
-		Assert.assertEquals(msg + "%0", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_varmorethanonce", "0"), e.getMessage());
 
 		e = Assert.assertThrows(InvalidPatternException.class, () -> {
 			_searchReplace.find(new SearchContext("aabbcd", "a%2b%2c", 0, false), true);
 		  });
 		
-		Assert.assertEquals(msg + "%2", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_varmorethanonce", "2"), e.getMessage());
 
 		e = Assert.assertThrows(InvalidPatternException.class, () -> {
 			_searchReplace.find(new SearchContext("aabccdeefgg", "%1b%1d%2f%3", 0, false), true);
 		  });
 		
-		Assert.assertEquals(msg + "%1", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_varmorethanonce", "1"), e.getMessage());
 
 		e = Assert.assertThrows(InvalidPatternException.class, () -> {
 			_searchReplace.find(new SearchContext("aabccdeefgg", "%8b%8d%2f%2", 0, false), true);
 		  });
 		
-		Assert.assertEquals(msg + "%8", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_varmorethanonce", "8"), e.getMessage());
 	}
 	
 	@Test
 	void testInvalidPattern3() {
 		InvalidPatternException e;
-		String msg = "Invalid search pattern! No variable used in the pattern";
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> { 
 			_searchReplace.find(new SearchContext("aabbcc", "", 0, false), true);
 		  });
-		Assert.assertEquals(msg, e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_novarused"), e.getMessage());
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> { 
 			_searchReplace.find(new SearchContext("aabbcc", "b", 0, false), true);
 		  });
-		Assert.assertEquals(msg, e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_novarused"), e.getMessage());
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> { 
 			_searchReplace.find(new SearchContext("aabbcc", "aabbcc", 0, false), true);
 		  });
-		Assert.assertEquals(msg, e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_novarused"), e.getMessage());
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> { 
 			_searchReplace.find(new SearchContext("aabbcc", "", 0, false), true);
 		  });
-		Assert.assertEquals(msg, e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_novarused"), e.getMessage());
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> { 
 			_searchReplace.find(new SearchContext("aabbcc", "dd", 0, false), true);
 		  });
-		Assert.assertEquals(msg, e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_novarused"), e.getMessage());
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> { 
 			_searchReplace.find(new SearchContext("abc", "abc", 0, false), true);
 		  });
-		Assert.assertEquals(msg, e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_novarused"), e.getMessage());
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> { 
 			_searchReplace.find(new SearchContext("a", "a", 0, false), true);
 		  });
-		Assert.assertEquals(msg, e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_novarused"), e.getMessage());
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> { 
 			_searchReplace.find(new SearchContext("abc", "", 0, false), true);
 		  });
-		Assert.assertEquals(msg, e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_novarused"), e.getMessage());
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> { 
 			_searchReplace.find(new SearchContext("$%§", "%", 0, false), true);
 		  });
-		Assert.assertEquals(msg, e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_novarused"), e.getMessage());
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> { 
 			_searchReplace.find(new SearchContext("!\"§$%&\\()=", "abc", 0, false), true);
 		  });
-		Assert.assertEquals(msg, e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_novarused"), e.getMessage());
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> {
 			_searchReplace.find(new SearchContext("aab%1bcc", "%%1", 0, false), true);
 		  });
-		Assert.assertEquals(msg, e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_novarused"), e.getMessage());
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> {
 			_searchReplace.find(new SearchContext("aab%1%2%3%4bcc", "%%1%%2%%3%%4", 0, false), true);
 		  });
-		Assert.assertEquals(msg, e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_novarused"), e.getMessage());
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> {
 			_searchReplace.find(new SearchContext("aab%1bcc", "a%%1", 0, false), true);
 		  });
-		Assert.assertEquals(msg, e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_novarused"), e.getMessage());
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> {
 			_searchReplace.find(new SearchContext("aab%1bcc", "%%1b", 0, false), true);
 		  });
-		Assert.assertEquals(msg, e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_novarused"), e.getMessage());
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> {
 			_searchReplace.find(new SearchContext("aab%1bcc", "a%%1c", 0, false), true);
 		  });
-		Assert.assertEquals(msg, e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_novarused"), e.getMessage());
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> {
 			_searchReplace.find(new SearchContext("aab%1bcc", "a%%1c%%2", 0, false), true);
 		  });
-		Assert.assertEquals(msg, e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_novarused"), e.getMessage());
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> {
 			_searchReplace.find(new SearchContext("aab%1bcc", "%%0a%%1c", 0, false), true);
 		  });
-		Assert.assertEquals(msg, e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_novarused"), e.getMessage());
 		
 		e = Assert.assertThrows(InvalidPatternException.class, () -> {
 			_searchReplace.find(new SearchContext("aab%1bcc", "%%0a%%1c%%2", 0, false), true);
 		  });
-		Assert.assertEquals(msg, e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_novarused"), e.getMessage());
 	}
 
 	@Test
 	void testInvalidInputs() {
-		IndexOutOfBoundsException e;
-		String msg = "Index out of range: "; 
+		SearchIndexOutOfBoundsException e;
 		
-		e = Assert.assertThrows(IndexOutOfBoundsException.class, () -> {
+		e = Assert.assertThrows(SearchIndexOutOfBoundsException.class, () -> {
 			_searchReplace.find(new SearchContext("abc", "%1a%2", -1, false), true);
 		  });
 		
-		Assert.assertEquals(msg + "-1", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_searchindexoutofbounds", "-1"), e.getMessage());
 		
-		e = Assert.assertThrows(IndexOutOfBoundsException.class, () -> {
+		e = Assert.assertThrows(SearchIndexOutOfBoundsException.class, () -> {
 			_searchReplace.find(new SearchContext("abc", "%1b%2", 5, false), true);
 		  });
 		
-		Assert.assertEquals(msg + "5", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_searchindexoutofbounds", "5"), e.getMessage());
 		
-		e = Assert.assertThrows(IndexOutOfBoundsException.class, () -> {
+		e = Assert.assertThrows(SearchIndexOutOfBoundsException.class, () -> {
 			_searchReplace.find(new SearchContext("", "%1c%2", 1, false), true);
 		  });
 		
-		Assert.assertEquals(msg + "1", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_searchindexoutofbounds", "1"), e.getMessage());
 	}
 
 	@Test
@@ -699,11 +697,10 @@ class AdvancedSearchTest {
 	@Test
 	void testConstructor() {
 		try {
-			IAdvancedSearchReplace searchReplace;
-			searchReplace = new AdvancedSearchReplace(null);
-			searchReplace = new AdvancedSearchReplace("");
+			new AdvancedSearchReplace(null);
+			new AdvancedSearchReplace("");
 			String matchingPairs = "(...), [...], {...}, \\(...\\), \\[...\\], \\{...\\}, \\begin{%1}...\\end{%1}";
-			searchReplace = new AdvancedSearchReplace(matchingPairs);
+			new AdvancedSearchReplace(matchingPairs);
 		} catch (Exception e) {
 			Assert.fail();
 		}
@@ -717,31 +714,31 @@ class AdvancedSearchTest {
 			_searchReplace.find(new SearchContext("a(a))aa", "a%1a", 0, false), true);
 		  });
 		
-		Assert.assertEquals("Matched string is unbalanced: (a))", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", "(a))"), e.getMessage());
 
 		e = Assert.assertThrows(UnbalancedStringException.class, () -> {
 			_searchReplace.find(new SearchContext("a)a(a)aa", "a%1a", 0, false), true);
 		  });
 		
-		Assert.assertEquals("Matched string is unbalanced: )", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", ")"), e.getMessage());
 
 		e = Assert.assertThrows(UnbalancedStringException.class, () -> {
 			_searchReplace.find(new SearchContext("a((a)a()a", "a%1a", 0, false), true);
 		  });
 		
-		Assert.assertEquals("Matched string is unbalanced: ((a)a()a", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", "((a)a()a"), e.getMessage());
 
 		e = Assert.assertThrows(UnbalancedStringException.class, () -> {
 			_searchReplace.find(new SearchContext("(a)(a)a", "a%1a", 0, false), true);
 		  });
 		
-		Assert.assertEquals("Matched string is unbalanced: )(", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", ")("), e.getMessage());
 
 		e = Assert.assertThrows(UnbalancedStringException.class, () -> {
 			_searchReplace.find(new SearchContext("(ab)a", "a%1a", 0, false), true);
 		  });
 		
-		Assert.assertEquals("Matched string is unbalanced: b)", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", "b)"), e.getMessage());
 	}
 	
 	@Test
@@ -752,31 +749,34 @@ class AdvancedSearchTest {
 			_searchReplace.find(new SearchContext("a{((a)})aa", "a%1a", 0, false), true);
 		  });
 		
-		Assert.assertEquals("Matched string is unbalanced: {((a)})", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().
+				getMessage("exception_unbalancedstring", "{((a)})"), e.getMessage());
 
 		e = Assert.assertThrows(UnbalancedStringException.class, () -> {
 			_searchReplace.find(new SearchContext("a{a(a})aa", "a%1a", 0, false), true);
 		  });
 		
-		Assert.assertEquals("Matched string is unbalanced: {a(a})", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().
+				getMessage("exception_unbalancedstring", "{a(a})"), e.getMessage());
 
 		e = Assert.assertThrows(UnbalancedStringException.class, () -> {
 			_searchReplace.find(new SearchContext("a({(a)a(})a", "a%1a", 0, false), true);
 		  });
 		
-		Assert.assertEquals("Matched string is unbalanced: ({(a)a(})", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().
+				getMessage("exception_unbalancedstring", "({(a)a(})"), e.getMessage());
 
 		e = Assert.assertThrows(UnbalancedStringException.class, () -> {
 			_searchReplace.find(new SearchContext("(a{)(a)a", "a%1a", 0, false), true);
 		  });
 		
-		Assert.assertEquals("Matched string is unbalanced: {)(", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", "{)("), e.getMessage());
 
 		e = Assert.assertThrows(UnbalancedStringException.class, () -> {
 			_searchReplace.find(new SearchContext("(a{(b)a)}", "a%1a", 0, false), true);
 		  });
 		
-		Assert.assertEquals("Matched string is unbalanced: {(b)a)}", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", "{(b)a)}"), e.getMessage());
 	}
 	
 	@Test
@@ -787,31 +787,31 @@ class AdvancedSearchTest {
 			_searchReplace.find(new SearchContext("a{((\\begin{center}{test}a)\\end{center}{test})}aa", "a%1a", 0, false), true);
 		  });
 		
-		Assert.assertEquals("Matched string is unbalanced: {((\\begin{center}{test}a)\\end{center}{test})}", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", "{((\\begin{center}{test}a)\\end{center}{test})}"), e.getMessage());
 
 		e = Assert.assertThrows(UnbalancedStringException.class, () -> {
 			_searchReplace.find(new SearchContext("a\\begin{center}{a\\end{center}(a})aa", "a%1a", 0, false), true);
 		  });
 		
-		Assert.assertEquals("Matched string is unbalanced: \\begin{center}{a\\end{center}(", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", "\\begin{center}{a\\end{center}("), e.getMessage());
 
 		e = Assert.assertThrows(UnbalancedStringException.class, () -> {
 			_searchReplace.find(new SearchContext("a\\begin{center}(\\begin{center}{\\begin{center}(a)a\\end{center}\\end{center}})a", "a%1a", 0, false), true);
 		  });
 		
-		Assert.assertEquals("Matched string is unbalanced: \\begin{center}(\\begin{center}{\\begin{center}(a)a\\end{center}\\end{center}})", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", "\\begin{center}(\\begin{center}{\\begin{center}(a)a\\end{center}\\end{center}})"), e.getMessage());
 
 		e = Assert.assertThrows(UnbalancedStringException.class, () -> {
 			_searchReplace.find(new SearchContext("\\begin{center}a\\begin{center}{(a)\\end{center}}a\\end{center}", "a%1a", 0, false), true);
 		  });
 		
-		Assert.assertEquals("Matched string is unbalanced: \\begin{center}{(a)\\end{center}}", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", "\\begin{center}{(a)\\end{center}}"), e.getMessage());
 
 		e = Assert.assertThrows(UnbalancedStringException.class, () -> {
 			_searchReplace.find(new SearchContext("(a{(\\begin{center}\\begin{center}b\\end{center})a)}", "a%1a", 0, false), true);
 		  });
 		
-		Assert.assertEquals("Matched string is unbalanced: {(\\begin{center}\\begin{center}b\\end{center})", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", "{(\\begin{center}\\begin{center}b\\end{center})"), e.getMessage());
 	}
 	
 	@Test
@@ -822,31 +822,31 @@ class AdvancedSearchTest {
 			_searchReplace.find(new SearchContext("a{((\\begin{center}{test}a)\\end{center}{test})}aa", "a%1a", 0, false), true);
 		  });
 		
-		Assert.assertEquals("Matched string is unbalanced: {((\\begin{center}{test}a)\\end{center}{test})}", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", "{((\\begin{center}{test}a)\\end{center}{test})}"), e.getMessage());
 
 		e = Assert.assertThrows(UnbalancedStringException.class, () -> {
 			_searchReplace.find(new SearchContext("a\\begin{center}a\\end{string}a", "a%1a", 0, false), true);
 		  });
 		
-		Assert.assertEquals("Matched string is unbalanced: \\begin{center}a\\end{string}", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", "\\begin{center}a\\end{string}"), e.getMessage());
 
 		e = Assert.assertThrows(UnbalancedStringException.class, () -> {
 			_searchReplace.find(new SearchContext("a\\begin{center}{\\begin{string}(a)a\\end{string}\\end{center}}a", "a%1a", 0, false), true);
 		  });
 		
-		Assert.assertEquals("Matched string is unbalanced: \\begin{center}{\\begin{string}(a)a\\end{string}\\end{center}}", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", "\\begin{center}{\\begin{string}(a)a\\end{string}\\end{center}}"), e.getMessage());
 
 		e = Assert.assertThrows(UnbalancedStringException.class, () -> {
 			_searchReplace.find(new SearchContext("\\begin{center}a\\begin{center}{(a)\\end{center}}a\\end{center}", "a%1a", 0, false), true);
 		  });
 		
-		Assert.assertEquals("Matched string is unbalanced: \\begin{center}{(a)\\end{center}}", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", "\\begin{center}{(a)\\end{center}}"), e.getMessage());
 
 		e = Assert.assertThrows(UnbalancedStringException.class, () -> {
 			_searchReplace.find(new SearchContext("(a{(\\begin{center}\\begin{center}b\\end{center})a)}", "a%1a", 0, false), true);
 		  });
 		
-		Assert.assertEquals("Matched string is unbalanced: {(\\begin{center}\\begin{center}b\\end{center})", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", "{(\\begin{center}\\begin{center}b\\end{center})"), e.getMessage());
 	}
 	
 	@Test
@@ -858,14 +858,14 @@ class AdvancedSearchTest {
 			searchReplace.find(new SearchContext("abc\\beg{x-y-z}test\\end{z-y-x}def", "a%1f", 0, false), true);
 		  });
 		
-		Assert.assertEquals("Matched string is unbalanced: bc\\beg{x-y-z}test\\end{z-y-x}de", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", "bc\\beg{x-y-z}test\\end{z-y-x}de"), e.getMessage());
 		
 		e = Assert.assertThrows(UnbalancedStringException.class, () -> {
 			IAdvancedSearchReplace searchReplace = new AdvancedSearchReplace("\\beg{%1-%2-%3}...\\end{%3-%2-%1}");
 			searchReplace.find(new SearchContext("abc\\beg{x-y-z}test\\end{x-y-z}def", "a%1f", 0, false), true);
 		  });
 		
-		Assert.assertEquals("Matched string is unbalanced: bc\\beg{x-y-z}test\\end{x-y-z}de", e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", "bc\\beg{x-y-z}test\\end{x-y-z}de"), e.getMessage());
 	}
 	
 	@Test
@@ -877,19 +877,19 @@ class AdvancedSearchTest {
 				_searchReplace.find(new SearchContext("a(((()())))())())b", "a%1b", 0, false), true);
 			  });
 			
-			Assert.assertEquals("Matched string is unbalanced: (((()())))())())", e.getMessage());
+			Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", "(((()())))())())"), e.getMessage());
 			
 			e = Assert.assertThrows(UnbalancedStringException.class, () -> {
 				_searchReplace.find(new SearchContext("(({[\\(\\{\\)\\}\\[\\]]}))", "(%1)", 0, false), true);
 			  });
 			
-			Assert.assertEquals("Matched string is unbalanced: ({[\\(\\{\\)\\}\\[\\]]}", e.getMessage());
+			Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", "({[\\(\\{\\)\\}\\[\\]]}"), e.getMessage());
 			
 			e = Assert.assertThrows(UnbalancedStringException.class, () -> {
 				_searchReplace.find(new SearchContext("(({[\\(\\{\\)\\}\\[\\]]})", "(%1)", 0, false), true);
 			  });
 			
-			Assert.assertEquals("Matched string is unbalanced: ({[\\(\\{\\)\\}\\[\\]]}", e.getMessage());
+			Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", "({[\\(\\{\\)\\}\\[\\]]}"), e.getMessage());
 			
 		} catch (Exception e) {
 			Assert.fail();
