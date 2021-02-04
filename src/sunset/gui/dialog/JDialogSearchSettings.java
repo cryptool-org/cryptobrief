@@ -21,6 +21,7 @@ import sunset.gui.listener.ActionListenerCloseWindow;
 import sunset.gui.logic.GUIPropertiesLogic;
 import sunset.gui.search.advanced.AdvancedSearchReplace;
 import sunset.gui.search.advanced.exception.MatchingPairConfigurationException;
+import sunset.gui.search.util.SearchReplaceMessageHandler;
 import sunset.gui.util.TranslateGUIElements;
 
 import javax.swing.JButton;
@@ -95,7 +96,8 @@ public class JDialogSearchSettings extends JDialog {
 				try {
 					new AdvancedSearchReplace(matchingPairs);
 					GUIPropertiesLogic.getInstance().setProperty(IProperties.GUI_SEARCH_PAIRS, matchingPairs);
-					updateStatus("Settings saved successfully.", Color.blue);
+					String msg = SearchReplaceMessageHandler.getInstance().getMessage("search_settings_saved");
+					updateStatus(msg, Color.blue);
 				} catch (MatchingPairConfigurationException e1) {
 					updateStatus(e1.getMessage(), Color.red);
 				}

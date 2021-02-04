@@ -116,6 +116,7 @@ public class AdvancedReplaceTest {
 			_searchReplace.find(new SearchContext("%%%", "%1%", 0, false), true);
 			Assert.assertEquals("", _searchReplace.replaceVariables("%1%1", _searchReplace.getCaptures()));
 			
+			// this test fails in recursive implementation of replace
 			_searchReplace.find(new SearchContext("$%§", "%1§", 0, false), true);
 			Assert.assertEquals("$%$%", _searchReplace.replaceVariables("%1%1", _searchReplace.getCaptures()));
 			
@@ -155,6 +156,7 @@ public class AdvancedReplaceTest {
 			Assert.assertEquals("%$$$%$$$$%", _searchReplace.replaceVariables("%1%1%2", _searchReplace.getCaptures()));
 
 			_searchReplace.find(new SearchContext("%5abc%6", "%0abc%1", 0, false), true);
+			// this test fails in recursive implementation of replace in reverse order
 			Assert.assertEquals("%5", _searchReplace.replaceVariables("%0", _searchReplace.getCaptures()));
 			Assert.assertEquals("%6", _searchReplace.replaceVariables("%1", _searchReplace.getCaptures()));
 			Assert.assertEquals("%5%6%5%6", _searchReplace.replaceVariables("%0%1%0%1", _searchReplace.getCaptures()));

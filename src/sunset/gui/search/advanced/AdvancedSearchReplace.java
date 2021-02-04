@@ -155,7 +155,7 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 				nextPattern = removeAdvancedEscapeSymbol(pattern.substring(currVarPosition+2, nextVarPosition));
 				_matchEnd = getIndexOf(text, nextPattern, prevMatch, false, matchCase);
 				try {
-					_matchEnd = performMatch(text, nextPattern, prevMatch, _matchEnd, varIndex, matchCase, matchingPairs);
+					_matchEnd = performBalancedMatch(text, nextPattern, prevMatch, _matchEnd, varIndex, matchCase, matchingPairs);
 					balanced = true;
 					_matchEnd += nextPattern.length();
 					prevMatch = _matchEnd;
@@ -368,8 +368,8 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 		return Character.getNumericValue(cVarIndex);
 	}
 	
-	private int performMatch(String text, String next, int prevMatch, int nextMatch, int varIndex, boolean matchCase, Map<String, String> matchingPairs) 
-			throws UnbalancedStringException {
+	private int performBalancedMatch(String text, String next, int prevMatch, int nextMatch, int varIndex, 
+			boolean matchCase, Map<String, String> matchingPairs) throws UnbalancedStringException {
 		Deque<String> stack = new ArrayDeque<String>();
 		int startIndex = prevMatch;
 		String str = "";
@@ -386,24 +386,30 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 					String top = stack.pop();
 					
 					if (!top.equals(matchingPairs.get(str))) {
+						// opening and closing string do not match
+						_matchEnd = i;
 						String msg = SearchReplaceMessageHandler.getInstance().
 								getMessage("exception_unbalancedstring", text.substring(startIndex, nextMatch));
-						throw new UnbalancedStringException(msg);
+						throw new UnbalancedStringException(msg, startIndex, nextMatch);
 					}
 				} catch (NoSuchElementException e) {
+					// stack is empty, but a closing string was found
+					_matchEnd = i;
 					String msg = SearchReplaceMessageHandler.getInstance().
 							getMessage("exception_unbalancedstring", text.substring(startIndex, nextMatch));
-					throw new UnbalancedStringException(msg);
+					throw new UnbalancedStringException(msg, startIndex, nextMatch);
 				}
 			}
 			
-			if ((i+1) == nextMatch && !stack.isEmpty()) {	// stay in loop if stack is not empty (unbalanced)
+			if ((i+1) == nextMatch && !stack.isEmpty()) {	
+				// stay in loop if stack is not empty (unbalanced)
 				nextMatch = getIndexOf(text, next, nextMatch + next.length(), false, matchCase);
 
 				if (nextMatch == -1) {
+					// no more match found
 					String msg = SearchReplaceMessageHandler.getInstance().
 							getMessage("exception_unbalancedstring", text.substring(startIndex, text.length()));
-					throw new UnbalancedStringException(msg);
+					throw new UnbalancedStringException(msg, startIndex, text.length());
 				}
 			}
 			

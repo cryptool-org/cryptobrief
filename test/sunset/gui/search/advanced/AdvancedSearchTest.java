@@ -20,9 +20,30 @@ class AdvancedSearchTest {
 		String matchingPairs = "(...), [...], {...}, \\(...\\), \\[...\\], \\{...\\}, \\begin{%1}...\\end{%1}";
 		_searchReplace = new AdvancedSearchReplace(matchingPairs);
 	}
+	
+	void checkResult(int start, int end, String[] captures) {
+		System.out.println("Expected:\t" + start + "," + end + "," + convertArrayToString(captures));
+		Assert.assertEquals(start, _searchReplace.getStart());
+		Assert.assertEquals(end, _searchReplace.getEnd());
+		Assert.assertArrayEquals(captures, _searchReplace.getCaptures());
+	}
+	
+	private String convertArrayToString(String[] array) {
+		String result = "";
+		
+		if (array.length == 0) {
+			return "";
+		}
+		
+		for (String s : array) {
+			result += s + ",";
+		}
+		
+		return result.substring(0, result.length()-1);
+	}
 
 	@Test
-	void testTrueCases() {
+	void testSimpleCases() {
 		try {
 			Assert.assertTrue(_searchReplace.find(new SearchContext("aabbcc", "%1", 0, false), true));
 			checkResult(0,6,new String[] {null, "aabbcc", null, null, null, null, null, null, null, null});
@@ -68,29 +89,8 @@ class AdvancedSearchTest {
 		}
 	}
 	
-	void checkResult(int start, int end, String[] captures) {
-		System.out.println("Expected:\t" + start + "," + end + "," + convertArrayToString(captures));
-		Assert.assertEquals(start, _searchReplace.getStart());
-		Assert.assertEquals(end, _searchReplace.getEnd());
-		Assert.assertArrayEquals(captures, _searchReplace.getCaptures());
-	}
-	
-	private String convertArrayToString(String[] array) {
-		String result = "";
-		
-		if (array.length == 0) {
-			return "";
-		}
-		
-		for (String s : array) {
-			result += s + ",";
-		}
-		
-		return result.substring(0, result.length()-1);
-	}
-	
 	@Test
-	void testFalseCases() {
+	void testFalseCasesSimple() {
 		try {
 			Assert.assertFalse(_searchReplace.find(new SearchContext("aabbcc", "a%1d", 0, false), true));
 			Assert.assertFalse(_searchReplace.find(new SearchContext("aabbcc", "%1d", 0, false), true));
@@ -153,6 +153,27 @@ class AdvancedSearchTest {
 			Assert.fail();
 		}
 	}
+	
+	@Test
+	void testFalseCasesSpecialCharacters() {
+		try {
+			Assert.assertFalse(_searchReplace.find(new SearchContext("%%%", "%1%%2%", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("$%§", "%5$%1§%", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("!\"§$%&\\()=", "\"%1\"\\", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("!\"§$%&\\()=", "%4\"!%1\\%6", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("!\"§$%&()=", "!%0=%1!", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("!\"§$\n%&()=", "%0\r%1", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("!\"§$%&\\()=", "%1!%", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("!\"§$%&()=", "!%9(=", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("1%%%%1%%%1%%%%1", "1%11%21%31%41", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("$%%%%&%%%?%%%%!", "$%1&%2!%3?", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("$%%%%&%%%?%%%%!", "%4$$%1&%2?%3!%0", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("$$%$$$%$$$%", "%1%$%2$%$%", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("$$%$$$%$?$%", "$$%1%$?%2%$", 0, false), true));
+		} catch (Exception e) {
+			Assert.fail();
+		}
+	}
 
 	@Test
 	void testNumbers() {
@@ -181,6 +202,22 @@ class AdvancedSearchTest {
 			Assert.assertTrue(_searchReplace.find(new SearchContext("0123401234567", "012345%5", 0, false), true));
 			checkResult(5,13,new String[] {null, null, null, null, null, "67", null, null, null, null});
 			
+		} catch (Exception e) {
+			Assert.fail();
+		}
+	}
+	
+	@Test
+	void testFalseCasesNumbers() {
+		try {
+			Assert.assertFalse(_searchReplace.find(new SearchContext("0123456789", "9%90", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("0123456789", "1%00%11%22", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("0123456789", "0%12%34%56%78%90", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("0123456789", "%010%12%34%56%78%9", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("0", "0%90", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("0", "%000", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("0123456789", "012345%556789", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("0123401234567", "%18%2", 0, false), true));
 		} catch (Exception e) {
 			Assert.fail();
 		}
@@ -278,6 +315,16 @@ class AdvancedSearchTest {
 			Assert.assertFalse(_searchReplace.find(new SearchContext("AaaaaaaaA", "a%1A%2a", 0, true), true));
 			Assert.assertFalse(_searchReplace.find(new SearchContext("aaaB", "a%0a%1ab", 0, true), true));
 			Assert.assertFalse(_searchReplace.find(new SearchContext("aBcdEaaBBccdde", "a%8b%4c%0d%5e", 0, true), true));
+			
+			Assert.assertTrue(_searchReplace.find(new SearchContext("aBcDeFgH", "A%1c", 0, false), true));
+			Assert.assertTrue(_searchReplace.find(new SearchContext("aBcDeFgH", "a%1b", 0, false), true));
+			Assert.assertTrue(_searchReplace.find(new SearchContext("aBcDeFgH", "a%1h", 0, false), true));
+			Assert.assertTrue(_searchReplace.find(new SearchContext("aBcDeFgH", "%0d", 0, false), true));
+			Assert.assertTrue(_searchReplace.find(new SearchContext("aBcDeFgH", "G%9", 0, false), true));
+			Assert.assertTrue(_searchReplace.find(new SearchContext("aBcDeFgH", "aBcd%8H", 0, false), true));
+			Assert.assertTrue(_searchReplace.find(new SearchContext("AaaaaaaaA", "a%1A%2a", 0, false), true));
+			Assert.assertTrue(_searchReplace.find(new SearchContext("aaaB", "a%0a%1ab", 0, false), true));
+			Assert.assertTrue(_searchReplace.find(new SearchContext("aBcdEaaBBccdde", "a%8b%4c%0d%5e", 0, false), true));
 			
 		} catch (Exception e) {
 			Assert.fail();
@@ -539,6 +586,54 @@ class AdvancedSearchTest {
 			Assert.fail();
 		}
 	}
+	
+	@Test
+	void testFalseCasesEscapedVariables() {
+		try {			
+			Assert.assertFalse(_searchReplace.find(new SearchContext("aab%1bcc", "%%1c%1", 0, false), true));	
+			Assert.assertFalse(_searchReplace.find(new SearchContext("aab%1bcc", "%1%%1%%1", 0, false), true));	
+			Assert.assertFalse(_searchReplace.find(new SearchContext("aab%1bcc", "%1%%1%2%%1", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("%1abc%1", "%%1a%1%%1c%%1", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("%1abc%1", "%1%%1%%1", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("%1abc%1", "%0%%1%1%%2%2", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("%1a%1c%1", "%%1%1%%%1%2%%1", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("aab%1%2%3%4bcc", "%8%%1%%3%%4%9", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("aab%1%2%4bcc", "%8%%1%2b%%4%9", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("aab%1%2%4bcc", "%8%%3%9", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("%1aaaaab", "%%1b%1a", 0, false), true));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("aabbc%1d", "a%1d%%1", 0, false), true));
+		} catch (Exception e) {
+			Assert.fail();
+		}
+	}
+	
+	@Test
+	void testSpecialSymbols() {
+		try {
+			Assert.assertTrue(_searchReplace.find(new SearchContext("abc\tdef\nghi\r\ntyz", "a%1f%2\r\n%3z", 0, false), true));
+			checkResult(0,16,new String[] {null, "bc\tde", "\nghi", "ty", null, null, null, null, null, null});
+			
+			Assert.assertTrue(_searchReplace.find(new SearchContext("abc\tdef\nghi\r\ntyz", "abc%1def%2ghi%3t", 0, false), true));
+			checkResult(0,14,new String[] {null, "\t", "\n", "\r\n", null, null, null, null, null, null});
+			
+			Assert.assertTrue(_searchReplace.find(new SearchContext("\n\n\n\t\t\t\n\n\n", "\n%1\t\n%2", 0, false), true));
+			checkResult(0,9,new String[] {null, "\n\n\t\t", "\n\n", null, null, null, null, null, null, null});
+			
+			Assert.assertTrue(_searchReplace.find(new SearchContext("\nn\tt\rr", "%1", 0, false), true));
+			checkResult(0,6,new String[] {null, "\nn\tt\rr", null, null, null, null, null, null, null, null});
+			
+			Assert.assertTrue(_searchReplace.find(new SearchContext("\\nn\\tt\\rr", "\\%1r", 0, false), true));
+			checkResult(0,8,new String[] {null, "nn\\tt\\", null, null, null, null, null, null, null, null});
+			
+			Assert.assertTrue(_searchReplace.find(new SearchContext("abc\r\n\t\tdef\r\t\t\txyz", "%1\r\n%2\t\t%3z", 0, false), true));
+			checkResult(0,17,new String[] {null, "abc", "", "def\r\t\t\txy", null, null, null, null, null, null});
+			
+			Assert.assertTrue(_searchReplace.find(new SearchContext("a\n\r\tb\\n\\rc\\t\nd\r\te", "%1\n\r%2\\n%3c%4\n%5e", 0, false), true));
+			checkResult(0,17,new String[] {null, "a", "\tb", "\\r", "\\t", "d\r\t", null, null, null, null});
+		} catch (Exception e) {
+			Assert.fail();
+		}
+	}
 
 	@Test
 	void testCorrectBalancing1() {
@@ -770,7 +865,15 @@ class AdvancedSearchTest {
 			_searchReplace.find(new SearchContext("(a{)(a)a", "a%1a", 0, false), true);
 		  });
 		
-		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", "{)("), e.getMessage());
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().
+				getMessage("exception_unbalancedstring", "{)("), e.getMessage());
+
+		e = Assert.assertThrows(UnbalancedStringException.class, () -> {
+			_searchReplace.find(new SearchContext("a({])b", "a%1b", 0, false), true);
+		  });
+		
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().
+				getMessage("exception_unbalancedstring", "({])"), e.getMessage());
 
 		e = Assert.assertThrows(UnbalancedStringException.class, () -> {
 			_searchReplace.find(new SearchContext("(a{(b)a)}", "a%1a", 0, false), true);
@@ -896,6 +999,25 @@ class AdvancedSearchTest {
 		}
 	}
 	
+	@Test 
+	void testComplexBalancing() {
+		try {
+			Assert.assertTrue(_searchReplace.find(new SearchContext("a{a(a)a", "a%1a", 0, false), false));
+			checkResult(2,7,new String[] {null, "(a)", null, null, null, null, null, null, null, null});
+			
+			Assert.assertTrue(_searchReplace.find(new SearchContext("a{a[a(a)a]a}a", "a%1a", 0, false), false));
+			checkResult(0,13,new String[] {null, "{a[a(a)a]a}", null, null, null, null, null, null, null, null});
+			
+			Assert.assertTrue(_searchReplace.find(new SearchContext("a{a[(a)]a}a", "a%1a", 0, false), false));
+			checkResult(0,11,new String[] {null, "{a[(a)]a}", null, null, null, null, null, null, null, null});
+			
+			Assert.assertFalse(_searchReplace.find(new SearchContext("a{a[(a)a]a})a", "a%1a", 0, false), false));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("a\\begin{center}(\\begin{center}{a\\begin{center}(a)a\\end{center}a\\end{center}})a", "a%1a", 0, false), false));			
+		} catch (Exception e) {
+			
+		}
+	}
+	
 	@Test
 	void testIgnoreBalancingError() {
 		try {
@@ -914,6 +1036,12 @@ class AdvancedSearchTest {
 			Assert.assertTrue(_searchReplace.find(new SearchContext("a{a(a})aa", "a%1a", 0, false), false));
 			checkResult(7,9,new String[] {null, "", null, null, null, null, null, null, null, null});
 			
+			Assert.assertTrue(_searchReplace.find(new SearchContext("a{a(a}a()aa", "a%1a", 0, false), false));
+			checkResult(6,10,new String[] {null, "()", null, null, null, null, null, null, null, null});
+			
+			Assert.assertTrue(_searchReplace.find(new SearchContext("a{a()a", "a%1a", 0, false), false));
+			checkResult(2,6,new String[] {null, "()", null, null, null, null, null, null, null, null});
+			
 			Assert.assertFalse(_searchReplace.find(new SearchContext("(a)(a)a", "a%1a", 0, false), false));
 			Assert.assertFalse(_searchReplace.find(new SearchContext("(ab)a", "a%1a", 0, false), false));
 			Assert.assertFalse(_searchReplace.find(new SearchContext("a({(a)a(})a", "a%1a", 0, false), false));
@@ -926,12 +1054,11 @@ class AdvancedSearchTest {
 			Assert.assertTrue(_searchReplace.find(new SearchContext("a\\begin{center}{a\\end{center}(a})aa", "a%1a", 0, false), false));
 			checkResult(33,35,new String[] {null, "", null, null, null, null, null, null, null, null});
 			
-			Assert.assertTrue(_searchReplace.find(new SearchContext("a\\begin{center}(\\begin{center}{a\\begin{center}(a)a\\end{center}a\\end{center}})a", "a%1a", 0, false), false));
-			checkResult(31,63,new String[] {null, "\\begin{center}(a)a\\end{center}", null, null, null, null, null, null, null, null});
+			Assert.assertTrue(_searchReplace.find(new SearchContext("a\\begin{center}{a\\begin{string}(a)a\\end{string}a}\\end{center}a", "a%1a", 0, false), false));
+			checkResult(0,62,new String[] {null, "\\begin{center}{a\\begin{string}(a)a\\end{string}a}\\end{center}", null, null, null, null, null, null, null, null});
 			
-			Assert.assertTrue(_searchReplace.find(new SearchContext("a\\begin{center}{a\\begin{string}(a)a\\end{string}a\\end{center}}a", "a%1a", 0, false), false));
-			checkResult(16,48,new String[] {null, "\\begin{string}(a)a\\end{string}", null, null, null, null, null, null, null, null});
-			
+			Assert.assertFalse(_searchReplace.find(new SearchContext("a\\begin{center}{a\\begin{string}(a)a\\end{string}a\\end{center}}a", "a%1a", 0, false), false));
+			Assert.assertFalse(_searchReplace.find(new SearchContext("a\\begin{center}(\\begin{center}{a\\begin{center}(a)a\\end{center}a\\end{center}})a", "a%1a", 0, false), false));
 			Assert.assertFalse(_searchReplace.find(new SearchContext("a\\begin{center}(\\begin{center}{\\begin{center}(a)a\\end{center}\\end{center}})a", "a%1a", 0, false), false));
 			Assert.assertFalse(_searchReplace.find(new SearchContext("\\begin{center}a\\begin{center}{(a)\\end{center}}a\\end{center}", "a%1a", 0, false), false));
 			Assert.assertFalse(_searchReplace.find(new SearchContext("(a{(\\begin{center}\\begin{center}b\\end{center})a)}", "a%1a", 0, false), false));
@@ -944,6 +1071,60 @@ class AdvancedSearchTest {
 		} catch (Exception e) {
 			Assert.fail();
 		}
+	}
+	
+	@Test
+	void testOptionCombinations() {
+		// options: fromIndex (0, >0), matchCase
+		try {
+			// fromIndex = 0, matchCase = false, showBalancingError = false
+			Assert.assertTrue(_searchReplace.find(new SearchContext("a(a))aa", "A%1a", 0, false), false));
+			checkResult(5,7,new String[] {null, "", null, null, null, null, null, null, null, null});
+			
+			// fromIndex = 3, matchCase = false, showBalancingError = false
+			Assert.assertTrue(_searchReplace.find(new SearchContext("aaaa(a))aa", "a%1A", 3, false), false));
+			checkResult(8,10,new String[] {null, "", null, null, null, null, null, null, null, null});
+			
+			// fromIndex = 0, matchCase = true, showBalancingError = false
+			Assert.assertTrue(_searchReplace.find(new SearchContext("aaa(a))aaaA()a", "A%1a", 0, true), false));
+			checkResult(10,14,new String[] {null, "()", null, null, null, null, null, null, null, null});
+			
+			// fromIndex = 3, matchCase = true, showBalancingError = false
+			Assert.assertTrue(_searchReplace.find(new SearchContext("A()a(a))aaaA()a", "a%1A", 3, true), false));
+			checkResult(8,12,new String[] {null, "aa", null, null, null, null, null, null, null, null});
+		} catch (Exception e) {
+			Assert.fail();
+		}
+		
+		UnbalancedStringException e;
+
+		// fromIndex = 0, matchCase = false, showBalancingError = true
+		e = Assert.assertThrows(UnbalancedStringException.class, () -> {
+			_searchReplace.find(new SearchContext("a(a))aa", "A%1a", 0, false), true);
+		  });
+		
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", "(a))"), e.getMessage());
+		
+		// fromIndex = 3, matchCase = false, showBalancingError = true
+		e = Assert.assertThrows(UnbalancedStringException.class, () -> {
+			_searchReplace.find(new SearchContext("a(aa))a", "a%1A", 3, false), true);
+		  });
+		
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", "))"), e.getMessage());
+		
+		// fromIndex = 0, matchCase = true, showBalancingError = true
+		e = Assert.assertThrows(UnbalancedStringException.class, () -> {
+			_searchReplace.find(new SearchContext("aaa(a))aaaA(()a", "A%1a", 0, true), true);
+		  });
+		
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", "(()a"), e.getMessage());
+		
+		// fromIndex = 3, matchCase = true, showBalancingError = true
+		e = Assert.assertThrows(UnbalancedStringException.class, () -> {
+			_searchReplace.find(new SearchContext("A()a(a))aaaA()a", "a%1A", 3, true), true);
+		  });
+		
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", "(a))aaa"), e.getMessage());		
 	}
 	
 	@Test

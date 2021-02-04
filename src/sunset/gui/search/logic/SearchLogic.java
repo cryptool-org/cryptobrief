@@ -3,6 +3,9 @@ package sunset.gui.search.logic;
 import java.util.regex.Matcher;
 
 import sunset.gui.search.advanced.AdvancedSearchReplace;
+import sunset.gui.search.advanced.exception.InvalidPatternException;
+import sunset.gui.search.advanced.exception.MatchingPairConfigurationException;
+import sunset.gui.search.advanced.exception.UnbalancedStringException;
 import sunset.gui.search.advanced.interfaces.IAdvancedSearchReplace;
 import sunset.gui.search.logic.interfaces.ISearchLogic;
 import sunset.gui.search.util.SearchReplaceMessageHandler;
@@ -38,7 +41,6 @@ public class SearchLogic extends BaseLogic implements ISearchLogic {
 		
 		_message = generateMessage();
 		_error = false;
-		
 		return _matchStart != -1;
 	}
 	
@@ -66,10 +68,8 @@ public class SearchLogic extends BaseLogic implements ISearchLogic {
 	
 	@Override
 	public boolean searchAdvanced(SearchContext context, boolean wrapAround, String matchingPairs, boolean showBalancingError) {
-		IAdvancedSearchReplace advSearchReplace = null;
-		
 		try {
-			advSearchReplace = new AdvancedSearchReplace(matchingPairs);
+			IAdvancedSearchReplace advSearchReplace = new AdvancedSearchReplace(matchingPairs);
 			boolean found = advSearchReplace.find(context, showBalancingError);
 			
 			// if not found starting fromIndex, fromIndex was not 0, and wrap around is activated, search again from 0
@@ -83,11 +83,13 @@ public class SearchLogic extends BaseLogic implements ISearchLogic {
 			_message = generateMessage();
 			_error = false;
 			return found;
-		} catch (Exception e) {
-			if (advSearchReplace != null) {
-				_matchStart = advSearchReplace.getStart();
-				_matchEnd = advSearchReplace.getEnd();
-			}
+		} catch (MatchingPairConfigurationException | InvalidPatternException e) {
+			_message = e.getMessage();
+			_error = true;
+			return false;
+		} catch (UnbalancedStringException e) {
+			_matchStart = e.getStart();
+			_matchEnd = e.getEnd();
 			_message = e.getMessage();
 			_error = true;
 			return false;
