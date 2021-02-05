@@ -31,16 +31,8 @@ public class SearchContext {
 		return _text;
 	}
 	
-	public void setText(String text) {
-		this._text = text;
-	}
-	
 	public String getPattern() {
 		return _pattern;
-	}
-	
-	public void setPattern(String pattern) {
-		this._pattern = pattern;
 	}
 	
 	public int getFromIndex() {
@@ -53,9 +45,5 @@ public class SearchContext {
 	
 	public boolean isMatchCase() {
 		return _matchCase;
-	}
-	
-	public void setMatchCase(boolean matchCase) {
-		this._matchCase = matchCase;
 	}
 }

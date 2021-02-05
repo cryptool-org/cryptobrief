@@ -149,6 +149,17 @@ class AdvancedSearchTest {
 			Assert.assertTrue(_searchReplace.find(new SearchContext("$$%$$$%$?$%", "$$%1%$?%2", 0, false), true));
 			checkResult(0,11,new String[] {null, "%$$$", "$%", null, null, null, null, null, null, null});
 			
+			Assert.assertTrue(_searchReplace.find(new SearchContext("\\Q()\\Ed", "\\E%1d", 0, false), true));
+			checkResult(4,7,new String[] {null, "", null, null, null, null, null, null, null, null});
+			
+			Assert.assertTrue(_searchReplace.find(new SearchContext("\\Q(\\Q)\\E", "\\Q%1\\E", 0, false), true));
+			checkResult(0,8,new String[] {null, "(\\Q)", null, null, null, null, null, null, null, null});
+			
+			Assert.assertTrue(_searchReplace.find(new SearchContext("\\Q()\\Ed", "\\Q%1d", 0, false), true));
+			checkResult(0,7,new String[] {null, "()\\E", null, null, null, null, null, null, null, null});
+			
+			Assert.assertTrue(_searchReplace.find(new SearchContext("\\E()\\Qd", "\\E%1d", 0, false), true));
+			checkResult(0,7,new String[] {null, "()\\Q", null, null, null, null, null, null, null, null});
 		} catch (Exception e) {
 			Assert.fail();
 		}

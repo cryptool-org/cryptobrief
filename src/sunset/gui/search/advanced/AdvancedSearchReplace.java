@@ -20,54 +20,31 @@ import sunset.gui.search.util.SearchReplaceMessageHandler;
 
 public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 	
-	/*
-	 * Constants
-	 */
+	/* Constants */
 	private final static int MAX_VARS = 10;
-	private final static char VAR_START_SYMBOL = '%';
-	private final static char VAR_ESC_SYMBOL = '%';
+	private final static char VAR_START_SYMBOL	= '%';	// variable symbol
+	private final static char VAR_ESC_SYMBOL 	= '%';	// escaping symbol
 	
-	// variable regex: 				%[0-9]
-	private final static String VARIABLE = VAR_START_SYMBOL + "[0-9]";
+	private final static String VAR 		= VAR_START_SYMBOL + "[0-9]";				// %[0-9]
+	private final static String ESC_VAR 	= VAR_ESC_SYMBOL + "(" + VAR + ")";			// %(%[0-9])
+	private final static String NON_ESC_VAR = "([^" + VAR_ESC_SYMBOL + "])" + VAR;		// ([^%])%[0-9]
+	private final static String MIN_ONE_VAR = ".*(^" + VAR + "|" + NON_ESC_VAR + ")((.+" + VAR + ")|.)*";	// .*(^%[0-9]|[^%]%[0-9])((.+%[0-9])|.)*
+	private final static String TWO_CONSECUTIVE_VARS = "(^" + VAR + VAR + ")|(" + NON_ESC_VAR + VAR + ")";	// (^%[0-9]%[0-9])|([^%]%[0-9]%[0-9])
 	
-	// escaped variable regex: 		%(%[0-9])
-	private final static String ESC_VAR = VAR_ESC_SYMBOL + "(" + VARIABLE + ")";
+	private final static String PAIR_DELIM_SYMBOL	= "...";	// matching pair delimiter String
+	private final static String ENTRY_DELIM_SYMBOL 	= ",";		// matching pair entry delimiter String
+	private final static String PAIR_DELIM 			= Pattern.quote(PAIR_DELIM_SYMBOL);		// \Q...\E
+	private final static String ENTRY_DELIM 		= Pattern.quote(ENTRY_DELIM_SYMBOL);	// \Q,\E
+	private final static String VALID_STRING 		= "[^" + PAIR_DELIM_SYMBOL + ENTRY_DELIM_SYMBOL + "]+";	// [^...,]+
+
+	private final static String VALID_MATCHING_PAIR_CONFIG =	// ([^...,]+\Q...\E[^...,]+\Q,\E)*[^...,]+\Q...\E[^...,]+
+			"("  + VALID_STRING + PAIR_DELIM + VALID_STRING + ENTRY_DELIM + 
+			")*" + VALID_STRING + PAIR_DELIM + VALID_STRING;	
 	
-	// non escaped variable regex: 	([^%])%[0-9]
-	private final static String NON_ESC_VAR = 
-			"([^" + VAR_ESC_SYMBOL + "])" + VARIABLE;
-	
-	// minimum one variable regex: 			.*(^%[0-9]|[^%]%[0-9])((.+%[0-9])|.)*
-	private final static String MIN_ONE_VAR = 
-			".*(^" + VARIABLE + "|" + NON_ESC_VAR + ")((.+" + VARIABLE + ")|.)*";
-	
-	// two consecutive variables regex:		(^%[0-9]%[0-9])|([^%]%[0-9]%[0-9])
-	private final static String TWO_CONSECUTIVE_VARS = 
-			"(^" + VARIABLE + VARIABLE + ")|(" + NON_ESC_VAR + VARIABLE + ")";
-	
-	private final static String PAIR_DELIM_SYMBOL = "...";
-	
-	// pair delimiter regex:	\Q...\E
-	private final static String PAIR_DELIM = "\\Q" + PAIR_DELIM_SYMBOL + "\\E";
-	
-	private final static String ENTRY_DELIM_SYMBOL = ",";
-	
-	// entry delimiter regex:	\Q,\E
-	private final static String ENTRY_DELIM = "\\Q" + ENTRY_DELIM_SYMBOL + "\\E";
-	
-	// valid part string regex:	[^...,]+
-	private final static String VALID_STRING = "[^" + PAIR_DELIM_SYMBOL + ENTRY_DELIM_SYMBOL + "]+";
-	
-	// valid matching pair config regex:	"([^...,]+\\Q...\\E[^...,]+\\Q,\\E)*[^...,]+\\Q...\\E[^...,]+"
-	private final static String VALID_MATCHING_PAIR_CONFIG = 
-			"(" + VALID_STRING + PAIR_DELIM + VALID_STRING + ENTRY_DELIM + ")*" + VALID_STRING + PAIR_DELIM + VALID_STRING;
-	
-	/*
-	 * member variables
-	 */
-	private String[] _captures = new String[MAX_VARS];
-	private int _matchStart = -1;
-	private int _matchEnd = -1;
+	/* member variables */
+	private String[] 	_captures 	= new String[MAX_VARS];
+	private int 		_matchStart = -1;
+	private int 		_matchEnd 	= -1;
 	private Map<String, String> _matchingPairTemplates = new HashMap<String, String>();
 	
 	public AdvancedSearchReplace() {
@@ -187,7 +164,7 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 	}
 	
 	/**
-	 * Puts the elements of the given array into a string separated by comma
+	 * Converts the elements of the given array into a string separated by comma
 	 * @param array the array to be printed
 	 * @return string containing array elements separated by comma
 	 */
@@ -202,15 +179,16 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 	}
 	
 	/**
-	 * Analyzes the given pattern and returns the positions of all non-escaped variables in the pattern 
-	 * @param pattern the pattern to be analyzed
-	 * @return An ArrayList of Integers containing start positions of all variables
+	 * Analyzes the given pattern and returns a list of positions of all non-escaped variables in the pattern 
+	 * Example: Pattern = a%1b%2c, returns a list with values 1 and 4
+	 * @param pattern The pattern to be analyzed
+	 * @return An ArrayList of Integers containing the starting position of all variables
 	 */
 	private ArrayList<Integer> getVariablePositions(String pattern) {
 		ArrayList<Integer> varIndexes = new ArrayList<Integer>();
 		
 		// check if pattern starts with a variable
-		Matcher m = getMatcher(pattern, "^" + VARIABLE, false);
+		Matcher m = getMatcher(pattern, "^" + VAR, false);
 		
 		if (m.find()) {
 			varIndexes.add(m.start());
@@ -231,23 +209,24 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 	
 	/**
 	 * Validates the given pattern. Checks if the pattern fulfills the following conditions:
-	 * - the pattern does not comprise two consecutive variables without delimiter
-	 * - the pattern comprises all variables only once
 	 * - the pattern includes at least one variable
-	 * @param pattern the pattern to be validated
-	 * @param varPositions the ArrayList containing all variable positions in the pattern
+	 * - all variables in the pattern are used only once
+	 * - the pattern does not comprise two consecutive variables (e.g. %1%2) without delimiter	 
+	 * @param pattern The pattern to be validated
+	 * @param varPositions The ArrayList containing all variable positions in the pattern
 	 * @return true if the pattern is valid, i.e. fulfills above conditions
 	 * @throws InvalidPatternException if the pattern is invalid, i.e. fulfills one of the conditions:
-	 * - the pattern comprises two variables without delimiter in between
+	 * - the pattern comprises no variable
 	 * - the pattern comprises a variable more than once
+	 * - the pattern comprises two variables without delimiter in between
 	 */
 	private void validatePattern(String pattern, ArrayList<Integer> varPositions) throws InvalidPatternException {
-		// check if there are two consecutive variables without delimiter, i.e. if the regex TWO_CONSECUTIVE_VARS is found in the pattern
-		Matcher m = getMatcher(pattern, TWO_CONSECUTIVE_VARS, false);
-		
-		if (m.find()) {
+		// check if the pattern includes at least one variable, i.e. if the pattern matches the regex MIN_ONE_VAR 
+		Matcher	m = getMatcher(pattern, MIN_ONE_VAR, false);
+				
+		if (!m.matches()) {
 			String msg = SearchReplaceMessageHandler.getInstance().
-					getMessage("exception_invalidpattern_missingdelim", pattern.substring(m.end()-4, m.end()));
+					getMessage("exception_invalidpattern_novarused");
 			throw new InvalidPatternException(msg);
 		}
 		
@@ -265,24 +244,24 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 				varIndexes.add(varIndex);
 			}
 		}
+	
+		// check if there are two consecutive variables without delimiter, i.e. if the regex TWO_CONSECUTIVE_VARS is found in the pattern
+		m = getMatcher(pattern, TWO_CONSECUTIVE_VARS, false);
 		
-		// check if the pattern includes at least one variable, i.e. if the pattern matches the regex MIN_ONE_VAR 
-		m = getMatcher(pattern, MIN_ONE_VAR, false);
-		
-		if (!m.matches()) {
+		if (m.find()) {
 			String msg = SearchReplaceMessageHandler.getInstance().
-					getMessage("exception_invalidpattern_novarused");
+					getMessage("exception_invalidpattern_missingdelim", pattern.substring(m.end()-4, m.end()));
 			throw new InvalidPatternException(msg);
 		}
 	}
 	
 	/**
-	 * Checks if the given text contains the given pattern starting fromIndex and considering the bMatchCase flag
-	 * @param text the text to be checked
-	 * @param pattern the pattern to be searched in the text
-	 * @param fromIndex the starting index of the text where the pattern is searched from 
-	 * @param matchCase the flag indicating if case sensitive search should be used to find the pattern in the text
-	 * @return true if the pattern converted to regular expressions is found in the given text considering fromIndex and bMatchCase
+	 * Checks if the given text contains the given pattern starting fromIndex and considering the matchCase flag
+	 * @param text The subject text
+	 * @param pattern The pattern to be searched in the text
+	 * @param fromIndex The starting index of the text where the pattern is searched from 
+	 * @param matchCase The flag indicating if case sensitive search should be used to find the pattern in the text
+	 * @return true if the pattern converted to regular expressions is found in the given text considering fromIndex and matchCase
 	 */
 	private boolean containsPattern(String text, String pattern, int fromIndex, boolean matchCase) {		
 		String patternRegex = convertPatternToRegex(pattern);
@@ -297,28 +276,33 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace{
 	
 	/**
 	 * Converts the given pattern into a regular expression pattern
-	 * @param pattern the advanced search pattern to be converted to a regular expression pattern
-	 * @return a regex version of the pattern where all literals are escaped and variables are replaced by .*
+	 * @param pattern The advanced search pattern to be converted to a regular expression pattern
+	 * @return a regex version of the pattern where all literals are quoted and variables are replaced by (.*?)
 	 */
 	private String convertPatternToRegex(String pattern) {
-		// non escaped variables are replaced by .*? (if pattern starts with variable)
-		pattern = pattern.replaceAll("^" + VARIABLE, "\\\\E(.*?)\\\\Q");
+		String patternRegex = "";
+		int pos = 0;
 		
-		// non escaped variables are replaced by .*? (variables which are not at start of pattern)
-		// $1 is needed to include the symbol before the (non escaped) variable ([^%])
-		pattern = pattern.replaceAll(NON_ESC_VAR, "$1\\\\E(.*?)\\\\Q");
+		Matcher m = getMatcher(pattern, "^" + VAR + "|" + NON_ESC_VAR, false);
+		
+		while (m.find(pos)) {
+			int offset = m.end()-m.start()-2;	// catch symbol [^%] before NON_ESC_VAR
+			String prefix = pattern.substring(pos, m.start()+offset);
+			patternRegex += Pattern.quote(prefix) + "(.*?)";
+			pos = m.end();
+		}
+		
+		patternRegex += Pattern.quote(pattern.substring(pos, pattern.length()));		
 		
 		// escaped variables (i.e. %%[0-9]) are replaced by the string %[0-9]
-		pattern = removeAdvancedEscapeSymbol(pattern);
-		
-		return "\\Q" + pattern + "\\E";
+		return removeAdvancedEscapeSymbol(patternRegex);
 	}
 	
 	/**
 	 * Returns a Matcher object corresponding to the specified text and regular expression pattern
-	 * @param text the text the matcher is based on
-	 * @param pattern the pattern the matcher is based on
-	 * @param matchCase the flag indicating if case sensitive regular expression matching is required
+	 * @param text The text the matcher should use
+	 * @param pattern The pattern the matcher should use
+	 * @param matchCase The flag indicating if case sensitive regular expression matching is required
 	 * @return a Matcher object corresponding to the given parameters
 	 */
 	private Matcher getMatcher(String text, String pattern, boolean matchCase) {

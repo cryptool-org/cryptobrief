@@ -188,6 +188,11 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 		return GUIPropertiesLogic.getInstance().getProperty(IProperties.GUI_SEARCH_PAIRS);
 	}
 	
+	/**
+	 * Depending on the state of the option useSpecialSymbols treats \r, \n and \t as symbols or as text (escaped)
+	 * @param s The subject string
+	 * @return The modified string
+	 */
 	private String handleEscapes(String s) {
 		return _dialog.useSpecialSymbols() ? s.replace("\\r", "\r").replace("\\n", "\n").replace("\\t", "\t") : s;
 	}
