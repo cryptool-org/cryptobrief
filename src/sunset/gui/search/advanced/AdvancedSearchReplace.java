@@ -19,23 +19,24 @@ import sunset.gui.search.util.SearchReplaceMessageHandler;
 
 public class AdvancedSearchReplace implements IAdvancedSearchReplace {
 	
-	/* Constants */
+	/* constants */
 	private final static int 	MAX_VARS = 10;
 	private final static char 	VAR_START_SYMBOL	= '%';	// variable symbol
-	private final static char 	VAR_ESC_SYMBOL 	= '%';	// escaping symbol
+	private final static char 	VAR_ESC_SYMBOL 		= '%';	// escaping symbol
 	
+	/* variable regex */
 	private final static String VAR 		= VAR_START_SYMBOL + "[0-9]";				// %[0-9]
 	private final static String ESC_VAR 	= VAR_ESC_SYMBOL + "(" + VAR + ")";			// %(%[0-9])
 	private final static String NON_ESC_VAR = "([^" + VAR_ESC_SYMBOL + "])" + VAR;		// ([^%])%[0-9]
 	private final static String MIN_ONE_VAR = ".*(^" + VAR + "|" + NON_ESC_VAR + ")((.+" + VAR + ")|.)*";	// .*(^%[0-9]|[^%]%[0-9])((.+%[0-9])|.)*
 	private final static String TWO_CONSECUTIVE_VARS = "(^" + VAR + VAR + ")|(" + NON_ESC_VAR + VAR + ")";	// (^%[0-9]%[0-9])|([^%]%[0-9]%[0-9])
 	
+	/* matching pair regex */
 	private final static String PAIR_DELIM_SYMBOL	= "...";	// matching pair delimiter string
 	private final static String ENTRY_DELIM_SYMBOL 	= ",";		// matching pair entry delimiter string
 	private final static String PAIR_DELIM 			= Pattern.quote(PAIR_DELIM_SYMBOL);		// \Q...\E
 	private final static String ENTRY_DELIM 		= Pattern.quote(ENTRY_DELIM_SYMBOL);	// \Q,\E
 	private final static String VALID_STRING 		= "[^" + PAIR_DELIM_SYMBOL + ENTRY_DELIM_SYMBOL + "]+";	// [^...,]+
-
 	private final static String VALID_MATCHING_PAIR_CONFIG =	// ([^...,]+\Q...\E[^...,]+\Q,\E)*[^...,]+\Q...\E[^...,]+
 			"("  + VALID_STRING + PAIR_DELIM + VALID_STRING + ENTRY_DELIM + 
 			")*" + VALID_STRING + PAIR_DELIM + VALID_STRING;	

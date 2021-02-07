@@ -27,8 +27,8 @@ public class SearchLogic extends BaseLogic implements ISearchLogic {
 			_matchStart = text.toLowerCase().indexOf(pattern.toLowerCase(), fromIndex);
 		}
 		
-		// if not found starting fromIndex, fromIndex was not 0, and wrap around is activated, search again from 0
 		if (_matchStart == -1 && fromIndex != 0 && wrapAround) {
+			// if not found starting fromIndex, fromIndex was not 0, and wrap around is activated, search again from 0
 			context.setFromIndex(0);
 			return search(context, wrapAround);
 		}
@@ -72,8 +72,8 @@ public class SearchLogic extends BaseLogic implements ISearchLogic {
 			IAdvancedSearchReplace advSearchReplace = new AdvancedSearchReplace(matchingPairs);
 			boolean found = advSearchReplace.find(context, showBalancingError);
 			
-			// if not found starting fromIndex, fromIndex was not 0, and wrap around is activated, search again from 0
 			if (!found && context.getFromIndex() != 0 && wrapAround) {
+				// if not found starting fromIndex, fromIndex was not 0, and wrap around is activated, search again from 0
 				context.setFromIndex(0);
 				found = advSearchReplace.find(context, showBalancingError);
 			}
@@ -85,17 +85,20 @@ public class SearchLogic extends BaseLogic implements ISearchLogic {
 			return found;
 		} catch (MatchingPairConfigurationException | InvalidPatternException e) {
 			_message = e.getMessage();
-			_error = true;
-			return false;
 		} catch (UnbalancedStringException e) {
 			_matchStart = e.getStart();
 			_matchEnd = e.getEnd();
 			_message = e.getMessage();
-			_error = true;
-			return false;
 		}
+		
+		_error = true;
+		return false;
 	}
 	
+	/**
+	 * Generates an information message depending on the search outcome
+	 * @return The information message representing the outcome of the search operation
+	 */
 	private String generateMessage() {
 		String msg_key = "";
 		

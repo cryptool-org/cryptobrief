@@ -47,20 +47,20 @@ class MatchLogicTest {
 	
 	@Test
 	void testMatchesAdvanced() {
-		Assert.assertTrue(_matcherLogic.matchesAdvanced("abc", "a%1c", null, false));
-		Assert.assertTrue(_matcherLogic.matchesAdvanced("abc", "ab%1", null, true));
-		Assert.assertTrue(_matcherLogic.matchesAdvanced("abc", "%1Bc", null, false));
-		Assert.assertTrue(_matcherLogic.matchesAdvanced("aBc", "aB%9", null, true));
-		Assert.assertTrue(_matcherLogic.matchesAdvanced("abc", "a%1c", null, true));
-		Assert.assertTrue(_matcherLogic.matchesAdvanced("ab\nc", "a%2c", null, true));
+		Assert.assertTrue(_matcherLogic.matchesAdvanced("abc", "a%1c", false, null));
+		Assert.assertTrue(_matcherLogic.matchesAdvanced("abc", "ab%1", true, null));
+		Assert.assertTrue(_matcherLogic.matchesAdvanced("abc", "%1Bc", false, null));
+		Assert.assertTrue(_matcherLogic.matchesAdvanced("aBc", "aB%9", true, null));
+		Assert.assertTrue(_matcherLogic.matchesAdvanced("abc", "a%1c", true, null));
+		Assert.assertTrue(_matcherLogic.matchesAdvanced("ab\nc", "a%2c", true, null));
 		
-		Assert.assertFalse(_matcherLogic.matchesAdvanced("abc", "abcd", null, false));
-		Assert.assertFalse(_matcherLogic.matchesAdvanced("abc", "ab%5%6c", null, false));
-		Assert.assertFalse(_matcherLogic.matchesAdvanced("abc", "a%5b%5c", null, false));
-		Assert.assertFalse(_matcherLogic.matchesAdvanced("abc", "ab%5cd", null, false));
-		Assert.assertFalse(_matcherLogic.matchesAdvanced("abc", "%1Bc", null, true));
-		Assert.assertFalse(_matcherLogic.matchesAdvanced("ab\nc", "a%1C", null, true));
-		Assert.assertFalse(_matcherLogic.matchesAdvanced("abc", "a(c%1", null, true));
-		Assert.assertFalse(_matcherLogic.matchesAdvanced("abc", "a%0b%1d", null, true));
+		Assert.assertFalse(_matcherLogic.matchesAdvanced("abc", "abcd", false, null));
+		Assert.assertFalse(_matcherLogic.matchesAdvanced("abc", "ab%5%6c", false, null));
+		Assert.assertFalse(_matcherLogic.matchesAdvanced("abc", "a%5b%5c", false, null));
+		Assert.assertFalse(_matcherLogic.matchesAdvanced("abc", "ab%5cd", false, null));
+		Assert.assertFalse(_matcherLogic.matchesAdvanced("abc", "%1Bc", true, null));
+		Assert.assertFalse(_matcherLogic.matchesAdvanced("ab\nc", "a%1C", true, null));
+		Assert.assertFalse(_matcherLogic.matchesAdvanced("abc", "a(c%1", true, null));
+		Assert.assertFalse(_matcherLogic.matchesAdvanced("abc", "a%0b%1d", true, null));
 	}
 }

@@ -19,8 +19,6 @@ import sunset.gui.search.logic.SearchLogic;
 import sunset.gui.search.logic.interfaces.IMatcherLogic;
 import sunset.gui.search.logic.interfaces.IReplaceLogic;
 import sunset.gui.search.logic.interfaces.ISearchLogic;
-import sunset.gui.search.util.SearchReplaceMessageHandler;
-import sunset.gui.search.advanced.exception.UndeclaredVariableException;
 import sunset.gui.search.exception.SearchIndexOutOfBoundsException;
 import sunset.gui.search.interfaces.ISearchReplaceCoordinator;
 
@@ -41,10 +39,6 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 		}
 	}
 	
-	private JTextPane getTextPane() {
-		return FFaplJFrame.getCurrentCodePanel().getCodePane();
-	}
-	
 	@Override
 	public boolean findString(boolean ignoreWrapAroundFlag) {
 		try {
@@ -52,7 +46,6 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 			Document doc = textPane.getDocument();
 			String text = doc.getText(0, doc.getLength());
 			int caretPos = textPane.getCaretPosition();
-			
 			ISearchLogic searchLogic = new SearchLogic();
 			String pattern = handleEscapes(_dialog.searchPattern());
 			boolean matchCase = _dialog.matchCase();
@@ -60,15 +53,10 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 			SearchContext context = new SearchContext(text, pattern, caretPos, matchCase);
 			boolean found;
 			
-			if (_dialog.useRegEx()) {
-				boolean dotAll = _dialog.dotMatchesNewLine();
-				
-				found = searchLogic.searchRegex(context, wrapAround, dotAll);
-			} else if (_dialog.useAdvancedSearch()){
-				String matchingPairs = getMatchingPairs();
-				boolean showBalancingError = _dialog.showBalancingError();
-				
-				found = searchLogic.searchAdvanced(context, wrapAround, matchingPairs, showBalancingError);
+			if (_dialog.useRegEx()) {				
+				found = searchLogic.searchRegex(context, wrapAround, _dialog.dotMatchesNewLine());
+			} else if (_dialog.useAdvancedSearch()){				
+				found = searchLogic.searchAdvanced(context, wrapAround, getMatchingPairs(), _dialog.showBalancingError());
 			} else {
 				found = searchLogic.search(context, wrapAround);
 			}
@@ -78,7 +66,6 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 				textPane.moveCaretPosition(searchLogic.getEnd());
 				
 				setStatus(searchLogic.getMessage() + getLineNumber(doc, searchLogic.getStart()), SearchStatus.SEARCH_SUCCESS);
-				
 				return true;
 			} else {
 				if (searchLogic.getError()) {
@@ -100,10 +87,87 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 		return false;
 	}
 	
+	@Override
+	public boolean isSearchPatternSelected() {
+		String selectedText = getTextPane().getSelectedText();
+		
+		if (selectedText == null) {
+			return false;
+		}
+		
+		IMatcherLogic matcherLogic = new MatcherLogic();
+		String pattern = handleEscapes(_dialog.searchPattern());
+		boolean matchCase = _dialog.matchCase();
+		
+		if (_dialog.useRegEx()) {
+			return matcherLogic.matchesRegex(selectedText, pattern, matchCase, _dialog.dotMatchesNewLine());
+		} else if (_dialog.useAdvancedSearch()){
+			return matcherLogic.matchesAdvanced(selectedText, pattern, matchCase, getMatchingPairs());
+		} else {
+			return matcherLogic.equals(selectedText, pattern, matchCase);
+		}
+	}
+	
+	@Override
+	public boolean replaceText() {
+		String selectedText = getTextPane().getSelectedText();
+		
+		if (selectedText == null) {
+			return false;
+		}
+		
+		IReplaceLogic replaceLogic = new ReplaceLogic();
+		String pattern = handleEscapes(_dialog.searchPattern());
+		String replace = handleEscapes(_dialog.replaceText());
+		boolean matchCase = _dialog.matchCase();
+		ReplaceContext context = new ReplaceContext(selectedText, pattern, replace, matchCase);
+		
+		try {
+			if (_dialog.useRegEx()) {
+				replace = replaceLogic.replaceRegex(context, _dialog.dotMatchesNewLine());
+			} else if (_dialog.useAdvancedSearch()) {
+				replace = replaceLogic.replaceAdvanced(context, getMatchingPairs(), _dialog.showBalancingError());
+			}
+		} catch (Exception e) {
+			setStatus(e.getMessage(), SearchStatus.FAILURE);
+			return false;
+		}
+		
+		if (replace == null) {
+			return false;
+		} else {		
+			getTextPane().replaceSelection(replace);
+			return true;
+		}
+	}
+	
+	@Override
+	public void setStatus(String message, int status) {
+		Color color = Color.black;
+		
+		if (status == SearchStatus.FAILURE) {
+			color = Color.red;
+		} else if (status == SearchStatus.SEARCH_SUCCESS) {
+			color = Color.black;
+		} else if (status == SearchStatus.REPLACE_SUCCESS) {
+			color = Color.blue;
+		}
+		
+		_dialog.setStatus(message, color);
+	}
+	
+	/**
+	 * Gets the text pane of the main frame
+	 * @return The JTextPane of the main frame
+	 */
+	private JTextPane getTextPane() {
+		return FFaplJFrame.getCurrentCodePanel().getCodePane();
+	}
+	
 	/**
 	 * Calculates the line number from the caret position inside a document
-	 * @param doc the subject document
-	 * @param position the current caret position
+	 * @param doc The subject document
+	 * @param position The current caret position
 	 * @return the corresponding line number
 	 */
 	private int getLineNumber(Document doc, int position) {
@@ -121,94 +185,20 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 		return 0;
 	}
 	
-	@Override
-	public boolean isSearchPatternSelected() {
-		String selectedText = getTextPane().getSelectedText();
-		
-		if (selectedText == null) {
-			return false;
-		}
-		
-		IMatcherLogic matcherLogic = new MatcherLogic();
-		String pattern = handleEscapes(_dialog.searchPattern());
-		boolean matchCase = _dialog.matchCase();
-		
-		if (_dialog.useRegEx()) {		
-			boolean dotAll = _dialog.dotMatchesNewLine();
-			
-			return matcherLogic.matchesRegex(selectedText, pattern, matchCase, dotAll);
-		} else if (_dialog.useAdvancedSearch()){
-			String matchingPairs = getMatchingPairs();
-			
-			return matcherLogic.matchesAdvanced(selectedText, pattern, matchingPairs, matchCase);
-		} else {
-			return matcherLogic.equals(selectedText, pattern, matchCase);
-		}
-	}
-	
-	@Override
-	public boolean replaceText() {
-		JTextPane textPane = getTextPane();
-		String selectedText = textPane.getSelectedText();
-		
-		if (selectedText == null) {
-			return false;
-		}
-		
-		IReplaceLogic replaceLogic = new ReplaceLogic();
-		String pattern = handleEscapes(_dialog.searchPattern());
-		String replace = handleEscapes(_dialog.replaceText());
-		boolean matchCase = _dialog.matchCase();
-		boolean dotAll = _dialog.dotMatchesNewLine();
-		boolean showBalancingError = _dialog.showBalancingError();
-		ReplaceContext context = new ReplaceContext(selectedText, pattern, replace, matchCase);
-		
-		try {
-			if (_dialog.useRegEx()) {
-				replace = replaceLogic.replaceRegex(context, dotAll);
-			} else if (_dialog.useAdvancedSearch()) {
-				String matchingPairs = getMatchingPairs();
-				replace = replaceLogic.replaceAdvanced(context, matchingPairs, showBalancingError);
-			}
-		} catch (Exception e) {
-			setStatus(e.getMessage(), SearchStatus.FAILURE);
-			return false;
-		}
-		
-		if (replace == null) {
-			return false;
-		}
-		
-		textPane.replaceSelection(replace);
-		
-		return true;
-	}
-	
+	/**
+	 * Gets the matching pair configuration string from properties class
+	 * @return the value of the matching pair configuration
+	 */
 	private String getMatchingPairs() {
 		return GUIPropertiesLogic.getInstance().getProperty(IProperties.GUI_SEARCH_PAIRS);
 	}
 	
 	/**
-	 * Depending on the state of the option useSpecialSymbols treats \r, \n and \t as symbols or as text (escaped)
+	 * Depending on the state of the dialog option useSpecialSymbols treats \r, \n and \t as symbols or as text (escaped)
 	 * @param s The subject string
 	 * @return The modified string
 	 */
 	private String handleEscapes(String s) {
 		return _dialog.useSpecialSymbols() ? s.replace("\\r", "\r").replace("\\n", "\n").replace("\\t", "\t") : s;
-	}
-	
-	@Override
-	public void setStatus(String message, int status) {
-		Color c = Color.black;
-		
-		if (status == SearchStatus.FAILURE) {
-			c = Color.red;
-		} else if (status == SearchStatus.SEARCH_SUCCESS) {
-			c = Color.black;
-		} else if (status == SearchStatus.REPLACE_SUCCESS) {
-			c = Color.blue;
-		}
-		
-		_dialog.setStatus(message, c);
 	}
 }

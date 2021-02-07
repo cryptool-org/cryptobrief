@@ -3,10 +3,6 @@ package sunset.gui.search.logic;
 import java.util.regex.Matcher;
 
 import sunset.gui.search.advanced.AdvancedSearchReplace;
-import sunset.gui.search.advanced.exception.InvalidPatternException;
-import sunset.gui.search.advanced.exception.MatchingPairConfigurationException;
-import sunset.gui.search.advanced.exception.UnbalancedStringException;
-import sunset.gui.search.advanced.exception.UndeclaredVariableException;
 import sunset.gui.search.advanced.interfaces.IAdvancedSearchReplace;
 import sunset.gui.search.logic.interfaces.IReplaceLogic;
 

@@ -18,7 +18,7 @@ public class MatcherLogic extends BaseLogic implements IMatcherLogic {
 	}
 
 	@Override
-	public boolean matchesAdvanced(String text, String pattern, String matchingPairs, boolean matchCase) {
+	public boolean matchesAdvanced(String text, String pattern, boolean matchCase, String matchingPairs) {
 		try {
 			IAdvancedSearchReplace advSearchReplace = new AdvancedSearchReplace(matchingPairs);
 			_error = false;

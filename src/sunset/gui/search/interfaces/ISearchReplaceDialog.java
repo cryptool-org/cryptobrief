@@ -34,6 +34,10 @@ public interface ISearchReplaceDialog {
 	 */
 	public boolean wrapAround();
 	
+	/**
+	 * Returns the value of the replace all from start flag, i.e. if replace all should start from start of the text
+	 * @return status of the from start checkbox
+	 */
 	public boolean replaceAllFromStart();
 	
 	/**
@@ -48,8 +52,16 @@ public interface ISearchReplaceDialog {
 	 */
 	public boolean dotMatchesNewLine();	
 
+	/**
+	 * Returns the value of the use special symbols flag, i.e. if \n, \r and \t should be treated as symbols
+	 * @return status of the use special symbols checkbox
+	 */
 	public boolean useSpecialSymbols();
 	
+	/**
+	 * Returns the value of the show balancing error flag, i.e. if a balancing error should be highlighted
+	 * @return status of the show balancing error checkbox
+	 */
 	public boolean showBalancingError();
 	
 	/**

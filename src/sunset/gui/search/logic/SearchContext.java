@@ -22,11 +22,6 @@ public class SearchContext {
 		}
 	}
 	
-	public String toString() {
-		return (_text.length() < 20 ? "Text: " + _text : "") 
-				+ "\tPattern: " + _pattern + "\tfromIndex: " + _fromIndex + "\tmatchCase: " + _matchCase;
-	}
-	
 	public String getText() {
 		return _text;
 	}

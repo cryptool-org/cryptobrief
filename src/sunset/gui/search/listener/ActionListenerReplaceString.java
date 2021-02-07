@@ -17,20 +17,18 @@ public class ActionListenerReplaceString implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (_coordinator.isSearchPatternSelected()) {
+			// if search pattern is selected already, perform replaceText operation
 			if (_coordinator.replaceText()) {
+				// replace operation was successful, now search for next occurrence
 				boolean found = _coordinator.findString(false);
 				
-				String msg = "";
-				
-				if (found) {
-					msg = SearchReplaceMessageHandler.getInstance().getMessage("replace_done_nextfound");
-				} else {
-					msg = SearchReplaceMessageHandler.getInstance().getMessage("replace_done_nofurtherfound");
-				}
+				String msg = found ? SearchReplaceMessageHandler.getInstance().getMessage("replace_done_nextfound") : 
+					SearchReplaceMessageHandler.getInstance().getMessage("replace_done_nofurtherfound");
 				
 				_coordinator.setStatus(msg, SearchStatus.REPLACE_SUCCESS);
 			}
 		} else {
+			// otherwise perform a findString first
 			_coordinator.findString(false);
 		}
 	}
