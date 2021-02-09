@@ -47,29 +47,41 @@
     </display>  
   </class>  
   <association id="6">    
-    <end type="SOURCE" refId="4" navigable="false">      
-      <attribute id="7" name="_coordinator"/>      
-      <multiplicity id="8" minimum="0" maximum="1"/>    
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="7" name="_coordinator">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </attribute>      
+      <multiplicity id="8" minimum="0" maximum="1">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </multiplicity>    
     </end>    
     <end type="TARGET" refId="1" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="9">    
-    <end type="SOURCE" refId="3" navigable="false">      
-      <attribute id="10" name="_coordinator"/>      
-      <multiplicity id="11" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="1" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <realization id="12">    
+  <realization id="9">    
     <end type="SOURCE" refId="2"/>    
     <end type="TARGET" refId="1"/>  
   </realization>  
+  <association id="10">    
+    <end type="SOURCE" refId="3" navigable="false">      
+      <attribute id="11" name="_coordinator">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </attribute>      
+      <multiplicity id="12" minimum="0" maximum="1">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="1" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
   <association id="13">    
-    <end type="SOURCE" refId="5" navigable="false">      
-      <attribute id="14" name="_coordinator"/>      
-      <multiplicity id="15" minimum="0" maximum="1"/>    
+    <end type="SOURCE" refId="4" navigable="false">      
+      <attribute id="14" name="_coordinator">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </attribute>      
+      <multiplicity id="15" minimum="0" maximum="1">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </multiplicity>    
     </end>    
     <end type="TARGET" refId="1" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  

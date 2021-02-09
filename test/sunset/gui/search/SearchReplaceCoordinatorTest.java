@@ -9,6 +9,7 @@ import sunset.gui.FFaplJFrame;
 import sunset.gui.dialog.JDialogSearchReplace;
 import sunset.gui.search.interfaces.ISearchReplaceCoordinator;
 import sunset.gui.search.logic.SearchContext;
+import sunset.gui.search.util.SearchReplaceMessageHandler;
 
 class SearchReplaceCoordinatorTest {
 
@@ -360,6 +361,29 @@ class SearchReplaceCoordinatorTest {
 		Assert.assertTrue(_coordinator.findString(false));
 		Assert.assertTrue(_coordinator.isSearchPatternSelected());
 		Assert.assertFalse(_coordinator.replaceText());
+	}
+	
+	@Test
+	void testConvertToRegex() {
+		_dialog.setSearchPattern("a%5b%8c");
+		_dialog.setUseAdvancedSearch(true);
+		_coordinator.convertPatternToRegex();
+		Assert.assertEquals("\\Qa\\E(?<g5>.*?)\\Qb\\E(?<g8>.*?)\\Qc\\E", _dialog.searchPattern());
+		
+		_dialog.setSearchPattern("$%1$%2\\[\\n%3\\n\\]");
+		_dialog.setUseAdvancedSearch(true);
+		_dialog.setUseSpecialSymbols(false);
+		_coordinator.convertPatternToRegex();
+		Assert.assertEquals("\\Q$\\E(?<g1>.*?)\\Q$\\E(?<g2>.*?)\\Q\\[\\n\\E(?<g3>.*?)\\Q\\n\\]\\E", _dialog.searchPattern());
+		
+		_dialog.setSearchPattern("$%1%2\\[\\n%3\\n\\]");
+		_dialog.setUseAdvancedSearch(true);
+		_dialog.setUseSpecialSymbols(true);
+		_coordinator.convertPatternToRegex();
+		Assert.assertEquals("$%1%2\\[\\n%3\\n\\]", _dialog.searchPattern());	// no change
+		String expected = SearchReplaceMessageHandler.getInstance().getMessage("exception_invalidpattern_missingdelim", "%1%2");
+		Assert.assertEquals(expected, _dialog.getStatus());
+		
 	}
 	
 	@Test

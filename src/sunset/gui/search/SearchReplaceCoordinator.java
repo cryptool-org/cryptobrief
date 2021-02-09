@@ -16,9 +16,11 @@ import sunset.gui.search.logic.ReplaceContext;
 import sunset.gui.search.logic.ReplaceLogic;
 import sunset.gui.search.logic.SearchContext;
 import sunset.gui.search.logic.SearchLogic;
+import sunset.gui.search.logic.ConverterLogic;
 import sunset.gui.search.logic.interfaces.IMatcherLogic;
 import sunset.gui.search.logic.interfaces.IReplaceLogic;
 import sunset.gui.search.logic.interfaces.ISearchLogic;
+import sunset.gui.search.logic.interfaces.IConverterLogic;
 import sunset.gui.search.exception.SearchIndexOutOfBoundsException;
 import sunset.gui.search.interfaces.ISearchReplaceCoordinator;
 
@@ -65,7 +67,15 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 				textPane.setCaretPosition(searchLogic.getStart());
 				textPane.moveCaretPosition(searchLogic.getEnd());
 				
-				setStatus(searchLogic.getMessage() + getLineNumber(doc, searchLogic.getStart()), SearchStatus.SEARCH_SUCCESS);
+				String start = getLineNumberAsString(doc, searchLogic.getStart());
+				String end	 = getLineNumberAsString(doc, searchLogic.getEnd());
+				String lineInfo = start;
+				
+				if (!start.equals(end)) {	// multiple-line match
+					lineInfo = start + " : " + end;
+				}
+				
+				setStatus(searchLogic.getMessage() + lineInfo, SearchStatus.SEARCH_SUCCESS);
 				return true;
 			} else {
 				if (searchLogic.getError()) {
@@ -77,7 +87,7 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 					}
 					setStatus(searchLogic.getMessage(), SearchStatus.FAILURE);
 				} else {	// search pattern not found and no error occurred
-					setStatus(searchLogic.getMessage() + getLineNumber(doc, caretPos), SearchStatus.FAILURE);
+					setStatus(searchLogic.getMessage() + getLineNumberAsString(doc, caretPos), SearchStatus.FAILURE);
 				}
 			}
 		} catch (BadLocationException | SearchIndexOutOfBoundsException e) {
@@ -142,6 +152,21 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 	}
 	
 	@Override
+	public void convertPatternToRegex() {
+		IConverterLogic converterLogic = new ConverterLogic();
+		String pattern = handleEscapes(_dialog.searchPattern());
+		
+		if (converterLogic.isValidAdvancedSearchPattern(pattern)) {
+			String regex = converterLogic.convertPatterntoRegex(pattern);
+			_dialog.setSearchPattern(regex);
+			_dialog.changeToRegexSearch();
+			setStatus("", SearchStatus.REPLACE_SUCCESS);
+		} else {
+			setStatus(converterLogic.getMessage(), SearchStatus.FAILURE);
+		}
+	}
+	
+	@Override
 	public void setStatus(String message, int status) {
 		Color color = Color.black;
 		
@@ -170,7 +195,7 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 	 * @param position The current caret position
 	 * @return the corresponding line number
 	 */
-	private int getLineNumber(Document doc, int position) {
+	private String getLineNumberAsString(Document doc, int position) {
 		Element root, element;
 		root = doc.getRootElements()[0];
 		
@@ -178,11 +203,11 @@ public class SearchReplaceCoordinator implements ISearchReplaceCoordinator {
 			element = root.getElement(i);
 			
 			if(element.getStartOffset() <= position && position < element.getEndOffset()) {
-				return i+1;
+				return String.valueOf(i+1);
 			}
 		}
 		
-		return 0;
+		return "0";
 	}
 	
 	/**

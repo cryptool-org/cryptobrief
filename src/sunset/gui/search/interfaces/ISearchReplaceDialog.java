@@ -69,4 +69,15 @@ public interface ISearchReplaceDialog {
 	 * @return status of advanced search checkbox
 	 */
 	public boolean useAdvancedSearch();
+	
+	/**
+	 * Sets the given search pattern in the search textfield
+	 * @param pattern The search pattern to be set
+	 */
+	public void setSearchPattern(String pattern);
+	
+	/**
+	 * Changes the dialog to regex search mode
+	 */
+	public void changeToRegexSearch();
 }

@@ -48,7 +48,6 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace {
 	
 	/* internal member variables */
 	private String		_text		= null;
-	private String		_pattern	= null;
 	private int			_fromIndex	= -1;
 	private boolean		_matchCase;
 	private Map<String, String> _matchingPairTemplates = new HashMap<String, String>();
@@ -116,32 +115,33 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace {
 	public boolean find(SearchContext context, boolean showBalancingError) throws InvalidPatternException, UnbalancedStringException {
 		reset();
 		_text = context.getText();
-		_pattern = context.getPattern();
 		_fromIndex = context.getFromIndex();
 		_matchCase = context.isMatchCase();
-		
-		ArrayList<Integer> varPositions = getVariablePositions(_pattern);
-		Map<String, String> matchingPairs = getConcreteMatchingPairs();
-		validatePattern(varPositions);
-		
+		String pattern = context.getPattern();
 		boolean balanced = true;
+		Map<String, String> matchingPairs = getConcreteMatchingPairs();
+		
+		validatePattern(pattern);
 		
 		do {
-			if (!containsPattern()) {
+			if (!containsPattern(pattern)) {
+				// if pattern is not found from current index
 				return false;
 			}
 			
-			int currVarPosition = varPositions.get(0);
-			String nextPattern = removeAdvancedEscapeSymbol(_pattern.substring(0, currVarPosition));
+			ArrayList<Integer> varPositions = getVariablePositions(pattern);
+			int currVarPos = varPositions.get(0);
+			String nextPattern = removeAdvancedEscapeSymbol(pattern.substring(0, currVarPos));
 			_matchStart = nextPattern.isEmpty() ? _fromIndex : getIndexOf(nextPattern, _fromIndex);
 			int prevMatch = _matchStart + nextPattern.length();
 			
 			for (int i = 0; i < varPositions.size(); i++) {
-				currVarPosition = varPositions.get(i);			
-				int nextVarPosition = (i+1 < varPositions.size()) ? varPositions.get(i+1) : _pattern.length();
-				int varIndex = getVariableIndex(_pattern, currVarPosition);
-				nextPattern = removeAdvancedEscapeSymbol(_pattern.substring(currVarPosition+2, nextVarPosition));
+				currVarPos = varPositions.get(i);			
+				int nextVarPos = (i+1 < varPositions.size()) ? varPositions.get(i+1) : pattern.length();
+				int varIndex = getVariableIndex(pattern, currVarPos);
+				nextPattern = removeAdvancedEscapeSymbol(pattern.substring(currVarPos+2, nextVarPos));
 				_matchEnd = nextPattern.isEmpty() ? _text.length() : getIndexOf(nextPattern, prevMatch);
+				
 				try {
 					_matchEnd = performBalancedMatch(nextPattern, prevMatch, _matchEnd, varIndex, matchingPairs);
 					_matchEnd += nextPattern.length();
@@ -165,15 +165,12 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace {
 	@Override
 	public boolean matches(String text, String pattern, boolean matchCase) throws InvalidPatternException {
 		_text = text;
-		_pattern = pattern;
 		_fromIndex = 0;
 		_matchCase = matchCase;
 		
-		ArrayList<Integer> varPositions = getVariablePositions(_pattern);
+		validatePattern(pattern);
 		
-		validatePattern(varPositions);
-		
-		return containsPattern();
+		return containsPattern(pattern);
 	}
 	
 	@Override
@@ -210,6 +207,61 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace {
 	}
 	
 	@Override
+	public void validatePattern(String pattern) throws InvalidPatternException {		
+		// check if the pattern includes at least one variable, i.e. if the pattern matches the regex MIN_ONE_VAR 
+		Matcher	m = getMatcher(pattern, MIN_ONE_VAR, false);
+				
+		if (!m.matches()) {
+			String msg = SearchReplaceMessageHandler.getInstance().
+					getMessage("exception_invalidpattern_novarused");
+			throw new InvalidPatternException(msg);
+		}
+		
+		// check if a variable is used more than once
+		ArrayList<Integer> varIndexes = new ArrayList<Integer>();
+		ArrayList<Integer> varPositions = getVariablePositions(pattern);
+		
+		for (int varPos : varPositions) {
+			int varIndex = getVariableIndex(pattern, varPos);
+			
+			if (varIndexes.contains(varIndex)) {
+				String msg = SearchReplaceMessageHandler.getInstance().
+						getMessage("exception_invalidpattern_varmorethanonce", String.valueOf(varIndex));
+				throw new InvalidPatternException(msg);
+			} else {
+				varIndexes.add(varIndex);
+			}
+		}
+	
+		// check if there are two consecutive variables without delimiter, i.e. if the regex TWO_CONSECUTIVE_VARS is found in the pattern
+		m = getMatcher(pattern, TWO_CONSECUTIVE_VARS, false);
+		
+		if (m.find()) {
+			String msg = SearchReplaceMessageHandler.getInstance().
+					getMessage("exception_invalidpattern_missingdelim", pattern.substring(m.end()-4, m.end()));
+			throw new InvalidPatternException(msg);
+		}
+	}
+	
+	@Override
+	public String convertPatternToRegex(String pattern) {
+		ArrayList<Integer> varPositions = getVariablePositions(pattern);
+		String regex = "";
+		int pos = 0;
+		
+		for (Integer varPos : varPositions) {
+			String prefix = pattern.substring(pos, varPos);
+			regex += Pattern.quote(prefix) + "(?<g" + getVariableIndex(pattern, varPos) + ">.*?)";	// named capturing group g[0-9]
+			pos = varPos+2;
+		}
+		
+		regex += Pattern.quote(pattern.substring(pos, pattern.length()));		
+		
+		// finally escaped variables (i.e. %%[0-9]) are replaced by the string %[0-9]
+		return removeAdvancedEscapeSymbol(regex);
+	}
+	
+	@Override
 	public String[] getCaptures() {
 		return _captures;
 	}
@@ -237,115 +289,36 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace {
 	/**
 	 * Analyzes the given pattern and returns a list of positions of all non-escaped variables in the pattern 
 	 * Example: Pattern = a%1b%%2c%3d, returns a list with values 1 and 8, %2 is not a variable as it is escaped (%%2)
+	 * @param pattern The advanced search pattern
 	 * @return An ArrayList of Integers containing the starting position of all variables
 	 */
 	private ArrayList<Integer> getVariablePositions(String pattern) {
 		ArrayList<Integer> varIndexes = new ArrayList<Integer>();
+		Matcher m = getMatcher(pattern, "^" + VAR + "|" + NON_ESC_VAR, false);
+		int pos = 0;
 		
-		// check if pattern starts with a variable
-		Matcher m = getMatcher(pattern, "^" + VAR, false);
-		
-		if (m.find()) {
-			varIndexes.add(m.start());
-		}
-		
-		// find variables (with index from 0-9) which are not escaped
-		m = getMatcher(pattern, NON_ESC_VAR, false);
-		
-		int startFrom = 0;
-		
-		while (m.find(startFrom)) {
-			varIndexes.add(m.start()+1);	// +1 because of [^%]
-			startFrom = m.end()-1;
+		while (m.find(pos)) {
+			varIndexes.add(m.end()-2);	// -2 to get start position of variable
+			pos = m.end()-1;			// -1 to support replace patterns like %1%1, to find 2nd variable using NON_ESC_VAR
 		}
 		
 		return varIndexes;
 	}
 	
 	/**
-	 * Validates the given pattern. Checks if the pattern fulfills the following conditions:
-	 * - the pattern includes at least one variable
-	 * - all variables in the pattern are used only once
-	 * - the pattern does not comprise two consecutive variables (e.g. %1%2) without delimiter	 
-	 * @param varPositions The ArrayList containing all variable positions in the pattern
-	 * @return true if the pattern is valid, i.e. fulfills above conditions
-	 * @throws InvalidPatternException if the pattern is invalid, i.e. fulfills one of the conditions:
-	 * - the pattern comprises no variable
-	 * - the pattern comprises a variable more than once
-	 * - the pattern comprises two variables without delimiter in between
-	 */
-	private void validatePattern(ArrayList<Integer> varPositions) throws InvalidPatternException {
-		// check if the pattern includes at least one variable, i.e. if the pattern matches the regex MIN_ONE_VAR 
-		Matcher	m = getMatcher(_pattern, MIN_ONE_VAR, false);
-				
-		if (!m.matches()) {
-			String msg = SearchReplaceMessageHandler.getInstance().
-					getMessage("exception_invalidpattern_novarused");
-			throw new InvalidPatternException(msg);
-		}
-		
-		// check if a variable is used more than once
-		ArrayList<Integer> varIndexes = new ArrayList<Integer>();
-		
-		for (int varPos : varPositions) {
-			int varIndex = getVariableIndex(_pattern, varPos);
-			
-			if (varIndexes.contains(varIndex)) {
-				String msg = SearchReplaceMessageHandler.getInstance().
-						getMessage("exception_invalidpattern_varmorethanonce", String.valueOf(varIndex));
-				throw new InvalidPatternException(msg);
-			} else {
-				varIndexes.add(varIndex);
-			}
-		}
-	
-		// check if there are two consecutive variables without delimiter, i.e. if the regex TWO_CONSECUTIVE_VARS is found in the pattern
-		m = getMatcher(_pattern, TWO_CONSECUTIVE_VARS, false);
-		
-		if (m.find()) {
-			String msg = SearchReplaceMessageHandler.getInstance().
-					getMessage("exception_invalidpattern_missingdelim", _pattern.substring(m.end()-4, m.end()));
-			throw new InvalidPatternException(msg);
-		}
-	}
-	
-	/**
 	 * Checks if the given text contains the given pattern starting fromIndex and considering the matchCase flag
+	 * @param pattern The advanced search pattern
 	 * @return true if the regex representation of the pattern is found in the given text considering fromIndex and matchCase
 	 */
-	private boolean containsPattern() {		
-		String patternRegex = convertPatternToRegex(_pattern);
+	private boolean containsPattern(String pattern) {	
+		// convert pattern to equivalent regex pattern
+		String patternRegex = convertPatternToRegex(pattern);
 		
+		// create matcher for regex pattern
 		Matcher m = getMatcher(_text, patternRegex, _matchCase);
 		
 		// use regex to check if text contains the converted pattern		
 		return m.find(_fromIndex);
-	}
-	
-	/**
-	 * Converts the given pattern into a regular expression pattern
-	 * Example: The pattern a%1b is converted into the regex \Qa\E(.*?)\Qb\E 
-	 * @param pattern The advanced search pattern to be converted to a regular expression pattern
-	 * @return a regex representation of the pattern where all literals are quoted and variables are replaced by (.*?)
-	 */
-	private String convertPatternToRegex(String pattern) {
-		String regex = "";
-		int pos = 0;
-		
-		// Find all (non-escaped) variables inside the pattern
-		Matcher m = getMatcher(pattern, "^" + VAR + "|" + NON_ESC_VAR, false);
-		
-		while (m.find(pos)) {
-			int offset = m.end()-m.start()-2;	// catch symbol [^%] before NON_ESC_VAR
-			String prefix = pattern.substring(pos, m.start()+offset);
-			regex += Pattern.quote(prefix) + "(.*?)";
-			pos = m.end();
-		}
-		
-		regex += Pattern.quote(pattern.substring(pos, pattern.length()));		
-		
-		// finally escaped variables (i.e. %%[0-9]) are replaced by the string %[0-9]
-		return removeAdvancedEscapeSymbol(regex);
 	}
 	
 	/**
@@ -391,9 +364,7 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace {
 	 * @return the index of the variable, i.e. for variable %2 it returns 2
 	 */
 	private int getVariableIndex(String pattern, int varPosition) {
-		char cVarIndex = pattern.charAt(varPosition+1);
-		
-		return Character.getNumericValue(cVarIndex);
+		return Character.getNumericValue(pattern.charAt(varPosition+1));
 	}
 	
 	/**

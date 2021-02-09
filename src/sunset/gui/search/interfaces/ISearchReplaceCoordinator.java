@@ -31,6 +31,11 @@ public interface ISearchReplaceCoordinator {
 	public void resetCaretPosition();
 	
 	/**
+	 * Checks if the given pattern is a valid advanced search pattern and then converts it into an equivalent regex pattern
+	 */
+	public void convertPatternToRegex();
+	
+	/**
 	 * Sets the status of the JSearchReplaceDialog
 	 * @param text the message to display
 	 * @param status the {@Link SearchStatus}

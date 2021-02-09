@@ -37,6 +37,27 @@ public interface IAdvancedSearchReplace {
 	public String replaceVariables(String pattern, String[] contents) throws UndeclaredVariableException;
 	
 	/**
+	 * Validates the given pattern, i.e. checks if the pattern fulfills the following conditions:
+	 * - the pattern includes at least one variable
+	 * - all variables in the pattern are used only once
+	 * - the pattern does not comprise two consecutive variables (e.g. %1%2) without delimiter	 
+	 * @param pattern The pattern to be validated
+	 * @throws InvalidPatternException if the pattern is invalid, i.e. fulfills one of the conditions:
+	 * - the pattern comprises no variable
+	 * - the pattern comprises a variable more than once
+	 * - the pattern comprises two variables without delimiter in between
+	 */
+	public void validatePattern(String pattern) throws InvalidPatternException;
+	
+	/**
+	 * Converts the given pattern into a regular expression pattern
+	 * Example: The pattern a%1b is converted into the regex \Qa\E(?<g1>.*?)\Qb\E 
+	 * @param pattern The advanced search pattern to be converted to a regular expression pattern
+	 * @return a regex representation of the pattern where all literals are quoted and variables are replaced by a named capturing group (?<g[0-9]>.*?)
+	 */
+	public String convertPatternToRegex(String pattern);
+	
+	/**
 	 * Returns the captures of the advanced search
 	 * @return the captures of the advanced search
 	 */

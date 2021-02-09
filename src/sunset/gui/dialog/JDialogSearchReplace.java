@@ -33,6 +33,7 @@ import sunset.gui.search.listener.ActionListenerFindString;
 import sunset.gui.search.listener.ActionListenerReplaceAll;
 import sunset.gui.search.listener.ActionListenerReplaceString;
 import sunset.gui.search.listener.ActionListenerOpenSettingsDialog;
+import sunset.gui.search.listener.ActionListenerRegexConverter;
 import sunset.gui.tabbedpane.JTabbedPaneNamed;
 import sunset.gui.util.TranslateGUIElements;
 
@@ -55,6 +56,7 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 	private JButton jButton_find;
 	private JButton jButton_replace;
 	private JButton jButton_replaceall;
+	private JButton jButton_converttoregex;
 	private JButton jButton_settings;
 	private JButton jButton_cancel;
 	private JLabel jLabel_searchfor;
@@ -179,6 +181,12 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 				}
 				
 				{
+					jButton_converttoregex = new JButton(">> RegEx");
+					jButton_converttoregex.setBounds(360, 182, 101, 21);
+					panelSearchReplaceMain.add(jButton_converttoregex);
+				}
+				
+				{
 					jButton_settings = new JButton("Settings");
 					jButton_settings.setBounds(360, 218, 101, 21);
 					jButton_settings.setName("button_settings");
@@ -272,6 +280,7 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 		jButton_find.addActionListener(new ActionListenerFindString(coordinator));
 		jButton_replace.addActionListener(new ActionListenerReplaceString(coordinator));
 		jButton_replaceall.addActionListener(new ActionListenerReplaceAll(coordinator));
+		jButton_converttoregex.addActionListener(new ActionListenerRegexConverter(coordinator));
 		jButton_settings.addActionListener(new ActionListenerOpenSettingsDialog(this));
 		
 		this.addWindowFocusListener(new WindowAdapter() {
@@ -296,8 +305,10 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 		ActionListener radioButtonListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				chckbxUseSpecialSymbols.setEnabled(!rdbtnRegularExpression.isSelected());
 				chckbxDotMatchNewLine.setEnabled(rdbtnRegularExpression.isSelected());
 				chckbxShowBalancingErrors.setEnabled(rdbtnAdvancedSearch.isSelected());
+				jButton_converttoregex.setEnabled(rdbtnAdvancedSearch.isSelected());
 			}
 		};
 		
@@ -312,6 +323,7 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 		rdbtnStandardSearch.setSelected(true);
 		chckbxShowBalancingErrors.setEnabled(false);
 		chckbxDotMatchNewLine.setEnabled(false);
+		jButton_converttoregex.setEnabled(false);
 	}
 	
 	private void addEscapeListener(final JDialog dialog) {
@@ -426,9 +438,27 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 	public boolean useAdvancedSearch() {
 		return rdbtnAdvancedSearch.isSelected();
 	}
-	
+
+	@Override
 	public void setSearchPattern(String pattern) {
 		jTextField_searchtext.setText(pattern);
+	}
+	
+	@Override
+	public void changeToRegexSearch() {
+		rdbtnRegularExpression.setSelected(true);
+		chckbxUseSpecialSymbols.setEnabled(false);
+		chckbxShowBalancingErrors.setEnabled(false);
+		jButton_converttoregex.setEnabled(false);
+		chckbxDotMatchNewLine.setEnabled(true);
+		chckbxDotMatchNewLine.setSelected(true);
+	}
+	
+	@Override
+	public void enableDisableButtons(boolean enable) {
+		jButton_find.setEnabled(enable);
+		jButton_replace.setEnabled(enable);
+		jButton_replaceall.setEnabled(enable);
 	}
 
 	public void setReplaceText(String text) {
@@ -470,11 +500,8 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 	public void setUseStandardSearch(boolean value) {
 		rdbtnStandardSearch.setSelected(value);
 	}
-
-	@Override
-	public void enableDisableButtons(boolean enable) {
-		jButton_find.setEnabled(enable);
-		jButton_replace.setEnabled(enable);
-		jButton_replaceall.setEnabled(enable);
+	
+	public String getStatus() {
+		return jLabel_status.getText();
 	}
 }
