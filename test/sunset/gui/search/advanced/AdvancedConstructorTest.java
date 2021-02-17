@@ -136,6 +136,18 @@ class AdvancedConstructorTest {
 		  });
 		
 		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_matchingpairconfig", "\\beg{%1-%2-%3}...\\end{%1-%2-%4}"), e.getMessage());
+		
+		e = Assert.assertThrows(MatchingPairConfigurationException.class, () -> {
+			new AdvancedSearchReplace("{...}, \\beg{%1%2}...\\end{%1%2}");
+		  });
+		
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_matchingpairconfig", "\\beg{%1%2}...\\end{%1%2}"), e.getMessage());
+		
+		e = Assert.assertThrows(MatchingPairConfigurationException.class, () -> {
+			new AdvancedSearchReplace("{...}, \\beg{%1-%1}...\\end{%1-%1}");
+		  });
+		
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_matchingpairconfig", "\\beg{%1-%1}...\\end{%1-%1}"), e.getMessage());
 	}
 
 }
