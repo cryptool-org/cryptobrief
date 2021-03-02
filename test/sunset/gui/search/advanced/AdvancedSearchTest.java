@@ -817,6 +817,12 @@ class AdvancedSearchTest {
 		UnbalancedStringException e;
 
 		e = Assert.assertThrows(UnbalancedStringException.class, () -> {
+			_searchReplace.find(new SearchContext(")", "%1", 0, false), true);
+		  });
+		
+		Assert.assertEquals(SearchReplaceMessageHandler.getInstance().getMessage("exception_unbalancedstring", ")"), e.getMessage());
+		
+		e = Assert.assertThrows(UnbalancedStringException.class, () -> {
 			_searchReplace.find(new SearchContext("a(a))aa", "a%1a", 0, false), true);
 		  });
 		
@@ -1146,6 +1152,12 @@ class AdvancedSearchTest {
 			
 			Assert.assertTrue(_searchReplace.find(new SearchContext("while (c1) {if (c2) {if (c3) {if (c4) {stmt;}}}}", "if (%1) {%2}", 0, false), true));
 			checkResult(12,47,new String[] {null, "c2", "if (c3) {if (c4) {stmt;}}", null, null, null, null, null, null, null});
+			
+			
+			
+			
+			Assert.assertTrue(_searchReplace.find(new SearchContext("a\\begin{g1}a\\begin{g2}a\\end{g2}a\\begin{g3}aaa\\end{g3}aa\\end{g1}a\\begin{g4}a\\end{g4}a", "a%1a", 0, false), true));
+			checkResult(0,64,new String[] {null, "\\begin{g1}a\\begin{g2}a\\end{g2}a\\begin{g3}aaa\\end{g3}aa\\end{g1}", null, null, null, null, null, null, null, null});
 		} catch (Exception e) {
 			Assert.fail();
 		}
