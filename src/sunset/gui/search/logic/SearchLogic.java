@@ -15,6 +15,10 @@ public class SearchLogic extends BaseLogic implements ISearchLogic {
 	private int _matchStart;
 	private int _matchEnd;
 	
+	public SearchLogic() {
+		
+	}
+	
 	@Override
 	public boolean search(SearchContext context, boolean wrapAround) {
 		String text = context.getText();
