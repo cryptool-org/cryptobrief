@@ -274,7 +274,7 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace {
 		String suffix = pattern.substring(pos, pattern.length());
 		suffix = suffix.isEmpty() ? "" : Pattern.quote(suffix);
 		regex += suffix;
-
+		System.out.println("Converted RegEx Pattern: " + removeAdvancedEscapeSymbol(regex));
 		// finally escaped variables (i.e. %%[0-9]) are replaced by the string %[0-9]
 		return removeAdvancedEscapeSymbol(regex);
 	}
@@ -477,10 +477,8 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace {
 			Matcher matcher = getMatcher(key, VAR_MIN_ONE, false);
 			
 			if (matcher.matches()) {	// check if at least one variable is used in key
-				ArrayList<String[]> matchedContents = new ArrayList<String[]>();
-				
 				// get matched contents for key, e.g. \end{%1}
-				matchedContents.addAll(getAllVariableContents(key));
+				ArrayList<String[]> matchedContents = getAllVariableContents(key);
 				
 				// add matched contents for value, e.g. \begin{%1}
 				matchedContents.addAll(getAllVariableContents(val));
@@ -511,6 +509,7 @@ public class AdvancedSearchReplace implements IAdvancedSearchReplace {
 	 * Finds all occurrences of the pattern in the text and replaces all variables with the according contents
 	 * Example: text = a{d1,d2}b{d3,d4}c, pattern = {%1,%2}
 	 * This pattern occurs two times in the text. The first set of the variables %1 and %2 stores the values d1 and d2, and the second set stores d3 and d4.
+	 * Example: text = \begin{a}\begin{b}\end{b}\end{a}, pattern = \begin{%1} or \end{%1}
 	 * @param text The subject text
 	 * @param pattern The advanced search pattern which is searched in the text
 	 * @return A list of String[], where each entry of this list corresponds to a set of variables from one match of the entire pattern in the text
