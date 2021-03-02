@@ -13,10 +13,3 @@ out/
 *.iws
 *.iml
 *.ipr
-doc/SearchReplaceV2.ucls
-doc/SearchReplace.ucls
-/build/
-.externalToolBuilders/org.eclipse.m2e.core.maven2Builder.launch
-.classpath
-.project
-.settings/org.eclipse.m2e.core.prefs

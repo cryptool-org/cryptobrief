@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import sunset.gui.FFaplJFrame;
 import sunset.gui.dialog.JDialogSearchReplace;
 import sunset.gui.search.interfaces.ISearchReplaceCoordinator;
-import sunset.gui.search.logic.SearchContext;
 import sunset.gui.search.util.SearchReplaceMessageHandler;
 
 class SearchReplaceCoordinatorTest {
