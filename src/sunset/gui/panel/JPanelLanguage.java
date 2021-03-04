@@ -23,6 +23,7 @@ import ffapl.utils.FFaplProperties;
 @SuppressWarnings("serial")
 public class JPanelLanguage extends javax.swing.JPanel implements IFFaplComponent{
 	private JLabel jLabel_Language;
+	private JLabel jLabel_Information;
 	private JComboBox jComboBox_Language;
 	private List<Locale>  _languages;
 	private FFaplJFrame _frame;
@@ -53,8 +54,15 @@ public class JPanelLanguage extends javax.swing.JPanel implements IFFaplComponen
 			}
 			{
 				jComboBox_Language = new JComboBox();
+				jComboBox_Language.setPreferredSize(new Dimension(70, 21));
 				this.add(jComboBox_Language);
 				//jComboBox_Language.setFont(new java.awt.Font(IProperties.GUIFontFamily,0,12));
+			}
+			{
+				jLabel_Information = new JLabel();
+				this.add(jLabel_Information);
+				jLabel_Information.setText("Information: This setting does not affect");
+				jLabel_Information.setName("label_langinfo");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -98,7 +106,7 @@ public class JPanelLanguage extends javax.swing.JPanel implements IFFaplComponen
 	
 	private void translate(){
 		TranslateGUIElements.translateLabel(jLabel_Language);
-		
+		TranslateGUIElements.translateLabel(jLabel_Information);
 	}
 
 

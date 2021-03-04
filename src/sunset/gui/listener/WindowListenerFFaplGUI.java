@@ -9,6 +9,7 @@ import java.awt.event.WindowListener;
 import javax.swing.JOptionPane;
 
 import sunset.gui.FFaplJFrame;
+import sunset.gui.panel.JPanelCode;
 import sunset.gui.util.SunsetBundle;
 
 
@@ -35,8 +36,11 @@ public class WindowListenerFFaplGUI implements WindowListener {
 	 */
 	@Override
 	public void windowActivated(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-
+		JPanelCode currentCodePanel = FFaplJFrame.getCurrentCodePanel(); 
+		
+	    if (currentCodePanel != null) {
+	    	currentCodePanel.getCodePane().requestFocusInWindow();
+	    }
 	}
 
 	/* (non-Javadoc)
@@ -99,7 +103,6 @@ public class WindowListenerFFaplGUI implements WindowListener {
 	 */
 	@Override
 	public void windowDeactivated(WindowEvent arg0) {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -108,7 +111,6 @@ public class WindowListenerFFaplGUI implements WindowListener {
 	 */
 	@Override
 	public void windowDeiconified(WindowEvent arg0) {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -117,7 +119,6 @@ public class WindowListenerFFaplGUI implements WindowListener {
 	 */
 	@Override
 	public void windowIconified(WindowEvent arg0) {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -126,7 +127,6 @@ public class WindowListenerFFaplGUI implements WindowListener {
 	 */
 	@Override
 	public void windowOpened(WindowEvent arg0) {
-		// TODO Auto-generated method stub
 
 	}
 

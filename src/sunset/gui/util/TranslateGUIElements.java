@@ -7,12 +7,17 @@ import java.awt.Component;
 import java.awt.Dialog;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
+import javax.swing.border.TitledBorder;
+
+import sunset.gui.tabbedpane.JTabbedPaneNamed;
 
 /**
  * @author Alexander Ortner
@@ -97,14 +102,14 @@ public class TranslateGUIElements {
 	}
 	
 	/**
-	 * Translates tabbedPane title
-	 * @param tabbedPane
+	 * Translates translateTappedPane tabs
+	 * @param JTabbedPaneNamed
 	 */
-	public static void translateTappedPane(JTabbedPane tabbedPane){
+	public static void translateTappedPane(JTabbedPaneNamed tabbedPane){
 		String title = null;
 		String name;
-		for(int i = 0; i < tabbedPane.getComponentCount(); i++){
-			name = tabbedPane.getComponent(i).getName();
+		for(int i = 0; i < tabbedPane.getTabCount(); i++){
+			name = tabbedPane.getTabNameAt(i);
 			if(name != null){
 				title = SunsetBundle.getInstance().getProperty(name);
 				if(title != null){
@@ -190,5 +195,30 @@ public class TranslateGUIElements {
 			}
 		}		
 	}
+	
+	public static void translateCheckbox(JCheckBox checkbox) {
+		String name = checkbox.getName();
+		
+		if (name != null) {
+			String txt = SunsetBundle.getInstance().getProperty(name);
+			
+			if (txt != null) {
+				checkbox.setText(txt);
+			}
+		}
+	}
 
+	public static void translatePanel(JPanel panel) {
+		String name = panel.getName();
+		
+		if (name != null) {
+			String txt = SunsetBundle.getInstance().getProperty(name);
+			
+			if (txt != null) {
+				if (panel.getBorder() instanceof TitledBorder) {
+					((TitledBorder)panel.getBorder()).setTitle(txt);
+				}
+			}
+		}
+	}
 }

@@ -1522,7 +1522,7 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 
 					// thus y = +- sqrt( -C(x) )
 					// however, in GF(2^n) these two solutions are identical
-					_y_gf = Algorithm.sqrt(c).value();
+					_y_gf = Algorithm.sqrt(c,null).value();
 
 				} else { // B(x) != 0
 
@@ -1587,7 +1587,7 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 				d.divide(valueOf(4));
 				d.subtract(c); //b^2/4 - c
 
-				d.setValue(Algorithm.sqrt(d).value());
+				d.setValue(Algorithm.sqrt(d,null).value());
 				
 				foo.setValue(b.value());
 				foo.divide(TWO);

@@ -165,6 +165,11 @@ public class FFaplView extends PlainView {
 			try {
 				//text = getDocument().getText(p0, p1 - p0);
 				text = getDocument().getText(0, getDocument().getLength());
+				
+				if (!text.stripLeading().startsWith("program")) {
+					// only perform syntax highlighting for valid FFapl programs
+					return;
+				}
 				// Match all regexes on this snippet, store positions
 		        /*for (Map.Entry<Pattern, Color> entry : FFaplRegex.patternColors.entrySet()) {
 		     

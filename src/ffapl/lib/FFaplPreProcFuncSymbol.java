@@ -5,6 +5,8 @@ package ffapl.lib;
 
 import ffapl.java.exception.FFaplAlgebraicException;
 import ffapl.java.interfaces.IPredefinedProcFunc;
+import ffapl.java.logging.FFaplLogger;
+import ffapl.java.predefined.function.Sqrt;
 import ffapl.lib.interfaces.IToken;
 import ffapl.lib.interfaces.IVm;
 import ffapl.types.Type;
@@ -74,8 +76,12 @@ public class FFaplPreProcFuncSymbol extends FFaplSymbol {
 	 * @param interpreter
 	 * @throws FFaplAlgebraicException 
 	 */
-	public void execute(IVm interpreter) throws FFaplAlgebraicException{
-                _procfunc.execute(interpreter); 
+	public void execute(IVm interpreter, FFaplLogger logger) throws FFaplAlgebraicException{
+		if (_procfunc instanceof Sqrt) {
+                ((Sqrt)_procfunc).execute(interpreter, logger);
+		} else {
+			_procfunc.execute(interpreter);
+		}
 	}
 
 }

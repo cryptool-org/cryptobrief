@@ -9,6 +9,8 @@ import ffapl.java.classes.ResidueClass;
 import ffapl.java.exception.FFaplAlgebraicException;
 import ffapl.java.interfaces.IJavaType;
 import ffapl.java.interfaces.IPredefinedProcFunc;
+import ffapl.java.interfaces.IPredefinedProcFuncLog;
+import ffapl.java.logging.FFaplLogger;
 import ffapl.java.math.Algorithm;
 import ffapl.lib.FFaplPreProcFuncSymbol;
 import ffapl.lib.FFaplSymbol;
@@ -19,10 +21,10 @@ import ffapl.types.FFaplGaloisField;
 import ffapl.types.FFaplInteger;
 import ffapl.types.FFaplResidueClass;
 
-public class Sqrt implements IPredefinedProcFunc {
+public class Sqrt implements IPredefinedProcFuncLog {
 	
 	@Override
-	public void execute(IVm interpreter) throws FFaplAlgebraicException {
+	public void execute(IVm interpreter, FFaplLogger logger) throws FFaplAlgebraicException {
 		
 		IJavaType a = (IJavaType) interpreter.popStack();
 		BigInteger valueRC = BigInteger.ZERO;
@@ -40,7 +42,7 @@ public class Sqrt implements IPredefinedProcFunc {
 			
 		case IJavaType.GALOISFIELD:
 			resultGF = ((GaloisField)a).clone();
-			resultGF.setValue( Algorithm.sqrt(((GaloisField)a)).value().getPolynomial() );
+			resultGF.setValue( Algorithm.sqrt((GaloisField)a, logger).value().getPolynomial() );
 			interpreter.pushStack(resultGF);
 			break;
 
@@ -106,6 +108,12 @@ public class Sqrt implements IPredefinedProcFunc {
 						new FFaplInteger(),
 						ISymbol.PARAMETER));
 		symbolTable.closeScope();
+	}
+
+	@Override
+	public void execute(IVm interpreter) throws FFaplAlgebraicException {
+		this.execute(interpreter, null);
+		
 	}
 	
 }

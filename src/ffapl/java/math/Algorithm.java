@@ -2,10 +2,13 @@ package ffapl.java.math;
 
 import ffapl.FFaplInterpreter;
 import ffapl.exception.FFaplException;
+import ffapl.exception.FFaplWarning;
 import ffapl.java.classes.*;
 import ffapl.java.exception.FFaplAlgebraicException;
 import ffapl.java.interfaces.IAlgebraicError;
+import ffapl.java.interfaces.ILevel;
 import ffapl.java.interfaces.IRandomGenerator;
+import ffapl.java.logging.FFaplLogger;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -552,10 +555,10 @@ public class Algorithm {
 	 * square root for gf elements
 	 * @throws FFaplAlgebraicException 
 	 */
-	public static GaloisField sqrt(GaloisField a) throws FFaplAlgebraicException
+	public static GaloisField sqrt(GaloisField a, FFaplLogger logger) throws FFaplAlgebraicException
 	{
 		a = a.clone(); //don't change the original value
-		GaloisField g,b,h, aux3, aux4;
+		GaloisField g,b,h, aux3, aux4, aux5;
 		g = a.clone();
 		b = a.clone();
 		h = a.clone();
@@ -617,9 +620,20 @@ public class Algorithm {
 			b = aux4.clone();
 			b.multiply(aux3);
 			
+			aux5 = b.clone();
+			aux5.multiply(aux5);
+			
+			// check if b is square root of a (b^2==a)
+			if (aux5.compareTo(a) != 0) {
+				// if not, a has no square root, therefore return 0
+				b.setValue(new Polynomial(ZERO,ZERO,a.getThread()));
+				
+				if (logger != null) {
+					logger.log(ILevel.WARNING, "Warning: " + a + " has no square root. Returning 0.\n");
+				}
+			}
 		}
-		
-		
+
 		return b;
 	}
 	
