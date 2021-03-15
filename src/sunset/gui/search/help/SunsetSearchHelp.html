@@ -1,0 +1,317 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title></title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)"> 
+<!-- html --> 
+<meta name="src" content="SunsetSearchHelp.tex"> 
+<link rel="stylesheet" type="text/css" href="SunsetSearchHelp.css"> 
+</head><body 
+>
+   <h3 class="sectionHead"><span class="titlemark">1   </span> <a 
+ id="x1-10001"></a>Advanced Search Patterns</h3>
+<!--l. 13--><p class="noindent" >The following table shows some valid advanced search patterns and a description of
+what these patterns match.
+   <div class="tabular"> <table id="TBL-1" class="tabular" 
+ 
+><colgroup id="TBL-1-1g"><col 
+id="TBL-1-1"><col 
+id="TBL-1-2"></colgroup><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-1-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-1-1"  
+class="td11"> Advanced Search Pattern  </td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-1-2"  
+class="td11"> Description                                                                                            </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-2-1"  
+class="td11"> <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">%1</span></span></span>                     </td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-2-2"  
+class="td11"> the entire text                                                                                        </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-3-1"  
+class="td11"> <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">a%1b</span></span></span>                   </td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-3-2"  
+class="td11"> an &#8217;a&#8217;, followed by a string which does not include a &#8217;b&#8217;, followed by a &#8217;b&#8217;           </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-4-1"  
+class="td11"> <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">%1a%2</span></span></span>                  </td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-4-2"  
+class="td11"> a string which does not include an &#8217;a&#8217;, followed by an &#8217;a&#8217;, followed by any string  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-5-1"  
+class="td11"> <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">a%1%%1</span></span></span>                 </td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-5-2"  
+class="td11"> an &#8217;a&#8217;, followed by a string which does not include &#8217;%1&#8217;, followed by &#8217;%1&#8217;           </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-6-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-6-1"  
+class="td11">                        </td> </tr></table>
+</div>
+<!--l. 26--><p class="indent" >   By putting a <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">%</span></span></span> in front of a variable, the variable is escaped. So, <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">%%1</span></span></span> does not
+represent a variable but the string %1. Patterns starting or ending with a variable
+have to be used carefully, as those patterns possibly could match the entire
+text.
+<!--l. 27--><p class="indent" >   There are three types of invalid search patterns. A pattern is invalid if there is no
+variable used in the pattern, two consecutive variables without delimiter in between
+are used, or the same variable is used more than once. Some examples of invalid
+search patterns are:
+   <div class="tabular"> <table id="TBL-2" class="tabular" 
+ 
+><colgroup id="TBL-2-1g"><col 
+id="TBL-2-1"><col 
+id="TBL-2-2"></colgroup><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-1-"><td  style="white-space:nowrap; text-align:left;" id="TBL-2-1-1"  
+class="td11"> Advanced Search Pattern  </td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-1-2"  
+class="td11"> Description                                            </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-2-2-1"  
+class="td11"> <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">abc</span></span></span>                    </td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-2-2"  
+class="td11"> Missing variable in the search pattern         </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-2-3-1"  
+class="td11"> <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">%1%2</span></span></span>                   </td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-3-2"  
+class="td11"> Two variables without delimiter in between  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-2-4-1"  
+class="td11"> <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">%1b%1</span></span></span>                  </td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-4-2"  
+class="td11"> Variable <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">%1</span></span></span> used more than once                </td></tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-2-5-1"  
+class="td11"> </td> </tr></table>
+</div>
+<!--l. 39--><p class="indent" >   If no variable is used in the search pattern, a standard search must be used
+instead of an advanced search. Also, two consecutive variables are invalid because it
+is not clear which variable should match which content. This also applies to the last
+invalid search pattern from above table, as reusing the same variable makes it unclear
+what this variable should match (the first match, the second match, or a combination
+of both). Advanced search patterns can be also converted into a corresponding
+regular expression.
+<!--l. 42--><p class="noindent" >
+   <h3 class="sectionHead"><span class="titlemark">2   </span> <a 
+ id="x1-20002"></a>Advanced Replacements Patterns</h3>
+<!--l. 45--><p class="noindent" >For replacement patterns there are less restrictions than for search patterns. If the
+search pattern <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">a%1c</span></span></span> is applied to the text &#8217;abc&#8217;, the replacement patterns shown in
+below table are valid examples. The resulting replacement strings are also shown in
+this table.
+   <div class="tabular"> <table id="TBL-3" class="tabular" 
+ 
+><colgroup id="TBL-3-1g"><col 
+id="TBL-3-1"><col 
+id="TBL-3-2"></colgroup><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-3-1-"><td  style="white-space:nowrap; text-align:left;" id="TBL-3-1-1"  
+class="td11"> Advanced Replacement Pattern  </td><td  style="white-space:nowrap; text-align:left;" id="TBL-3-1-2"  
+class="td11"> Resulting Replacement String  </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-3-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-3-2-1"  
+class="td11"> <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">abc</span></span></span>                         </td><td  style="white-space:nowrap; text-align:left;" id="TBL-3-2-2"  
+class="td11"> &#8217;abc&#8217;                                   </td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-3-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-3-3-1"  
+class="td11"> <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">%1</span></span></span> </td> <td  style="white-space:nowrap; text-align:left;" id="TBL-3-3-2"  
+class="td11"> &#8217;b&#8217;</td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-3-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-3-4-1"  
+class="td11"> <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">c%1a</span></span></span>                        </td><td  style="white-space:nowrap; text-align:left;" id="TBL-3-4-2"  
+class="td11"> &#8217;cba&#8217;                                   </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-3-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-3-5-1"  
+class="td11"> <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">%1%1%1</span></span></span>                      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-3-5-2"  
+class="td11"> &#8217;bbb&#8217;                                  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-3-6-"><td  style="white-space:nowrap; text-align:left;" id="TBL-3-6-1"  
+class="td11"> <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">%%0%1%%1</span></span></span>                    </td><td  style="white-space:nowrap; text-align:left;" id="TBL-3-6-2"  
+class="td11"> &#8217;%0b%1&#8217;                              </td></tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-3-7-"><td  style="white-space:nowrap; text-align:left;" id="TBL-3-7-1"  
+class="td11"> </td> </tr></table>
+</div>
+<!--l. 59--><p class="indent" >   So, replacement patterns do not need to comprise variables at all, and it&#8217;s
+
+allowed to use the same variable more than once in the replacement pattern.
+Invalid replacement patterns are patterns that comprise variables which
+were not used in the search pattern, for example <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">a%2b</span></span></span> or <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">%1%9</span></span></span> in above
+context. So, all replacement patterns which do not comprise unused variables
+are valid. One important note here is that not only the variable but the
+entire match of the search pattern is replaced with the according replacement
+string. In the example above, the search pattern matches the entire text,
+therefore the entire text is replaced with the according replacement string. In a
+more realistic scenario, the search starts from a given position in the text
+(the position of the cursor), and typically matches only a substring of the
+text.
+<!--l. 62--><p class="noindent" >
+   <h3 class="sectionHead"><span class="titlemark">3   </span> <a 
+ id="x1-30003"></a>Balancing</h3>
+<!--l. 64--><p class="noindent" >The advanced search approach also supports a configurable balancing mechanism
+which properly match balanced constructs such as nested <span 
+class="cmtt-10">if</span>-statements in a Java
+code fragment. The balancing configuration allows so-called matching pairs to be
+specified by the user. A valid matching pair configuration starts with a string which
+does not comprise dot (<span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">.</span></span></span>) and comma (<span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">,</span></span></span>) as these two symbols are used as delimiters
+in the configuration. This string acts as an opening tag and must be followed by <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">...</span></span></span>
+and another string without dot and comma. The second string acts as a closing tag.
+These two strings form a so-called matching pair. So, if an opening tag is found in
+the text, the according closing tag must be found subsequently in order
+to have a proper balanced string. To configure multiple matching pairs, a
+comma is used to delimit the matching pairs from each other. Additionally, it
+should be possible to include variables in the balancing configuration, to
+support matching pairs which content is not fixed. These are some examples of
+valid matching pair configurations, here referring to the LaTeXsyntax as an
+example:
+     <ul class="itemize1">
+     <li class="itemize"><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">(...)</span></span></span>
+     </li>
+     <li class="itemize"><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">(...),</span><span 
+class="cmtt-10">&#x00A0;[...],</span><span 
+class="cmtt-10">&#x00A0;{...}</span></span></span>
+     </li>
+     <li class="itemize"><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">open...close</span></span></span>
+     </li>
+     <li class="itemize"><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">\begin{%1}...\end{%1}</span></span></span>
+     </li>
+     <li class="itemize"><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">start[%1-%2-%3]...end(%3-%2-%1)</span></span></span>
+
+     </li>
+     <li class="itemize"><span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">(...),</span><span 
+class="cmtt-10">&#x00A0;[...],</span><span 
+class="cmtt-10">&#x00A0;{...},</span><span 
+class="cmtt-10">&#x00A0;\(...\),</span><span 
+class="cmtt-10">&#x00A0;\[...\],</span><span 
+class="cmtt-10">&#x00A0;\{...\},</span><span 
+class="cmtt-10">&#x00A0;\begin{%1}...\end{%1}</span></span></span></li></ul>
+<!--l. 75--><p class="indent" >   The last item represents the default balancing configuration which is used if no
+configuration is specified by the user. If an empty balancing configuration is specified,
+the balancing functionality is disabled. If variables are used in the matching pairs,
+the content of the variables used in the opening and closing tags have to be identical.
+Also, same as for the variable constraints in the search pattern, the variables in
+the matching pair configuration also have to be delimited by at least one
+character and the same variable must not be used more than once per tag.
+Additionally, the exact same variables have to be used in the opening and closing
+tag of a matching pair. The following examples are invalid matching pair
+configurations:
+   <div class="tabular"> <table id="TBL-4" class="tabular" 
+ 
+><colgroup id="TBL-4-1g"><col 
+id="TBL-4-1"><col 
+id="TBL-4-2"></colgroup><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-1-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-1-1"  
+class="td11"> Invalid Configuration                      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-1-2"  
+class="td11"> Comment                                                    </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-2-1"  
+class="td11"> <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">(..)</span></span></span>                            </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-2-2"  
+class="td11"> Invalid delimiter between tags                         </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-3-1"  
+class="td11"> <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">(),[],{}</span></span></span>                        </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-3-2"  
+class="td11"> Missing delimiter between tags                        </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-4-1"  
+class="td11"> <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">(...)</span><span 
+class="cmtt-10">&#x00A0;[...]</span></span></span>                     </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-4-2"  
+class="td11"> Invalid delimiter between matching pairs           </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-5-1"  
+class="td11"> <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">open[a,b]...close[a,b]</span></span></span>          </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-5-2"  
+class="td11"> Tags must not include matching pair delimiter   </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-6-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-6-1"  
+class="td11"> <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">\begin{%1}...\end{}</span></span></span>             </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-6-2"  
+class="td11"> Missing variable in closing tag                         </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-7-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-7-1"  
+class="td11"> <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">start[%1-%2-%3]...end(%6-%5-%4)</span></span></span> </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-7-2"  
+class="td11"> Opening and closing tags use different variables  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-8-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-8-1"  
+class="td11"> <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">\begin[%1%2]...\end(%1%2)</span></span></span>       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-8-2"  
+class="td11"> Missing delimiter between variables                  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-9-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-9-1"  
+class="td11"> <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">\begin[%1-%1]...\end(%1-%1)</span></span></span>     </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-9-2"  
+class="td11"> Variable <span class="obeylines-h"><span class="verb"><span 
+class="cmtt-10">%1</span></span></span> used more than once per tag           </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-10-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-10-1"  
+class="td11">                                 </td> </tr></table></div>
+<!--l. 93--><p class="noindent" >
+   <h3 class="sectionHead"><span class="titlemark">4   </span> <a 
+ id="x1-40004"></a>Error Recovery</h3>
+<!--l. 95--><p class="noindent" >The most important error messages and possible actions to recover are shown
+next.
+     <ul class="itemize1">
+     <li class="itemize"><span 
+class="cmbx-10">Invalid search pattern! Missing delimiter between variables</span>
+     <!--l. 99--><p class="noindent" >Either remove one of the variables from the search pattern or insert a
+     delimiter string between variables
+     </li>
+     <li class="itemize"><span 
+class="cmbx-10">Invalid search pattern! Variable has been used more than once</span>
+     <!--l. 102--><p class="noindent" >Remove duplicate variables from the search pattern
+     </li>
+     <li class="itemize"><span 
+class="cmbx-10">Invalid search pattern! No variable used in the search pattern</span>
+     <!--l. 105--><p class="noindent" >Either switch to <span 
+class="cmti-10">Standard Search </span>mode or insert at least one variable in
+     the search pattern
+     </li>
+     <li class="itemize"><span 
+class="cmbx-10">Variable from replace text has not been used in search pattern</span>
+     <!--l. 108--><p class="noindent" >Check  naming  of  variables  in  replacement  pattern,  remove  or  rename
+     variables which are not used in the search pattern
+
+     </li>
+     <li class="itemize"><span 
+class="cmbx-10">Bad matching pair configuration</span>
+     <!--l. 111--><p class="noindent" >Check matching pair configuration constraints from Section&#x00A0;<a 
+href="#x1-30003">3<!--tex4ht:ref: appendix:balancing --></a>
+     </li>
+     <li class="itemize"><span 
+class="cmbx-10">Matched string is unbalanced</span>
+     <!--l. 114--><p class="noindent" >This error is shown because the <span 
+class="cmti-10">Show balancing error </span>option is enabled
+     and an unbalanced string was found in the text. Either disable this option
+     or check the document for errors.</li></ul>
+    
+</body></html> 
+
+
+

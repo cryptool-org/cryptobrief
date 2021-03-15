@@ -3,7 +3,9 @@ package sunset.gui.dialog;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.FocusTraversalPolicy;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -24,6 +26,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.SwingConstants;
 
+import sunset.gui.interfaces.IProperties;
 import sunset.gui.listener.ActionListenerCloseWindow;
 import sunset.gui.search.SearchReplaceCoordinator;
 import sunset.gui.search.interfaces.ISearchReplaceDialog;
@@ -35,6 +38,7 @@ import sunset.gui.search.listener.ActionListenerReplaceString;
 import sunset.gui.search.listener.ActionListenerOpenSettingsDialog;
 import sunset.gui.search.listener.ActionListenerRegexConverter;
 import sunset.gui.tabbedpane.JTabbedPaneNamed;
+import sunset.gui.util.DialogFocusTraversalPolicy;
 import sunset.gui.util.TranslateGUIElements;
 
 import java.awt.event.ActionEvent;
@@ -42,9 +46,18 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.awt.Font;
-
+import java.awt.HeadlessException;
 import java.util.Vector;
+import javax.swing.ImageIcon;
 
 @SuppressWarnings("serial")
 public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialog, ISearchReplaceShowDialog {
@@ -59,6 +72,7 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 	private JButton jButton_converttoregex;
 	private JButton jButton_settings;
 	private JButton jButton_cancel;
+	private JButton jButton_help;
 	private JLabel jLabel_searchfor;
 	private JLabel jLabel_replacewith;
 	private Vector<Component> replaceComp = new Vector<Component>();
@@ -112,13 +126,13 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 				panelMode.setName("panel_mode");
 				panelMode.setLayout(null);
 				
-				panelMode.setBounds(10, 140, 140, 100);
+				panelMode.setBounds(10, 140, 148, 100);
 				
 				panelOptions.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Options", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 				panelOptions.setName("panel_options");
 				panelOptions.setLayout(null);
 				
-				panelOptions.setBounds(160, 140, 190, 100);
+				panelOptions.setBounds(160, 139, 190, 100);
 				
 				jLabel_searchfor = new JLabel("Search for:");
 				jLabel_searchfor.setBounds(10, 10, 74, 26);
@@ -142,6 +156,7 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 				jTextField_replacetext.setBounds(90, 46, 260, 26);
 				jTextField_replacetext.setColumns(10);
 				panelSearchReplaceMain.add(jTextField_replacetext);
+
 				replaceComp.add(jTextField_replacetext);
 				
 				{
@@ -224,7 +239,7 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 				panelMode.add(rdbtnStandardSearch);
 				
 				rdbtnAdvancedSearch = new JRadioButton("Advanced search");
-				rdbtnAdvancedSearch.setBounds(10, 42, 120, 21);
+				rdbtnAdvancedSearch.setBounds(10, 42, 108, 21);
 				rdbtnAdvancedSearch.setName("rdbtn_advancedsearch");
 				panelMode.add(rdbtnAdvancedSearch);
 				
@@ -240,6 +255,15 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 				
 				panelSearchReplaceMain.add(panelOptions);
 				panelSearchReplaceMain.add(panelMode);
+				
+				jButton_help = new JButton("");
+				jButton_help.setIcon((new ImageIcon(getClass().getClassLoader().getResource(
+						IProperties.IMAGEPATH + "info16.png"))));
+				jButton_help.setOpaque(false);
+				jButton_help.setContentAreaFilled(false);
+				jButton_help.setBorderPainted(false);
+				jButton_help.setBounds(120, 42, 27, 21);
+				panelMode.add(jButton_help);
 				
 				jTabbedPaneNamed_main.addTab("Search", null, 
 						panelSearchReplace, "Search", 
@@ -282,6 +306,38 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 		jButton_replaceall.addActionListener(new ActionListenerReplaceAll(coordinator));
 		jButton_converttoregex.addActionListener(new ActionListenerRegexConverter(coordinator));
 		jButton_settings.addActionListener(new ActionListenerOpenSettingsDialog(this));
+		jButton_help.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					InputStream isHTML = getClass().getClassLoader().getResourceAsStream(IProperties.SEARCHHELPPATH + "SunsetSearchHelp.html");
+					InputStream isCSS = getClass().getClassLoader().getResourceAsStream(IProperties.SEARCHHELPPATH + "SunsetSearchHelp.css");
+					
+					File htmlFile = new File(System.getProperty("java.io.tmpdir") + "/SunsetSearchHelp.html");
+					File cssFile = new File(System.getProperty("java.io.tmpdir") + "/SunsetSearchHelp.css");
+					
+					byte[] buffer = new byte[isHTML.available()];
+				    isHTML.read(buffer);
+				    OutputStream outStream = new FileOutputStream(htmlFile);
+				    outStream.write(buffer);
+				    outStream.close();
+
+				    buffer = new byte[isCSS.available()];
+				    isCSS.read(buffer);
+				    outStream = new FileOutputStream(cssFile);
+				    outStream.write(buffer);
+				    outStream.close();
+				    
+				    htmlFile.deleteOnExit();
+				    cssFile.deleteOnExit();
+					Desktop.getDesktop().browse(htmlFile.toURI());
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(null, e1.getMessage(), "Failed to open help file", JOptionPane.INFORMATION_MESSAGE);
+				}
+			}
+			
+		});
 		
 		this.addWindowFocusListener(new WindowAdapter() {
 		    public void windowGainedFocus(WindowEvent e) {
@@ -299,6 +355,8 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 				for (Component comp : replaceComp) {
 					comp.setVisible(bReplaceTabSelected);
 				}
+				
+				setComponentFocusOrder(bReplaceTabSelected);
 			}
 	    });
 		
@@ -364,6 +422,29 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 		TranslateGUIElements.translateDialog(this);
 	}
 	
+	private void setComponentFocusOrder(boolean isReplace){
+		Vector<Component> order = new Vector<Component>();
+        order.add(jTextField_searchtext);
+        if (isReplace) {
+        	order.add(jTextField_replacetext);
+        }
+        order.add(chckbxMatchCase);
+        order.add(chckbxWrapAround);
+        order.add(rdbtnStandardSearch);
+        order.add(chckbxUseSpecialSymbols);
+        order.add(jButton_find);
+        if (isReplace) {
+        	order.add(jButton_replace);
+        	order.add(chckbxReplaceAllFromStart);
+            order.add(jButton_replaceall);
+        }
+        order.add(jButton_settings);
+        order.add(jButton_cancel);
+        
+		FocusTraversalPolicy focusTraversalPolicy = new DialogFocusTraversalPolicy(order);
+		this.setFocusTraversalPolicy(focusTraversalPolicy);
+	}
+	
 	@Override
 	public void prepareAndShowDialog(boolean isReplace, JFrame owner) {
 		jTabbedPaneNamed_main.setSelectedIndex(isReplace ? 1 : 0);
@@ -376,6 +457,7 @@ public class JDialogSearchReplace extends JDialog implements ISearchReplaceDialo
 		this.setLocationRelativeTo(owner);
 		jLabel_status.setText("");
 		translate();
+		setComponentFocusOrder(isReplace);
 		setVisible(true);
 	}
 
