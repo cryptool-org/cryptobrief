@@ -32,6 +32,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -265,6 +266,7 @@ public class FFaplJFrame extends javax.swing.JFrame {
 		}
 
 		List<Image> icons = new ArrayList<Image>();
+		
 		icons.add((new ImageIcon(getClass().getClassLoader().getResource(
 				IProperties.IMAGEPATH + "sunset16.png")).getImage()));
 		icons.add((new ImageIcon(getClass().getClassLoader().getResource(

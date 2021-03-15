@@ -25,6 +25,7 @@ public class IProperties {
 	public final static String LASTDIRSAVE = "LAST.DIR.SAVED";
 	public final static String GUIFontFamily = "Sans-Serif";
 	public final static String IMAGEPATH = "sunset/gui/images/";
+	public final static String SEARCHHELPPATH = "sunset/gui/search/help/";
 	public final static String APPTITLE = "FFapl {0} Sunset";
 	public final static String APPVERSION = "2.1";
 	public final static String SHOW_API = "SHOW.API";
