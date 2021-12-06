@@ -139,6 +139,17 @@ public interface IAlgebraicError {
 	public static final int NOT_IMPLEMENTED = 9999;
 
 
+	/** Different array lengths for congruences and moduli **/
+	public static final int CRT_DIFFERENT_ARRAY_LENGTHS = 1300;
+	/** Array is empty, non-empty expected **/
+	public static final int CRT_ARRAY_EMPTY = 1301;
+	/** Zeroes or negative values in moduli array detected **/
+	public static final int CRT_ZERO_OR_NEGATIVE_MODULES = 1302;
+	/** This Chinese Remainder Theorem feature is not implemented yet **/
+	public static final int CRT_NOT_IMPLEMENTED = 1303;
+
+
+
     /**
 	 * Return the compiler error number.
 	 * @return error number
