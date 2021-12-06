@@ -1,0 +1,10 @@
+program SimultaneousCongruences{
+	moduli, congruences : Integer[];
+	result : Integer;
+
+	moduli := {1473,1234,1827};
+	congruences := {1031,1141,50};
+
+	result := crt(congruences, moduli);
+	println(result);	// should be 1024360583
+}
