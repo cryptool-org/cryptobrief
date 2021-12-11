@@ -3,11 +3,12 @@ package ffapl.java.predefined.function;
 import ffapl.exception.FFaplException;
 import ffapl.java.classes.Array;
 import ffapl.java.classes.BInteger;
+import ffapl.java.classes.PolynomialRC;
 import ffapl.java.exception.FFaplAlgebraicException;
-import ffapl.java.interfaces.IAlgebraicError;
 import ffapl.java.interfaces.IJavaType;
 import ffapl.java.interfaces.IPredefinedProcFunc;
-import ffapl.java.math.crt.SimultaneousCongruencesProblem;
+import ffapl.java.math.crt.IntegerSimultaneousCongruencesProblem;
+import ffapl.java.math.crt.PolynomialSimultaneousCongruencesProblem;
 import ffapl.lib.FFaplPreProcFuncSymbol;
 import ffapl.lib.FFaplSymbol;
 import ffapl.lib.interfaces.ISymbol;
@@ -16,6 +17,7 @@ import ffapl.lib.interfaces.IVm;
 import ffapl.types.FFaplArray;
 import ffapl.types.FFaplInteger;
 import ffapl.types.FFaplPolynomial;
+import ffapl.types.FFaplPolynomialResidue;
 
 /**
  * Calculates the value 'x' which satisfies a number of simultaneous congruences "congruences" for different moduli "moduli"
@@ -24,6 +26,7 @@ import ffapl.types.FFaplPolynomial;
  * @version 1.0
  *
  */
+// TODO - DOMINIC - 08.12.2021: 1. What about the case when requested congruences > moduli? 2. what to return in polynomial case since [-1] might be a valid answer?
 public class CRT implements IPredefinedProcFunc {
 
     @Override
@@ -34,33 +37,39 @@ public class CRT implements IPredefinedProcFunc {
         b = (IJavaType) interpreter.popStack();
         a = (IJavaType) interpreter.popStack();
 
-        if (a.typeID() != IJavaType.ARRAY || b.typeID() != IJavaType.ARRAY) {
-            System.err.println("error in CRT.execute");
-        }
+        if (a.typeID() == IJavaType.ARRAY && b.typeID() == IJavaType.ARRAY) {
+            Array moduli = (Array) b;
+            Array congruences = (Array) a;
 
-        Array moduli = (Array) b;
-        Array congruences = (Array) a;
+            if (congruences.getBaseType() == IJavaType.INTEGER && moduli.getBaseType() == IJavaType.INTEGER) {
+                BInteger[] congr = new BInteger[congruences.length()];
+                for (int i = 0; i < congr.length; i++) {
+                    congr[i] = (BInteger) congruences.getValue(i);
+                }
 
-        if (moduli.getBaseType() != IJavaType.INTEGER) {
-            System.err.println("error in CRT.execute");
-        }
+                BInteger[] mod = new BInteger[moduli.length()];
+                for (int i = 0; i < mod.length; i++) {
+                    mod[i] = (BInteger) moduli.getValue(i);
+                }
 
-        if (congruences.getBaseType() == IJavaType.INTEGER) {
-            BInteger[] congr = new BInteger[congruences.length()];
-            for (int i = 0; i < congr.length; i++) {
-                congr[i] = (BInteger) congruences.getValue(i);
+                interpreter.pushStack(
+                        new IntegerSimultaneousCongruencesProblem(congr, mod).solve());
+            } else if (congruences.getBaseType() == IJavaType.BOOLEAN && moduli.getBaseType() == IJavaType.BOOLEAN) { // TODO - DOMINIC - 08.12.2021: BOOLEAN is given but ... that's actually wrong! POLYNOMIALRC is expected. There must a bug somewhere where the java type enum is assigned
+                PolynomialRC[] congr = new PolynomialRC[congruences.length()];
+                for (int i = 0; i < congr.length; i++) {
+                    congr[i] = (PolynomialRC) congruences.getValue(i);
+                }
+
+                PolynomialRC[] mod = new PolynomialRC[moduli.length()];
+                for (int i = 0; i < mod.length; i++) {
+                    mod[i] = (PolynomialRC) moduli.getValue(i);
+                }
+
+                interpreter.pushStack(
+                        new PolynomialSimultaneousCongruencesProblem(congr, mod).solve());
+            } else {
+                System.err.println("error in CRT.execute");
             }
-
-            BInteger[] mod = new BInteger[moduli.length()];
-            for (int i = 0; i < mod.length; i++) {
-                mod[i] = (BInteger) moduli.getValue(i);
-            }
-
-            interpreter.pushStack(
-                    new SimultaneousCongruencesProblem(congr, mod).solve());
-
-        } else if (congruences.getBaseType() == IJavaType.POLYNOMIAL) {
-            throw new FFaplAlgebraicException(null, IAlgebraicError.CRT_NOT_IMPLEMENTED);
         } else {
             System.err.println("error in CRT.execute");
         }
@@ -97,7 +106,7 @@ public class CRT implements IPredefinedProcFunc {
                         ISymbol.PARAMETER));
         symbolTable.closeScope();
 
-        //crt(congruences,moduli) Polynomial-Array - Integer-Array
+        //crt(congruences,moduli) Z()[x]-Array - Z()[x]-Array
         s = new FFaplPreProcFuncSymbol("crt",
                 null,
                 new FFaplPolynomial(),
@@ -109,12 +118,12 @@ public class CRT implements IPredefinedProcFunc {
         symbolTable.addSymbol(
                 new FFaplSymbol("_t1",
                         null,
-                        new FFaplArray(new FFaplPolynomial(), 1),
+                        new FFaplArray(new FFaplPolynomialResidue(), 1),
                         ISymbol.PARAMETER));
         symbolTable.addSymbol(
                 new FFaplSymbol("_t2",
                         null,
-                        new FFaplArray(new FFaplInteger(), 1),
+                        new FFaplArray(new FFaplPolynomialResidue(), 1),
                         ISymbol.PARAMETER));
         symbolTable.closeScope();
     }
