@@ -149,6 +149,8 @@ public interface IAlgebraicError {
 	public static final int CRT_POLYNOMIAL_NONCOPRIME_NOTIMPLEMENTED = 1303;
 	/** No solution for given simultaneous congruences problem **/
 	public static final int CRT_NO_SOLUTION = 1304;
+	/** Characteristics of moduli array and congruences array are not equal **/
+	public static final int CRT_CHARACTERISTICS_MISMATCH = 1305;
 
 
     /**

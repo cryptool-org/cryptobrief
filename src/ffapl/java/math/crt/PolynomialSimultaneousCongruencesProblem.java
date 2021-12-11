@@ -34,6 +34,7 @@ public class PolynomialSimultaneousCongruencesProblem {
      *         <CRT_DIFFERENT_ARRAY_LENGTHS> if lengths of  "congruences" or "moduli" arrays differ.
      *         <CRT_ARRAYS_EMPTY> if "congruences" or "moduli" arrays are empty.
      *         <CRT_ZERO_OR_NEGATIVE_MODULES> if "moduli" array contains values <= 0
+     *         <CRT_CHARACTERISTICS_MISMATCH> if "moduli" characteristics != "congruences" characteristics.
      */
     public PolynomialSimultaneousCongruencesProblem(PolynomialRC[] congruences, PolynomialRC[] moduli) throws FFaplAlgebraicException {
         if (congruences == null) {
@@ -55,6 +56,9 @@ public class PolynomialSimultaneousCongruencesProblem {
 
         this.thread = congruences[0].getThread();
         this.characteristic = congruences[0].characteristic();
+        if (!this.characteristic.equals(moduli[0].characteristic())) {
+            throw new FFaplAlgebraicException(null, IAlgebraicError.CRT_CHARACTERISTICS_MISMATCH);
+        }
         for (PolynomialRC currentModule : moduli) {
             isRunning(thread);
             if (currentModule.isZero()) {
