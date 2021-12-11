@@ -1,0 +1,13 @@
+program calculate{
+	congruences, moduli : Z(5)[x][];
+	result : Z(5)[x];
+
+	congruences := {[0],[x]};
+	moduli := {[x^5+2x^4-x^2+1],[x^4-1]};
+	result := crt(congruences, moduli);
+	println(result);		// should be [3x + 3x^3 + 3x^4 + 2x^7 + 2x^8 + 3x^9];
+
+	if (result MOD moduli[0] == congruences[0] AND result MOD moduli[1] == congruences[1]) {
+		println("Both congruences satisfied.");
+	}
+}

@@ -7,4 +7,8 @@ program SimultaneousCongruences{
 
 	result := crt(congruences, moduli);
 	println(result);	// should be 1024360583
+
+	if (result MOD moduli[0] == congruences[0] AND result MOD moduli[1] == congruences[1]) {
+    	println("Both congruences satisfied.");
+    }
 }
