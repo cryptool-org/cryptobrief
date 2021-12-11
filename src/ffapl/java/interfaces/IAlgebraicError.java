@@ -145,9 +145,10 @@ public interface IAlgebraicError {
 	public static final int CRT_ARRAY_EMPTY = 1301;
 	/** Zeroes or negative values in moduli array detected **/
 	public static final int CRT_ZERO_OR_NEGATIVE_MODULES = 1302;
-	/** This Chinese Remainder Theorem feature is not implemented yet **/
-	public static final int CRT_NOT_IMPLEMENTED = 1303;
-
+	/** Solving simultaneous congruences for non-pairwise coprime polynomial moduli is not yet implemented **/
+	public static final int CRT_POLYNOMIAL_NONCOPRIME_NOTIMPLEMENTED = 1303;
+	/** No solution for given simultaneous congruences problem **/
+	public static final int CRT_NO_SOLUTION = 1304;
 
 
     /**
