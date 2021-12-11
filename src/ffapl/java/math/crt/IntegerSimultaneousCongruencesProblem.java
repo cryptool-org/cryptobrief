@@ -5,8 +5,6 @@ import ffapl.java.exception.FFaplAlgebraicException;
 import ffapl.java.interfaces.IAlgebraicError;
 import ffapl.java.math.Algorithm;
 
-import java.math.BigInteger;
-
 import static ffapl.java.math.Algorithm.*;
 import static java.math.BigInteger.*;
 
@@ -16,13 +14,11 @@ import static java.math.BigInteger.*;
  * @version 1.0
  *
  */
-public class SimultaneousCongruencesProblem {
+public class IntegerSimultaneousCongruencesProblem {
 
     private final BInteger[] congruences;
     private final BInteger[] moduli;
     private final Thread thread;
-
-    private static final BigInteger NO_SOLUTION_FOUND = new BigInteger("-1");
 
     /**
      * Constructor for the problem of solving simultaneous congruences.
@@ -35,7 +31,7 @@ public class SimultaneousCongruencesProblem {
      *         <CRT_ARRAYS_EMPTY> if "congruences" or "moduli" arrays are empty.
      *         <CRT_ZERO_OR_NEGATIVE_MODULES> if "moduli" array contains values <= 0
      */
-    public SimultaneousCongruencesProblem(BInteger[] congruences, BInteger[] moduli) throws FFaplAlgebraicException {
+    public IntegerSimultaneousCongruencesProblem(BInteger[] congruences, BInteger[] moduli) throws FFaplAlgebraicException {
         if (congruences == null) {
             throw new FFaplAlgebraicException(new Object[] {"Array of congruences"}, IAlgebraicError.VALUE_IS_NULL);
         }
@@ -64,14 +60,13 @@ public class SimultaneousCongruencesProblem {
 
     /**
      * Solving simultaneous congruences with given congruences and moduli. Calculates the value which solves those congruences
-     * using the Chinese remainder theorem or NO_SOLUTION_FOUND if no such value exists.
+     * using the Chinese remainder theorem or throws an exception if no solution exists.
      * Uses different solution strategies based on whether the moduli are pairwise coprime or not.
      * @throws FFaplAlgebraicException
      */
     public BInteger solve() throws FFaplAlgebraicException {
         if (valuesArePairwiseCoprime(moduli)) {
             return solveForCoprimeModuli();
-
         } else {
             return solveForNonCoprimeModuli();
         }
@@ -83,7 +78,7 @@ public class SimultaneousCongruencesProblem {
      *          <INTERRUPT> if thread is interrupted
      */
     private BInteger solveForCoprimeModuli() throws FFaplAlgebraicException {
-        BInteger moduliProduct = new BInteger(productSum(moduli), thread);
+        BInteger moduliProduct = productSum(moduli);
         BInteger result = new BInteger(ZERO, thread);
         BInteger n;
         for (int i = 0; i < moduli.length; i++) {
@@ -110,7 +105,7 @@ public class SimultaneousCongruencesProblem {
     // Another idea: https://stackoverflow.com/questions/50081378/system-of-congruences-with-non-pairwise-coprime-moduli
     private BInteger solveForNonCoprimeModuli() throws FFaplAlgebraicException {
         if (!solutionExists()) {
-            return new BInteger(NO_SOLUTION_FOUND, thread);
+            throw new FFaplAlgebraicException(null, IAlgebraicError.CRT_NO_SOLUTION);
         }
         BInteger moduleLcm = lcm(moduli);	// the solution x is between 0 and lcm
         int largestModulePosition = positionOfLargestValue(moduli);
@@ -126,7 +121,7 @@ public class SimultaneousCongruencesProblem {
         }
 
         // This place should never be reached in theory, since we already checked and concluded that a solution should exist.
-        return new BInteger(NO_SOLUTION_FOUND, thread);
+        throw new FFaplAlgebraicException(null, IAlgebraicError.CRT_NO_SOLUTION);
     }
 
     /**
@@ -168,11 +163,11 @@ public class SimultaneousCongruencesProblem {
      * @throws FFaplAlgebraicException
      * 			<INTERRUPT> if thread is interrupted
      */
-    private BigInteger productSum(BInteger[] values) throws FFaplAlgebraicException {
-        BigInteger result = ONE;
+    private BInteger productSum(BInteger[] values) throws FFaplAlgebraicException {
+        BInteger result = new BInteger(ONE, thread);
         for (BInteger value : values) {
             isRunning(thread);
-            result = result.multiply(value);
+            result = result.multR(value);
         }
         return result;
     }
