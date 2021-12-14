@@ -66,7 +66,8 @@ public class IntegerSimultaneousCongruencesProblem {
     /**
      * Solving simultaneous congruences with given congruences and moduli. Calculates the value which solves those congruences
      * using the Chinese remainder theorem or throws an exception if no solution exists.
-     * Uses different solution strategies based on whether the moduli are pairwise coprime or not.
+     * If there are pairs of non-coprime moduli, those are tried to be solved directly. As soon as all moduli are coprime,
+     * the CRT is applied directly.
      * @throws FFaplAlgebraicException
      */
     public BInteger solve() throws FFaplAlgebraicException {
