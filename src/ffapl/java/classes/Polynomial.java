@@ -388,24 +388,6 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 		}
 		return new BInteger(result, _thread);
 	}
-
-	/**
-	 * @param val
-	 * @return the result of the polynomial if x = val and val is another polynomial
-	 * @throws FFaplAlgebraicException
-	 */
-	public Polynomial calculate(Polynomial val) throws FFaplAlgebraicException {
-		BigInteger currentCoefficient;
-		Polynomial result = new Polynomial("0", _thread);
-
-		for (BigInteger currentPower : _polynomialMap.keySet()) {
-			currentCoefficient = _polynomialMap.get(currentPower);
-			result.add(
-					val.powR(currentPower)
-							.scalarMultR(currentCoefficient));
-		}
-		return result;
-	}
 	
 	/**
 	 * Returns true if the polynomial is monic
@@ -617,7 +599,7 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 			String[]arguments = {this + " " + FFaplInterpreter.tokenImage[FFaplInterpreter.DIVIDE].replace("\"", "") + " " + ply};
 			throw new FFaplAlgebraicException(arguments, IAlgebraicError.DIVISION_NOT_REASONABLE);
 		}else{
-
+			
 		}
 	}
 

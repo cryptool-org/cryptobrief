@@ -446,17 +446,6 @@ public class PolynomialRC extends Polynomial {
 		}
 		return result.value();
 	}
-
-	/**
-	 * @param val
-	 * @return the result of the polynomial if x = val and val is a polynomial
-	 * @throws FFaplAlgebraicException
-	 */
-	public Polynomial calculate(Polynomial val) throws FFaplAlgebraicException {
-		Polynomial result = super.calculate(val);
-		result = result.mod(this._characteristic);
-		return result;
-	}
 	
 	/**
 	 * Calculates coefficients modulus characteristic
