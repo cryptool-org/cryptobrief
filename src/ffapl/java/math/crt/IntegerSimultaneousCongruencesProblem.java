@@ -3,10 +3,15 @@ package ffapl.java.math.crt;
 import ffapl.java.classes.BInteger;
 import ffapl.java.exception.FFaplAlgebraicException;
 import ffapl.java.interfaces.IAlgebraicError;
-import ffapl.java.math.Algorithm;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 import static ffapl.java.math.Algorithm.*;
-import static java.math.BigInteger.*;
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.ZERO;
 
 /**
  * Represents a problem were simultaneous congruences need to be solved, which is done via the Chinese Remainder Theorem
@@ -65,11 +70,37 @@ public class IntegerSimultaneousCongruencesProblem {
      * @throws FFaplAlgebraicException
      */
     public BInteger solve() throws FFaplAlgebraicException {
-        if (valuesArePairwiseCoprime(moduli)) {
-            return solveForCoprimeModuli();
-        } else {
-            return solveForNonCoprimeModuli();
+        List<BInteger> currentCongruences = new ArrayList<>(Arrays.asList(congruences));
+        List<BInteger> currentModuli = new ArrayList<>(Arrays.asList(moduli));
+
+        int[] currentNonCoprimeModuliIndices;
+
+        // As long as congruence-moduli pairs with non-coprime moduli are found ...
+        while ((currentNonCoprimeModuliIndices = findTwoNonCoprimeModuli(currentModuli)) != null) {
+            int firstModuleIndex = currentNonCoprimeModuliIndices[0];
+            int secondModuleIndex = currentNonCoprimeModuliIndices[1];
+
+            // TODO - DOMINIC - 14.12.2021: Works, but could use some refactoring
+            BInteger firstCongruence = currentCongruences.get(firstModuleIndex);
+            BInteger secondCongruence = currentCongruences.get(secondModuleIndex);
+            BInteger firstModule = currentModuli.get(firstModuleIndex);
+            BInteger secondModule = currentModuli.get(secondModuleIndex);
+
+            // ... try to solve them directly, and ...
+            BInteger[] directCongruenceResult = solveSimultaneousCongruenceDirectlyFor(
+                    firstCongruence, firstModule, secondCongruence, secondModule);
+
+            // ... replace the original congruence equation with the solution acquired in the previous step.
+            currentCongruences.remove(firstCongruence);
+            currentCongruences.remove(secondCongruence);
+            currentModuli.remove(firstModule);
+            currentModuli.remove(secondModule);
+
+            currentCongruences.add(directCongruenceResult[0]);
+            currentModuli.add(directCongruenceResult[1]);
         }
+
+        return solveForCoprimeModuli(currentCongruences, currentModuli);
     }
 
     /**
@@ -77,93 +108,49 @@ public class IntegerSimultaneousCongruencesProblem {
      * @throws FFaplAlgebraicException
      *          <INTERRUPT> if thread is interrupted
      */
-    private BInteger solveForCoprimeModuli() throws FFaplAlgebraicException {
+    private BInteger solveForCoprimeModuli(List<BInteger> congruences, List<BInteger> moduli) throws FFaplAlgebraicException {
         BInteger moduliProduct = productSum(moduli);
         BInteger result = new BInteger(ZERO, thread);
         BInteger n;
-        for (int i = 0; i < moduli.length; i++) {
+        for (int i = 0; i < moduli.size(); i++) {
             isRunning(thread);
-            n = new BInteger(moduliProduct.divide(moduli[i]), thread);
+            n = new BInteger(moduliProduct.divide(moduli.get(i)), thread);
             result = (BInteger) result.add(
-                    eea(n, moduli[i])[1]
+                    eea(n, moduli.get(i))[1]
                             .multiply(n)
-                            .multiply(congruences[i])
+                            .multiply(congruences.get(i))
                             .mod(moduliProduct));
         }
         return result;
     }
 
     /**
-     * Since moduli are not pairwise coprime, we first need to check whether a solution exists.
-     * If this is the case then the solution must be somewhere between 0 and the lcm of the moduli.
-     * We find the solution by starting with the congruence given for the greatest module as a solution candidate.
-     * If this solution candidate happens to fulfill all other congruences, we have found a solution.
-     * If it does not, we replace it with solutionCandidate := solutionCandidate + greatest_module and check again.
-     * This is done until a solution is found or solutionCandidate exceeds the lcm of all moduli.
-     * @throws FFaplAlgebraicException
+     * This function returns the indices of the first to moduli of the given array which are not coprime, if there are any.
+     * If there are non or it's impossible for them to exist due to the array being smaller than 2, null is returned.
      */
-    // Another idea: https://stackoverflow.com/questions/50081378/system-of-congruences-with-non-pairwise-coprime-moduli
-    private BInteger solveForNonCoprimeModuli() throws FFaplAlgebraicException {
-        if (!solutionExists()) {
-            throw new FFaplAlgebraicException(null, IAlgebraicError.CRT_NO_SOLUTION);
-        }
-        BInteger moduleLcm = lcm(moduli);	// the solution x is between 0 and lcm
-        int largestModulePosition = positionOfLargestValue(moduli);
-        BInteger largestModule = moduli[largestModulePosition];
-        BInteger solutionCandidate = congruences[largestModulePosition];
-
-        while (solutionCandidate.compareTo(moduleLcm) <= 0) {
-            if (problemIsSolvedBy(solutionCandidate)) {
-                return solutionCandidate;
-            }
-
-            solutionCandidate = solutionCandidate.addR(largestModule);
+    private int[] findTwoNonCoprimeModuli(List<BInteger> moduli) throws FFaplAlgebraicException {
+        if(moduli.size() < 2) {
+            return null;
         }
 
-        // This place should never be reached in theory, since we already checked and concluded that a solution should exist.
-        throw new FFaplAlgebraicException(null, IAlgebraicError.CRT_NO_SOLUTION);
-    }
-
-    /**
-     * returns true if the passed solution candidate satisfies all simultaneous congruences; "false" otherwise
-     */
-    private boolean problemIsSolvedBy(BInteger solutionCandidate) {
-        for (int i = 0; i < moduli.length; i++) {
-            if (!solutionCandidate.mod(moduli[i]).equals(congruences[i])) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
-    /**
-     * Checks for all pairs of moduli (m,n) whether their respective congruences are equal mod gcd(m,n)
-     * If yes, then a solution exists and "true" is returned; "false" otherwise.
-     * @throws FFaplAlgebraicException
-     *          <INTERRUPT> if thread is interrupted
-     */
-    private boolean solutionExists() throws FFaplAlgebraicException {
-        for (int i = 0; i < moduli.length; i++) {
-            for (int j = i+1; j < moduli.length; j++) {
-                BInteger gcd = Algorithm.gcd(moduli[i], moduli[j]);
-
+        for (int i = 0; i < moduli.size(); i++) {
+            for (int j = i+1; j < moduli.size(); j++) {
                 isRunning(thread);
-                if (!congruences[i].mod(gcd).equals(congruences[j].mod(gcd))) {
-                    return false;
+                if (!gcd(moduli.get(i), moduli.get(j)).equals(ONE)) {
+                    return new int[] {i,j};
                 }
             }
         }
-        return true;
-    }
 
+        return null;
+    }
 
     /**
      * Returns all values multiplied together, "1" if array is empty
      * @throws FFaplAlgebraicException
      * 			<INTERRUPT> if thread is interrupted
      */
-    private BInteger productSum(BInteger[] values) throws FFaplAlgebraicException {
+    private BInteger productSum(Collection<BInteger> values) throws FFaplAlgebraicException {
         BInteger result = new BInteger(ONE, thread);
         for (BInteger value : values) {
             isRunning(thread);
@@ -172,65 +159,30 @@ public class IntegerSimultaneousCongruencesProblem {
         return result;
     }
 
-    /**
-     * Returns "true" if values are coprime or array is empty, "false" otherwise
-     * @throws FFaplAlgebraicException
-     * 			<INTERRUPT> if thread is interrupted
+    /** If a = b mod d with d = gcd(m1, m2), then x = a mod m1 and x = b mod m2 is equivalent to
+     *  x = a - y * m1 * (a-b)/d mod (m1*m2)/d with d = y * m1 + z * m2 given by the extended Euclidian algorithm
+     *  In this case, this function returns a two-dimensional array containing the new congruence to be fulfilled by x
+     *  and the respective modulus for this congruence. This congruence-module pair can be reduced to replace the two
+     *  pairs given as input to this function.
      */
-    public boolean valuesArePairwiseCoprime(BInteger[] values) throws FFaplAlgebraicException {
-        if(values.length == 0) {
-            return true;
+    private BInteger[] solveSimultaneousCongruenceDirectlyFor(BInteger a, BInteger m1, BInteger b, BInteger m2) throws FFaplAlgebraicException {
+        BInteger[] eeaResult = eea(m1, m2);
+        BInteger d = eeaResult[0];
+        BInteger y = eeaResult[1];
+
+        // first, check whether a solution exists;
+        if (!a.mod(d).equals(b.mod(d))) {
+            throw new FFaplAlgebraicException(null, IAlgebraicError.CRT_NO_SOLUTION);
         }
 
-        Thread thread = values[0].getThread();
-        for (int i = 0; i < values.length; i++) {
-            for (int j = i+1; j < values.length; j++) {
-                isRunning(thread);
-                if (!gcd(values[i], values[j]).equals(ONE)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
+        // Calculate newModulus := (m1*m2)/d
+        BInteger newModulus = (BInteger) m1.multiply(m2).divide(d);
 
-    /**
-     * Returns least common multiple for all values in the given integer array.
-     * @throws FFaplAlgebraicException
-     * 			<INTERRUPT> if thread is interrupted
-     * 		    <CRT_ARRAY_EMPTY> if the "values" array is empty.
-     */
-    private BInteger lcm(BInteger[] values) throws FFaplAlgebraicException {
-        if(values.length == 0) {
-            throw new FFaplAlgebraicException(null, IAlgebraicError.CRT_ARRAY_EMPTY);
-        }
-
-        Thread thread = values[0].getThread();
-        BInteger currentResult = new BInteger(ONE, thread);
-        for (BInteger value : values) {
-            isRunning(thread);
-            currentResult = (BInteger) currentResult
-                    .multiply(value)
-                    .abs()
-                    .divide(gcd(currentResult, value));
-        }
-        return currentResult;
-    }
-
-    /**
-     * returns position of the largest value. "-1" if array is empty
-     */
-    private int positionOfLargestValue(BInteger[] values) {
-        int currentMaximumPosition = -1;
-        for (int i = 0; i < values.length; i++) {
-            if (currentMaximumPosition < 0) {
-                currentMaximumPosition = i;
-            }
-
-            if (values[i].compareTo(values[currentMaximumPosition]) > 0) {
-                currentMaximumPosition = i;
-            }
-        }
-        return currentMaximumPosition;
+        // return {a - y * m1 * (a-b)/d mod newModulus; newModulus}
+        return new BInteger[] {
+                (BInteger) a.subtract(
+                        y.multiply(m1).multiply(a.subtract(b).divide(d)))
+                        .mod(newModulus),
+                newModulus};
     }
 }
