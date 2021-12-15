@@ -1,0 +1,44 @@
+program calculate{
+	
+	procedure two_coprime_moduli() {
+		congruences, moduli : Z(5)[x][];
+		result : Z(5)[x];
+	
+		congruences := {[0],[x]};
+		moduli := {[x^5+2x^4-x^2+1],[x^4-1]};
+		result := crt(congruences, moduli);
+		println(result);		// should be [3 + 3x + 2x^2 + 3x^3 + x^4 + 3x^5 + 3x^6 + 2x^7 + x^8]
+		
+		if (result == [3 + 3x + 2x^2 + 3x^3 + x^4 + 3x^5 + 3x^6 + 2x^7 + x^8]) {
+			println("two_coprime_moduli - Test OKAY.");
+		}
+	}
+	
+	procedure two_noncoprime_moduli() {
+		congruences, moduli : Z(5)[x][];
+		result : Z(5)[x];
+	
+		congruences := {[4x^2+4x+3],[x+3]};
+		moduli := {[x^3+3],[x^2+1]};
+		result := crt(congruences, moduli);
+		println(result);		// should be [2 + 4x + 4x^2 + 3x^3]
+		
+		if (result == [2 + 4x + 4x^2 + 3x^3]) {
+			println("two_noncoprime_moduli - Test OKAY.");
+		}
+	}
+	
+	procedure unsolvable_crt_problem_throws_error() {
+		congruences, moduli : Z(5)[x][];
+		result : Z(5)[x];
+	
+		congruences := {[x],[x+1]};
+		moduli := {[x^2+3],[x^2+3]};
+		result := crt(congruences, moduli);
+		println(result);
+	}
+	
+	two_coprime_moduli();
+	two_noncoprime_moduli();
+	unsolvable_crt_problem_throws_error();
+}

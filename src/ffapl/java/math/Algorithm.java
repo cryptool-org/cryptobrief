@@ -228,7 +228,7 @@ public class Algorithm {
 		
 		return g;
 	}
-	
+
 	/**
 	 * Great common divisor of g(x) and h(x)
 	 * based on: Handbook of applied Cryptography Algorithm: 2.218
@@ -1916,7 +1916,7 @@ public class Algorithm {
 	  * @param thread
 	  * @throws FFaplException
 	  */
-	  private static void isRunning(Thread thread) throws FFaplAlgebraicException
+	  public static void isRunning(Thread thread) throws FFaplAlgebraicException
 	  {
 		if(thread != null){
 			if(thread.isInterrupted()){

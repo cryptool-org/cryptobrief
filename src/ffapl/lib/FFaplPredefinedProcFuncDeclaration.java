@@ -15,6 +15,7 @@ import ffapl.java.predefined.function.EvalulatePolynomial;
 import ffapl.java.predefined.function.Factor;
 import ffapl.java.predefined.function.FactorInteger;
 import ffapl.java.predefined.function.FactorSquareFree;
+import ffapl.java.predefined.function.CRT;
 import ffapl.java.predefined.function.GCD;
 import ffapl.java.predefined.function.GetCharacteristic;
 import ffapl.java.predefined.function.GetECPointOrder;
@@ -66,6 +67,7 @@ public class FFaplPredefinedProcFuncDeclaration {
 		GetNextPrime.registerProcFunc(symbolTable);
 		GetCharacteristic.registerProcFunc(symbolTable);
 		GetIrreduciblePolynomial.registerProcFunc(symbolTable);
+		CRT.registerProcFunc(symbolTable);
 		GCD.registerProcFunc(symbolTable);
 		LCM.registerProcFunc(symbolTable);
 		EEA.registerProcFunc(symbolTable);
