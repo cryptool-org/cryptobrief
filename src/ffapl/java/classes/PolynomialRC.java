@@ -48,6 +48,7 @@ public class PolynomialRC extends Polynomial {
 			BigInteger modulus, Thread thread) throws FFaplAlgebraicException{
 		super(polynomTable, thread);
 		_characteristic = modulus;
+		postTask();
 	}
 
 	/**
