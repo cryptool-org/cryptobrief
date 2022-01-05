@@ -34,7 +34,7 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants, FF
 
   /**
    * @param logger
-   * @param reader 
+   * @param reader
    */
   public FFaplInterpreter(FFaplLogger logger, Reader reader)
   {
@@ -47,7 +47,7 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants, FF
 
   /**
    * @param logger
-   * @param stream 
+   * @param stream
    */
   public FFaplInterpreter(FFaplLogger logger, InputStream stream)
   {
@@ -75,7 +75,7 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants, FF
          //Symbol and Type checking
          _symbolVisit = new FFaplSymbolTypeCheckingVisitor(_symbolTable, _logger, this);
          _symbolVisit.visit(_root, null);
-         //interpret        	
+         //interpret
          _javaInterpreter = new FFaplJavaInterpreterVisitor(_symbolTable, _logger, this);
          _javaInterpreter.visit(_root, null);
      }catch(ParseException pe){
@@ -3092,12 +3092,6 @@ t7 = new FFaplNodeToken(t1);
     finally { jj_save(11, xla); }
   }
 
-  private boolean jj_3_2()
- {
-    if (jj_3R_28()) return true;
-    return false;
-  }
-
   private boolean jj_3_8()
  {
     if (jj_3R_33()) return true;
@@ -3548,6 +3542,12 @@ t7 = new FFaplNodeToken(t1);
     if (jj_scan_token(ECLEFT)) { if (!jj_rescan) trace_return("ECPoint(LOOKAHEAD FAILED)"); return true; }
     if (jj_3R_36()) { if (!jj_rescan) trace_return("ECPoint(LOOKAHEAD FAILED)"); return true; }
     { if (!jj_rescan) trace_return("ECPoint(LOOKAHEAD SUCCEEDED)"); return false; }
+  }
+
+  private boolean jj_3_2()
+ {
+    if (jj_3R_28()) return true;
+    return false;
   }
 
   /** Generated Token Manager. */

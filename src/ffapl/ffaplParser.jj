@@ -49,7 +49,7 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants
 		this.disable_tracing();
 		_logger = logger;
 		_interrupted = false;
-		_identTypeMapping = new RestrictedHashMap<String,Type>();
+		_identTypeMapping = new ASTNodeMessageBroker<String,Type>();
   }
 
   /**
@@ -62,7 +62,7 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants
 		this.disable_tracing();
 		_logger = logger;
 		_interrupted = false;
-		_identTypeMapping = new RestrictedHashMap<String,Type>();
+		_identTypeMapping = new ASTNodeMessageBroker<String,Type>();
   }
 
   public FFaplLogger getLogger(){
@@ -105,7 +105,6 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants
 			_logger.log(ILevel.ERROR, (new FFaplException(arguments, ICompilerError.INTERNAL)).getErrorMessage());
     	}*/
   }
-}}
 }
 
 
