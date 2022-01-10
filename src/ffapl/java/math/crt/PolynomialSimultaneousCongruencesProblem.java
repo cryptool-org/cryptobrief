@@ -159,7 +159,7 @@ public class PolynomialSimultaneousCongruencesProblem {
         for (int i = 0; i < moduli.size(); i++) {
             for (int j = i+1; j < moduli.size(); j++) {
                 isRunning(thread);
-                if (!gcd(moduli.get(i), moduli.get(j)).isOne()) {
+                if (!gcd(moduli.get(i), moduli.get(j)).isConstant()) {
                     return new int[] {i,j};
                 }
             }
