@@ -78,7 +78,6 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	public Polynomial(String s, Thread thread) throws FFaplAlgebraicException {
 		this(thread);
 		ArrayList<Polynomial> list = extractValuesfromString(s);
-		//System.out.println(list.toString());
 		for(Polynomial p : list){
 			add(p);
 		}
@@ -87,12 +86,8 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	private ArrayList<Polynomial> extractValuesfromString(String s) throws FFaplAlgebraicException {
 		
 		ArrayList<Polynomial> list = new ArrayList<>();
-		//System.out.println("Wert der übergeben wurde: " +s);
 		String withoutSquareB = s.replaceAll("\\[|\\]", "");
-		//System.out.println(withoutSquareB);
-                //split at "+"
 		String[] d = withoutSquareB.trim().split("\\+");
-                //split at "-"
                 Vector<String> minusSplit = new Vector<>();
                 for(int i = 0; i < d.length; i++){
                         String[] temp = d[i].split("-");
@@ -109,7 +104,6 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
                 minusSplit.toArray(d);
                 
 		for(int i = 0; i < d.length; i++){
-			//System.out.println(d[i]);
 			if(d[i].contains("x")){
 				int index = d[i].indexOf("x");
 				long c = 1, e = 1;
@@ -653,7 +647,6 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 					}
 				}
 			}
-
 			return stringBuilder.toString();
 		}else{
 			//Polynom is Zero

@@ -16,7 +16,7 @@ public class FFaplInteger extends PrimitiveType {
 	 */
 	public FFaplInteger(){
 		this._typeID = FFaplTypeCrossTable.FFAPLINTEGER;
-	}
+		}
 	
 	/**
 	 * Constructor
@@ -25,7 +25,6 @@ public class FFaplInteger extends PrimitiveType {
 	public FFaplInteger(BigInteger value){
 		this();
 		_value = value;
-		
 	}
 	
 	/**

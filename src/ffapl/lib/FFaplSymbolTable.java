@@ -199,18 +199,13 @@ public class FFaplSymbolTable implements ISymbolTable {
 		}
 		scope = _currentScope;
 		next = _parentSymbol;
-		//System.out.println("Scope: " + _currentScope + " -search: " + symbol);
 		while (result == null && scope != null){
 			if(next == null){//end of list, go one scope up 
-				//if(!scope.isShielded()){ //if not shielded
 					scope = scope.scope();
 					if(scope != null){
 						next = scope.local();
 					}
-				//}else{
-				//	scope = null;
-				//}
-		     
+
 			}else if (symbol.equals(next)){
 				result = next;
 			}else{

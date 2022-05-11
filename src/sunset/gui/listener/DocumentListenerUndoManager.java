@@ -52,7 +52,7 @@ public class DocumentListenerUndoManager implements DocumentListener {
 		_pane.getActiveView().updateSyntaxHighlighting();
 		setEnabled(_undoComp, true);
 	    setEnabled(_redoComp, false);
-	    //System.out.println("insert" + counter++ + " " + arg.getType());
+
 	}
 
 	/* (non-Javadoc)
@@ -64,7 +64,7 @@ public class DocumentListenerUndoManager implements DocumentListener {
 	    setEnabled(_undoComp, true);
 	    setEnabled(_redoComp, false);
 	    _pane.repaint();
-	    //System.out.println("remove" + counter++);
+
 	}
 	
 	

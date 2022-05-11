@@ -53,7 +53,6 @@ public class ActionListenerSaveAs implements ActionListener {
 		for (int i = 0; i < _tabbedPane.getTabCount(); i++){
 			comp = _tabbedPane.getComponentAt(i);
 			if(comp instanceof JPanelCode){
-				//System.out.println(((FFaplCodeTextPane)((JPanelCode)comp).getCodePane()).isSaved());
 				if(!((FFaplCodeTextPane)((JPanelCode)comp).getCodePane()).isSaved()){
 					setEnabled(_saveAllComp, true);
 					break;

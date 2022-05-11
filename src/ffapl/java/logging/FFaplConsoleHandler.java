@@ -60,7 +60,6 @@ public class FFaplConsoleHandler implements Observer {
 
 		 if(logMessage.kind() <= _mode.getMode()){
 			if(_default){
-				System.out.println(logMessage.message());
 			}else{
 				
 				attributes = new SimpleAttributeSet();

@@ -53,7 +53,6 @@ public class Factor implements IPredefinedProcFunc {
 		//Generates output Array
 		for(Iterator<GaloisField> itr = set.iterator(); itr.hasNext(); ){
 			key = itr.next();
-			//System.out.println(key);
 			Object[] arr = {key.value().getPolynomial(), 
 					        new Polynomial(primeFactors.get(key), BigInteger.ZERO, a.getThread())};
 			res[i] = arr;

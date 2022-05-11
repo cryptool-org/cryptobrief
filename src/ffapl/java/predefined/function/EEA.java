@@ -50,7 +50,7 @@ public class EEA implements IPredefinedProcFunc {
 											array,
 											a.clone(),
 											((PolynomialRC)a).getThread()));
-			//System.out.println(interpreter);
+
 		}else if(a instanceof BInteger){
 			
 			if( ((BInteger)a).compareTo(BigInteger.ZERO) < 0){//must not be < 0

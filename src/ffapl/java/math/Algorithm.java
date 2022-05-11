@@ -98,8 +98,7 @@ public class Algorithm {
     		if (IV != null) {
     			ivspec = new IvParameterSpec(zeroPadding(IV));
     		}
-    		
-			
+
 			byte[] input = m.toByteArray();
 			if (!withPadding) {
 				// without padding, we work only on a single block, so throw an exception for anything more than 16 bytes
@@ -428,8 +427,6 @@ public class Algorithm {
 			isRunning(thread);
 			G.multiply(G);
 			G = PolynomialRC.divide(G, f)[1];
-			//System.out.println("i " + i + " bit:" + k.testBit(i));
-			//if ki = 1
 			if(k.testBit(i)){
 				//s <- G*s mod f
 				s.multiply(G);
@@ -847,8 +844,6 @@ public class Algorithm {
 
 
 		x = new PolynomialRC(ONE, ONE, p, thread);
-		//System.out.println("f = " + f);
-		//System.out.println("x = " + x);
 		u = (PolynomialRC) x.clone();
 		result = true;
 		for(long i = 1; i <= m.divide(new BigInteger("2")).longValue(); i++){
@@ -1252,7 +1247,6 @@ public class Algorithm {
 									factors.push(fact2);
 								}
 							} else {
-								System.out.println("error");
 							}
 						}
 					}

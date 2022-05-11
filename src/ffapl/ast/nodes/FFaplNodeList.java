@@ -23,8 +23,8 @@ import ffapl.visitor.interfaces.IVoidVisitor;
  */
 public class FFaplNodeList implements INodeList {
 
-	protected List<INode> _nodes;
-	protected INode _parent;
+	 List<INode> _nodes;
+	 INode _parent;
 	
 	public FFaplNodeList(){
 		_nodes = new ArrayList<INode>();

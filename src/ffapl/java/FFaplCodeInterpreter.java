@@ -73,8 +73,6 @@ public class FFaplCodeInterpreter implements ICodeInterpreter {
 		int result;		
 		this._procedureStackTypes.add(symbol.getType().typeID());
 		this._procedureStackSymbols.add(symbol);
-		//System.out.println(this);
-		//System.out.println(type);
 		if(initvalue(symbol.getType().typeID())){
 			this._procedureStack.add(this._expressionStack.pop());
 		}else{
@@ -100,8 +98,6 @@ public class FFaplCodeInterpreter implements ICodeInterpreter {
 			Object[] arguments = {"allocArray"};
 			throw new FFaplAlgebraicException(arguments, IAlgebraicError.INTERNAL);
 		}
-		
-
 	}
 	
 	@Override
@@ -109,8 +105,6 @@ public class FFaplCodeInterpreter implements ICodeInterpreter {
 		int result;		
 		this._procedureStackTypes.add(symbol.getType().typeID());
 		this._procedureStackSymbols.add(symbol);
-		//System.out.println(symbol.getType().typeID());
-		//System.out.println(type);
 		this._procedureStack.add(null);
 		
 		result = _sp - _fp;
@@ -220,7 +214,6 @@ public class FFaplCodeInterpreter implements ICodeInterpreter {
 		BInteger b;
 		IJavaType c, d;
 		
-		//System.out.println(this);
 		c = (IJavaType) _expressionStack.pop();
 		b = (BInteger) _expressionStack.pop();
 		a = (Array) _expressionStack.pop();
@@ -228,7 +221,6 @@ public class FFaplCodeInterpreter implements ICodeInterpreter {
 			if(a.typeID() == IJavaType.ARRAY){
 				if(b.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) <= 0){
 					d = (IJavaType) ((Array) a).getValue(b.intValue());
-					//System.out.println(FFaplTypeCrossTable.TYPE_Name[((Array) a).getBaseType()]);
 					c  = (IJavaType) castTo(IJavaType.FFapl_Type_Compatibility[d.typeID()], c, d);
 					((Array) a).setValue(b.intValue(), c);
 					
@@ -1641,8 +1633,8 @@ public class FFaplCodeInterpreter implements ICodeInterpreter {
 		       "Global Memory size: " + this._globalMemory.size() + "\n" +
 		       "FP: " + _fp + "\n" +   
 		     "Expression Stack: " + this._expressionStack + "\n" +
-	       "Procedure Stack: " + this._procedureStack + "\n" + 
-	       "Global Memory: " + this._globalMemory + "\n";
+	       "Procedure Stack: " + this._procedureStack + "\n" +
+				"Global Memory: " + this._globalMemory + "\n";
 	}
 	
 
@@ -1690,18 +1682,9 @@ public class FFaplCodeInterpreter implements ICodeInterpreter {
 		IJavaType toobj;
 		IJavaType result;
 		String txt;
-		//if(from instanceof BigInteger){
-		//	fromobj = (IJavaType)((BInteger) from);
-		//}else{
 			fromobj = (IJavaType) from;
-		//}
-		//if(to instanceof BigInteger){
-		//	toobj = (IJavaType)((BInteger) to);
-		//}else{
 			toobj = (IJavaType) to;
-		//}
-		//System.out.println(typeID + " -> " + fromobj + " -> " + toobj);
-			
+
 		switch(typeID){
 		case FFaplTypeCrossTable.FFAPLARRAY:
 			if (fromobj.typeID() == IJavaType.ARRAY){ //Integer
@@ -1760,7 +1743,6 @@ public class FFaplCodeInterpreter implements ICodeInterpreter {
 			}
 			break;
 		case FFaplTypeCrossTable.FFAPLRESIDUECLASS:
-			//System.out.println(fromobj + "->" + toobj);
 			if (fromobj.typeID() == IJavaType.PRIME || fromobj.typeID() == IJavaType.INTEGER){ //Integer
 				result = ((ResidueClass)toobj).clone();
 				((ResidueClass) result).setValue((BigInteger) fromobj);
@@ -2024,7 +2006,6 @@ public class FFaplCodeInterpreter implements ICodeInterpreter {
 	 */
 	private IJavaType[] convertToMaxType(IJavaType a, IJavaType b) throws FFaplAlgebraicException{
 		IJavaType[] result = new IJavaType[2];
-		// System.out.println(a.classInfo() + " -> " + b.classInfo());
 		if(a.typeID() == IJavaType.STRING){
 			result[0] = a;
 			result[1] = (IJavaType) castTo(IJavaType.FFapl_Type_Compatibility[a.typeID()], b, a);

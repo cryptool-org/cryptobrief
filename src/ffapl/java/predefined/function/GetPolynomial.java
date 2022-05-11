@@ -39,7 +39,6 @@ public class GetPolynomial implements IPredefinedProcFunc {
 		}else if(type instanceof GaloisField){
 			 interpreter.pushStack(((GaloisField) type).value().getPolynomial());
 		}
-	   
 	    interpreter.funcReturn();
 	}
 	

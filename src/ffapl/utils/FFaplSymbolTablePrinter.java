@@ -28,8 +28,6 @@ public class FFaplSymbolTablePrinter {
 		for(int i = symbol.level(); i > 0; i--){
 			temp = temp + ".";
 		}
-		System.out.println(temp + symbol.getName() + " - " + symbol.getKindStr()
-				 + " - " + symbol.isGlobal() + " - " + symbol.getType() + " - " + symbol.scope());
 	}
 	
 }

@@ -50,6 +50,7 @@ public class FFaplNodeListOpt extends FFaplNodeList {
 
 	@Override
 	public <A, R> R accept(IRetArgVisitor<R, A> visitor, A argument) throws FFaplException{
+		//List of node with values
 		return visitor.visit(this, argument);
 	}
 }

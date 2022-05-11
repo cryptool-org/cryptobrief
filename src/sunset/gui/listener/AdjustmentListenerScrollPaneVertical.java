@@ -32,30 +32,8 @@ implements AdjustmentListener, MouseMotionListener {
 	    int orient = source.getOrientation();
 	   
 	    if (orient == Adjustable.VERTICAL) {
-	    	//System.out.println("b - " + source.getValue());
-	    	_scrollPane.getVerticalScrollBar().setValue(source.getValue()); 
-	    	//System.out.println("a - " + _scrollPane.getVerticalScrollBar().getValue());
+	    	_scrollPane.getVerticalScrollBar().setValue(source.getValue());
 	    }
-	    /*int type = evt.getAdjustmentType();
-	    switch (type) {
-	    case AdjustmentEvent.UNIT_INCREMENT:
-	      System.out.println("Scrollbar was increased by one unit");
-	      break;
-	    case AdjustmentEvent.UNIT_DECREMENT:
-	      System.out.println("Scrollbar was decreased by one unit");
-	      break;
-	    case AdjustmentEvent.BLOCK_INCREMENT:
-	      System.out.println("Scrollbar was increased by one block");
-	      break;
-	    case AdjustmentEvent.BLOCK_DECREMENT:
-	      System.out.println("Scrollbar was decreased by one block");
-	      break;
-	    case AdjustmentEvent.TRACK:
-	      System.out.println("The knob on the scrollbar was dragged");
-	      break;
-	    }
-	    int value = evt.getValue();
-	    */
 	  }
 
 	@Override

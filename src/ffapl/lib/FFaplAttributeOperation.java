@@ -78,45 +78,22 @@ public class FFaplAttributeOperation implements IAttributeOperation {
 			Object[] arguments = {"AttributeOperation op2"};
 			throw new FFaplException(arguments, ICompilerError.INTERNAL);
 		}
-		//System.out.println(a1.getType().typeID()+ "..." +a2.getType().typeID());
 		if(!FFaplTypeCrossTable.OP2_compatibility[a1.getType().typeID()][a2.getType().typeID()]){
 			Object[] arguments = {"'" + a1.getType() + "; " + a2.getType() + "'", "'" + op.toString() + "'", 
 								  a1.getType() + " " + op.toString() + " " + a2.getType()};//for error
 			throw new FFaplException(arguments, ICompilerError.ILLEGAL_OP2_TYPE, op);
 		}else if((a2.getType().typeID() == FFaplTypeCrossTable.FFAPLRESIDUECLASS || 
 				a2.getType().typeID() == FFaplTypeCrossTable.FFAPLGF ||
-				//a2.getType().typeID() == FFaplTypeCrossTable.FFAPLPOLYNOMIALRESIDUE ||
-				a1.getType().typeID() == FFaplTypeCrossTable.FFAPLRESIDUECLASS || 
+				a1.getType().typeID() == FFaplTypeCrossTable.FFAPLRESIDUECLASS ||
 				a1.getType().typeID() == FFaplTypeCrossTable.FFAPLGF //||
-				//a1.getType().typeID() == FFaplTypeCrossTable.FFAPLPOLYNOMIALRESIDUE
-				)	&& 
+				)	&&
 				(op.toString().equals(FFaplTypeConversation.getTokenString(FFaplInterpreterConstants.MODULO)) )){
 			//for String only + allowed
 			Object[] arguments = {"'" + a1.getType() + "; " + a2.getType() + "'", "'" + op.toString() + "'", 
 					  a1.getType() + " " + op.toString() + " " + a2.getType()};//for error
 					  throw new FFaplException(arguments, ICompilerError.ILLEGAL_OP2_TYPE, op);
 		}
-		/*
-		if(a1.getType().typeID() == FFaplTypeCrossTable.FFAPLINTEGERRESIDUE && a1.getType().typeID() == a2.getType().typeID()){
-			//IntegerResidue with different UUID are per definition of FFapl 1.0 not compatible
-			if(((FFaplIntegerResidue)a1.getType()).getUUID().compareTo(((FFaplIntegerResidue)a2.getType()).getUUID()) != 0 ){
-				throw new FFaplException("illegal operand type for binary operator '" +
-						  op.toString() + "'" + 
-						  " ---> " + a1.getType() + " " + op.toString() + " " +
-						  a2.getType() , op, ICompilerError.ILLEGAL_OP2_TYPE);
-			}
-		}/*else if(a1.getType().typeID() == FFaplTypeCrossTable.FFAPLGF && a1.getType().typeID() == a2.getType().typeID()){
-				//System.out.println("hier");
-				//Galois Fields with different UUID are per definition of FFapl 1.0 not compatible
-				if(((FFaplGaloisField)a1.getType()).getUUID().compareTo(((FFaplGaloisField)a2.getType()).getUUID()) != 0 ){
-					throw new FFaplException("illegal operand type for binary operator '" +
-							  op.toString() + "'" + 
-							  " ---> " + a1.getType() + " " + op.toString() + " " +
-							  a2.getType() , op, ICompilerError.ILLEGAL_OP2_TYPE);
-				}
-		}*/
-		
-		if((a2.getType().typeID() == FFaplTypeCrossTable.FFAPLSTRING || 
+			if((a2.getType().typeID() == FFaplTypeCrossTable.FFAPLSTRING ||
 				a1.getType().typeID() == FFaplTypeCrossTable.FFAPLSTRING )	&& 
 				( !op.toString().equals(FFaplTypeConversation.getTokenString(FFaplInterpreterConstants.PLUS)) )){
 			//for String only + allowed
@@ -144,12 +121,6 @@ public class FFaplAttributeOperation implements IAttributeOperation {
 					  a1.getType() + " " + op.toString() + " " + a2.getType()};//for error
 					  throw new FFaplException(arguments, ICompilerError.ILLEGAL_OP2_TYPE, op);
 		}
-		
-
-		
-		
-	        //System.out.println(a1.getType() + " " + op.toString() + " " +
-					  //a2.getType() + " = " + _typeconv.max(a1.getType(), a2.getType())) ;
 			return new FFaplAttribute(IAttribute.REGISTER, FFaplTypeConversation.max(a1.getType(), a2.getType()));
 	}
 	
@@ -258,33 +229,11 @@ public class FFaplAttributeOperation implements IAttributeOperation {
 			Object[] arguments = {"AttributeOperation assignment"};
 			throw new FFaplException(arguments, ICompilerError.INTERNAL);
 		}
-		
-		//System.out.println(a1.getType() + " := " + a2.getType());
-		
 		if(!FFaplTypeCrossTable.ASSIGN_compatibility[a1.getType().typeID()][a2.getType().typeID()]){
 			Object[] arguments = {a1.getType() + " " + t1.toString() + " " + a2.getType()};//for error
 			throw new FFaplException(arguments, ICompilerError.TYPE_MISMATCH_ASSIGN, t1);
 		}
-		/*
-		if(a1.getType().typeID() == FFaplTypeCrossTable.FFAPLGF && 
-				a1.getType().typeID() == a2.getType().typeID()){
-			//Galois Fields with different UUID are per definition of FFapl 1.0 not compatible
-			if(((FFaplGaloisField)a1.getType()).getUUID().compareTo(((FFaplGaloisField)a2.getType()).getUUID()) != 0 ){
-				throw new FFaplException("type missmatch in assignment '" +
-						  t1.toString() + "'" + 
-						  " ---> " + a1.getType() + " " +  t1.toString() + " " +
-						  a2.getType() , t1, ICompilerError.TYPE_MISMATCH_ASSIGN);
-			}
-		}else if(a1.getType().typeID() == FFaplTypeCrossTable.FFAPLINTEGERRESIDUE && 
-				a1.getType().typeID() == a2.getType().typeID()){
-			//Residual Class with different UUID are per definition of FFapl 1.0 not compatible
-			if(((FFaplIntegerResidue)a1.getType()).getUUID().compareTo(((FFaplIntegerResidue)a2.getType()).getUUID()) != 0 ){
-				throw new FFaplException("type missmatch in assignment '" +
-						  t1.toString() + "'" + 
-						  " ---> " + a1.getType() + " " +  t1.toString() + " " +
-						  a2.getType() , t1, ICompilerError.TYPE_MISMATCH_ASSIGN);
-			}
-		}else */ if(a1.getType().typeID() == FFaplTypeCrossTable.FFAPLARRAY){
+if(a1.getType().typeID() == FFaplTypeCrossTable.FFAPLARRAY){
 			ar1 = (FFaplArray) a1.getType();
 			ar2 = (FFaplArray) a2.getType();
 			

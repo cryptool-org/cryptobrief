@@ -292,6 +292,9 @@ public interface IVm {
 	 */
 	public boolean isStackOffsetAllocated(int offset);
 
-	
-	
+
+	String getRecordScope(int index, ISymbol scope, ISymbol recordN);
+
+	public String getIndex_procedureStackSymbols(String recordN);
+
 }

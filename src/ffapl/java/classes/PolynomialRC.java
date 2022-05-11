@@ -103,7 +103,6 @@ public class PolynomialRC extends Polynomial {
 				Object[] arguments ={"Error in PolynomialRC monic function"};
 				throw new FFaplAlgebraicException(arguments, IAlgebraicError.INTERNAL);
 			}
-			//System.out.println(tmp[0] + " + " + tmp[1]);
 		}else{
 			//already monic
 			result = (PolynomialRC) this.clone();

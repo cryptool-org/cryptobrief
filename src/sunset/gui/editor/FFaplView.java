@@ -35,7 +35,6 @@ public class FFaplView extends PlainView {
 	public FFaplView(Element element, JTextPane owner) {
 		super(element);
 		_owner = owner;
-		//System.out.println("newview");
 		startMap = new TreeMap<Integer, Integer>();
 		colorMap = new TreeMap<Integer, Color>();
 	    fontMap = new TreeMap<Integer, Integer>();
@@ -104,11 +103,7 @@ public class FFaplView extends PlainView {
         }catch(Exception e){
         	e.printStackTrace();
         }
-        //System.out.println(_errorLine + " == " + _currentLine);
         if(_owner instanceof FFaplCodeTextPane){
-	        /*if(((FFaplCodeTextPane)_owner).getErrorLine() == _currentLine){
-	        	drawErrorLine(graphics, xStart, x, y, );
-	        }*/
         	FFaplStatusLine sLine = ((FFaplCodeTextPane)_owner).getLineHandler().getStateOfLine(_currentLine);
         	if(sLine != null){
         		drawErrorLine(graphics, xStart, x, y, sLine);

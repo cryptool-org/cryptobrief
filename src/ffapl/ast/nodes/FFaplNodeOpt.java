@@ -106,6 +106,5 @@ public class FFaplNodeOpt implements INode{
 	public void setParent(INode parent) {
 		_parent = parent;		
 	}
-	
 
 }

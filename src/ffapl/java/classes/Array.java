@@ -154,7 +154,6 @@ public class Array implements IJavaType{
 				for(int i = 0; i < pos.size(); i++){
 					tmp = ((Object[])tmp)[pos.elementAt(i)];
 				}
-				//System.out.println(result instanceof Array);
 				if(pos.size() != _dim){
 					//subarray
 					if(tmp instanceof Array){

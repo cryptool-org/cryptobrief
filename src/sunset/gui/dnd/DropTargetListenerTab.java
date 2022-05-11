@@ -54,8 +54,6 @@ public class DropTargetListenerTab implements DropTargetListener {
 	 */
 	@Override
 	public void drop(DropTargetDropEvent arg0) {
-		System.out.println(arg0.getSource());
-
 	}
 
 	/* (non-Javadoc)

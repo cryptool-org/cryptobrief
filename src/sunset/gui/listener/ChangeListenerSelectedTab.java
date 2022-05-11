@@ -94,8 +94,7 @@ public class ChangeListenerSelectedTab implements ChangeListener {
 			for (int i = 0; i < tabbedPane.getTabCount(); i++){
 				comp = tabbedPane.getComponentAt(i);
 				if(comp instanceof JPanelCode){
-					//System.out.println(((FFaplCodeTextPane)((JPanelCode)comp).getCodePane()).isSaved());
-					if(!((FFaplCodeTextPane)((JPanelCode)comp).getCodePane()).isSaved()){
+										if(!((FFaplCodeTextPane)((JPanelCode)comp).getCodePane()).isSaved()){
 						setEnabled(_saveAllComp, true);
 						break;
 					}

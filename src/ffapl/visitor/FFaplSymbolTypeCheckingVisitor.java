@@ -191,12 +191,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 		s1 = new FFaplSymbol(node._node2.getToken().toString(), node._node2.getToken(), ISymbol.VARIABLE);
 		s1.setReference(true);
 		found = _symbolTable.lookup(s1);
-		//if(found.getType() instanceof FFaplArray){
-		//	System.out.println(found.hashCode());
-		//System.out.println(found + " - " + found.getType() + " - " + 
-		//		((FFaplArray)found.getType()).getDim() + " - " + found.isInitialized());
-		//}
-		if(found == null){
+			if(found == null){
 			Object[] arguments = {"'" + node._node2.getToken() + "'"};
 			throw new FFaplException(arguments, ICompilerError.IDENT_NOT_DECL, node._node2.getToken());
 		}else if(!found.isInitialized()){
@@ -212,11 +207,11 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 			}
 		}
 		a1 = this._attribOperation.arraylen(node._node1.getToken(), attribv.firstElement());
-		
+
 		attribv.clear();
 		attribv.add(a1);
-		
-		
+
+
 		return attribv;
 	}
 
@@ -244,20 +239,15 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 				Object[] arguments = {"'" + t1.getToken() + "'"};
 				throw new FFaplException(arguments, ICompilerError.READONLY_ASSIGN, t1.getToken());
 			}
-			//System.out.println(found + " - " + found.getType() + " - " + found.isInitialized());
-			//System.out.println(found.hashCode());
-			
+
 			av1 = node._node2.accept(this, found);
-			//if(av1 != null){
-			//	System.out.println(found.getName() + " - " + found.getType() + " -- " + av1.firstElement().getType());
-			//}
-			node._node3.accept(this, symbol);
+				node._node3.accept(this, symbol);
 			if(av1 != null){
 				av2 = node._node4.accept(this, av1.firstElement().getType());
 			}else{
 				av2 = node._node4.accept(this, found.getType());
 			}
-			
+
 			if(node._node2.ispresent()){
 				if(!found.isInitialized()){
 					Object[] arguments = {"'" + t1.getToken() + "'"};
@@ -266,12 +256,12 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 				this._attribOperation.assignment(av1.firstElement(), node._node3.getToken(), av2.firstElement());
 			}else{
 				//�berarbeiten
-				this._attribOperation.assignment(new FFaplAttribute(IAttribute.REGISTER,found.getType()), 
+				this._attribOperation.assignment(new FFaplAttribute(IAttribute.REGISTER,found.getType()),
 						 						node._node3.getToken(), av2.firstElement());
 			}
 			found.setInitialized(true);
 			//if(node._node4._node1.getPos() == 2){//creation Expression
-			
+
 			//}
 		}catch(FFaplException fe){
 			fe.addToken(node._node3.getToken());
@@ -296,7 +286,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 			node._node4.accept(this, symbol);
 		_symbolTable.closeScope();
 		return null;
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -304,13 +294,13 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 	 */
 	@Override
 	public Vector<IAttribute> visit(ASTComplexAlgebraicType node, Object symbol) throws FFaplException{
-		
+
 		FFaplNodeOpt opt;
 		node.setSymbolScope(_symbolTable.currentScope());
-		
+
 		switch(node._node1.getPos()){
 		case 1: //ResidueClass
-		
+
 			opt = (FFaplNodeOpt) ((FFaplNodeSequence)((FFaplNodeType) node._node1.getNode()).getNode()).elementAt(3);
 			if(opt.ispresent()){
 				if(!((FFaplNodeToken)((FFaplNodeSequence) opt.getNode()).elementAt(1)).getToken().toString().equals("x")){
@@ -318,7 +308,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 					throw new FFaplException(arguments, ICompilerError.INVALID_INDETERMINATE, ((FFaplNodeToken)((FFaplNodeSequence)opt.getNode()).elementAt(1)).getToken());
 				}
 			}
-		
+
 		}
 		return node._node1.accept(this, symbol);
 	}
@@ -334,7 +324,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 		FFaplNodeSequence s1;
 		node.setSymbolScope(_symbolTable.currentScope());
 		av1 = node._node1.accept(this, symbol);
-		
+
 		if(node._node2.ispresent()){
 			for(Iterator<INode> itr = node._node2.iterator(); itr.hasNext();){
 				s1 = (FFaplNodeSequence) itr.next();
@@ -343,13 +333,13 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 				a1 = this._attribOperation.op2boolean(av1.firstElement(), t1, av2.firstElement());
 				av1 = new Vector<IAttribute>(0,1);
 				av1.add(a1);
-			}	
+			}
 		}
 		return av1;
 	}
-	
-	
-	
+
+
+
 	/* (non-Javadoc)
 	 * @see ffapl.visitor.interfaces.IVoidVisitor#visit(ffapl.ast.nodes.ASTCondOrExpr)
 	 */
@@ -361,7 +351,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 		FFaplNodeSequence s1;
 		node.setSymbolScope(_symbolTable.currentScope());
 		av1 = node._node1.accept(this, symbol);
-		
+
 		if(node._node2.ispresent()){
 			for(Iterator<INode> itr = node._node2.iterator(); itr.hasNext();){
 				s1 = (FFaplNodeSequence) itr.next();
@@ -370,7 +360,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 				a1 = this._attribOperation.op2boolean(av1.firstElement(), t1, av2.firstElement());
 				av1 = new Vector<IAttribute>(0,1);
 				av1.add(a1);
-			}	
+			}
 		}
 		return av1;
 	}
@@ -409,27 +399,27 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 			av2 = node._node6.accept(this, null);
 		}
 		node._node7.accept(this, symbol);
-		constant = new FFaplSymbol(node._node2.getToken().toString(), 
+		constant = new FFaplSymbol(node._node2.getToken().toString(),
                 node._node2.getToken(),
                 av1.firstElement().getType(),
                 ISymbol.CONSTANT);
-		//TODO readonly 
+		//TODO readonly
 		constant.setReadonly(true);
-		
+
 		_symbolTable.addSymbol(constant);
 		//TODO �berarbeiten Adresse Attribute
 		this._attribOperation.assignment(av1.firstElement(), node._node5.getToken(), av2.firstElement());
 		constant.setInitialized(true);
 		return null;
 	}
-	
+
 	@Override
 	public Vector<IAttribute> visit(ASTConstType node, Object symbol)
 			throws FFaplException {
 		node.setSymbolScope(_symbolTable.currentScope());
 		return node._node1.accept(this, symbol);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see ffapl.visitor.interfaces.IVoidVisitor#visit(ffapl.ast.nodes.ASTCreationExpr)
 	 */
@@ -443,14 +433,14 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 		node.setSymbolScope(_symbolTable.currentScope());
 		node._node1.accept(this, symbol);
 		av1 = node._node2.accept(this, symbol);
-		
+
 		av2 = node._node3.accept(this, symbol);
 		//Check if expression are integer or prime
 		for(Iterator<IAttribute> itr = av2.iterator(); itr.hasNext(); ){
 			a1 = itr.next();
 			if(!(a1.getType().typeID() == FFaplTypeCrossTable.FFAPLINTEGER ||
 					a1.getType().typeID() == FFaplTypeCrossTable.FFAPLPRIME)){
-				    Object[] arguments = {"'" + a1.getType() + "'", i, 
+				    Object[] arguments = {"'" + a1.getType() + "'", i,
 				    					  FFaplTypeCrossTable.TYPE_Name[FFaplTypeCrossTable.FFAPLARRAY],
 				    					  "[" + FFaplTypeCrossTable.TYPE_Name[FFaplTypeCrossTable.FFAPLINTEGER] + ", " +
 				    						FFaplTypeCrossTable.TYPE_Name[FFaplTypeCrossTable.FFAPLPRIME] + "]"};
@@ -460,7 +450,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 	    }
 
 		if(node._node3.size() > 0){
-			av1.add( new FFaplAttribute(IAttribute.TYPE, 
+			av1.add( new FFaplAttribute(IAttribute.TYPE,
 					new FFaplArray(av1.firstElement().getType(), node._node3.size())));
 			av1.remove(0);//must be removed, simulates replace
 			node._arrayType = (FFaplArray) av1.firstElement().getType();
@@ -468,7 +458,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 		}else{
 			Object[] arguments = {"CreationExpr"};
 			throw new FFaplException(arguments, ICompilerError.INTERNAL);
-		}			
+		}
 	}
 
 	/* (non-Javadoc)
@@ -488,9 +478,9 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 		    //checks if argument is integer or prime
 			tp1 = (FFaplNodeType) node._node1.getNode();
 			t1 = (FFaplNodeToken)((FFaplNodeSequence) tp1.getNode()).elementAt(0);
-			if (! ( av1.elementAt(1).getType().typeID() == FFaplTypeCrossTable.FFAPLINTEGER || 
+			if (! ( av1.elementAt(1).getType().typeID() == FFaplTypeCrossTable.FFAPLINTEGER ||
 					av1.elementAt(1).getType().typeID() == FFaplTypeCrossTable.FFAPLPRIME ) ){
-				Object[] arguments = {"'" + av1.elementAt(1).getType() + "'", 1, 
+				Object[] arguments = {"'" + av1.elementAt(1).getType() + "'", 1,
   					  tp1.getType(),
   					"[" + FFaplTypeCrossTable.TYPE_Name[FFaplTypeCrossTable.FFAPLINTEGER] + ", " +
 					FFaplTypeCrossTable.TYPE_Name[FFaplTypeCrossTable.FFAPLPRIME] + "]"};
@@ -508,7 +498,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 		}
 		return av1;
 	}
-	
+
 
 	/* (non-Javadoc)
 	 * @see ffapl.visitor.interfaces.IVoidVisitor#visit(ffapl.ast.nodes.ASTDecl)
@@ -523,24 +513,27 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 		//node1
 		node._node1.accept(this, symbol);
 		//add Symbol to Symboltable
-		s1 = new FFaplSymbol(node._node1.getToken().toString(), 
+		s1 = new FFaplSymbol(node._node1.getToken().toString(),
                 node._node1.getToken(),
                 ISymbol.VARIABLE);
 		symbolV.add(s1);
 		_symbolTable.addSymbol(s1);
-		
-		
+
+
 		//examine Node 2
 		node._node2.accept(this, symbol);
-				
+
 		//examine Node 3
 		node._node3.accept(this, symbol);
-	
+
 		attrib = node._node4.accept(this, symbol);
 		//add Symbols to Symboltable
+		int i=0;
 		for (final Iterator<INode> e = node._node2.iterator(); e.hasNext();) {
+
+			i++;
 		      ntk = (FFaplNodeToken)((FFaplNodeSequence) e.next()).elementAt(1);
-		      s1 = new FFaplSymbol(ntk.getToken().toString(), 
+		      s1 = new FFaplSymbol(ntk.getToken().toString(),
 	                    ntk.getToken(),
 	                    ISymbol.VARIABLE);
 		      symbolV.add(s1);
@@ -550,13 +543,13 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 		    		  _symbolTable.cloneSubTree(symbolV.firstElement().local(), s1)
 		    		  );
 		}
-		
+
 		node._node5.accept(this, symbol);
-		
-		
-		
+
+
+
 		//set type
-		for (final Iterator<ISymbol> e = symbolV.iterator(); e.hasNext();) { 
+		for (final Iterator<ISymbol> e = symbolV.iterator(); e.hasNext();) {
 			s2 = e.next();
 			s2.setType(attrib.firstElement().getType().clone());
 			//record is initialized by creation
@@ -566,12 +559,12 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 				   s2.setInitialized(true);
 				 //records cannot be override, while elements of records can be overwritten
 					s2.setReadonly(true);
-			}		    
-		   
-		}		
-	
+			}
+
+		}
+
 		return null;
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -635,7 +628,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 		node.setSymbolScope(_symbolTable.currentScope());
 		FFaplNodeSequence n1;
 		FFaplNodeListOpt n2;
-		
+
 		switch (node._node1.getPos()){
 		case 0:
 			n1 = (FFaplNodeSequence)(node._node1.getNode());
@@ -649,14 +642,14 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 					a1 = this._attribOperation.op2boolean(av1.firstElement(), t1, av2.firstElement());
 					av1 = new Vector<IAttribute>(0,1);
 					av1.add(a1);
-				}	
+				}
 			}
 			break;
 		case 1:
 			av1 = node._node1.accept(this, symbol);
 		}
 		return av1;
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -667,7 +660,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 		Vector<IAttribute> attrib;
 		FFaplNodeToken ntk;
 		node.setSymbolScope(_symbolTable.currentScope());
-		
+
 		node._node1.accept(this, symbol);
 		node._node2.accept(this, symbol);
 		node._node3.accept(this, symbol);
@@ -679,17 +672,17 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 					ICompilerError.ILLEGAL_FORMAL_PARAM_TYPE, node._node3.getToken());
 		}*/
 		//
-		_symbolTable.addSymbol(new FFaplSymbol(node._node1.getToken().toString(), 
+		_symbolTable.addSymbol(new FFaplSymbol(node._node1.getToken().toString(),
                 node._node1.getToken(),
                 attrib.firstElement().getType().clone(),
                 ISymbol.PARAMETER));
 		for (final Iterator<INode> e = node._node2.iterator(); e.hasNext();) {
 			ntk = (FFaplNodeToken)((FFaplNodeSequence) e.next()).elementAt(1);
-			_symbolTable.addSymbol(new FFaplSymbol(ntk.getToken().toString(), 
+			_symbolTable.addSymbol(new FFaplSymbol(ntk.getToken().toString(),
 					ntk.getToken(),
 					attrib.firstElement().getType().clone(),
 					ISymbol.PARAMETER));
-		}		
+		}
 		return null;
 	}
 
@@ -718,20 +711,20 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 		node.setSymbolScope(_symbolTable.currentScope());
 			node._node1.accept(this, symbol);
 			node._node2.accept(this, symbol);
-			
-			s1 = new FFaplSymbol(node._node2.getToken().toString(), 
+
+			s1 = new FFaplSymbol(node._node2.getToken().toString(),
 	                node._node2.getToken(),
 	                ISymbol.VARIABLE);
 			s1.setType(new FFaplInteger());
 			s1.setInitialized(true);
 			_symbolTable.addSymbol(s1);
-			
-			
+
+
 			node._node3.accept(this, symbol);
 			a1 = node._node4.accept(this, symbol);
 			if(! FFaplTypeCrossTable.FORSTATEMENT_compatibility[ s1.getType().typeID() ][ a1.firstElement().getType().typeID() ]){
 				Object[] arguments = {"'" + node._node3.getToken() + "'",
-										a1.firstElement().getType(), 
+										a1.firstElement().getType(),
 										FFaplTypeConversation.getExpected(s1.getType().typeID(), FFaplTypeCrossTable.FORSTATEMENT_compatibility)};
 				throw new FFaplException(arguments,
 						ICompilerError.TYPE_MISMATCH_FORSTATEMENT, node._node3.getToken());
@@ -740,7 +733,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 			a2 = node._node6.accept(this, symbol);
 			if(! FFaplTypeCrossTable.FORSTATEMENT_compatibility[ s1.getType().typeID() ][ a2.firstElement().getType().typeID() ]){
 				Object[] arguments = {"'" + node._node5.getToken() + "'",
-						a1.firstElement().getType(), 
+						a1.firstElement().getType(),
 						FFaplTypeConversation.getExpected(s1.getType().typeID(), FFaplTypeCrossTable.FORSTATEMENT_compatibility)};
 				throw new FFaplException(arguments,
 							ICompilerError.TYPE_MISMATCH_FORSTATEMENT, node._node5.getToken());
@@ -749,17 +742,17 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 			if(node._node7.ispresent()){
 					if(! FFaplTypeCrossTable.FORSTATEMENT_compatibility[ s1.getType().typeID() ][ a3.firstElement().getType().typeID() ]){
 						tk = ((FFaplNodeToken)((FFaplNodeSequence)node._node7.getNode()).elementAt(0)).getToken();
-						
+
 						Object[] arguments = {"'" + tk + "'",
-								a1.firstElement().getType(), 
+								a1.firstElement().getType(),
 								FFaplTypeConversation.getExpected(s1.getType().typeID(), FFaplTypeCrossTable.FORSTATEMENT_compatibility)};
 						throw new FFaplException(arguments,
 									ICompilerError.TYPE_MISMATCH_FORSTATEMENT, tk);
 					}
 			}
-			
-			
-			
+
+
+
 			node._node8.accept(this, symbol);
 		_symbolTable.closeScope();
 		return null;
@@ -775,7 +768,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 		    node.setSymbolScope(_symbolTable.currentScope());
 		    node._node1.accept(this, symbol);
 			node._node2.accept(this, symbol);
-			function = new FFaplProcFuncSymbol(node._node2.getToken().toString(), 
+			function = new FFaplProcFuncSymbol(node._node2.getToken().toString(),
                     node._node2.getToken(),
                     null,
                     ISymbol.FUNCTION, node);
@@ -824,8 +817,8 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 		av1 = node._node3.accept(this, symbol);
 		if(! (av1.firstElement().getType().typeID() == FFaplTypeCrossTable.FFAPLINTEGER ||
 				av1.firstElement().getType().typeID() == FFaplTypeCrossTable.FFAPLPRIME)){
-			Object[] arguments = {av1.firstElement().getType(), 1, 
-					FFaplTypeCrossTable.TYPE_Name[FFaplTypeCrossTable.FFAPLGF], 
+			Object[] arguments = {av1.firstElement().getType(), 1,
+					FFaplTypeCrossTable.TYPE_Name[FFaplTypeCrossTable.FFAPLGF],
 					"[" + FFaplTypeCrossTable.TYPE_Name[FFaplTypeCrossTable.FFAPLINTEGER] + ", " +
 					FFaplTypeCrossTable.TYPE_Name[FFaplTypeCrossTable.FFAPLPRIME] + "]"};
 			throw new FFaplException(arguments,
@@ -834,13 +827,13 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 		node._node4.accept(this, symbol);
 		av2 = node._node5.accept(this, symbol);
 		if(! (av2.firstElement().getType().typeID() == FFaplTypeCrossTable.FFAPLPOLYNOMIAL) ){
-			Object[] arguments = {av2.firstElement().getType(), 2, 
-					FFaplTypeCrossTable.TYPE_Name[FFaplTypeCrossTable.FFAPLGF], 
+			Object[] arguments = {av2.firstElement().getType(), 2,
+					FFaplTypeCrossTable.TYPE_Name[FFaplTypeCrossTable.FFAPLGF],
 					"[" + FFaplTypeCrossTable.TYPE_Name[FFaplTypeCrossTable.FFAPLPOLYNOMIAL] + "]"};
 			throw new FFaplException(arguments,
 					ICompilerError.ILLEGAL_TYPE_ARGUMENT, node._node2.getToken());
 		}
-		
+
 		node._node6.accept(this, symbol);
 		return null;
 	}
@@ -851,62 +844,62 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 	@Override
 	public Vector<IAttribute> visit(ASTEC node, Object symbol) throws FFaplException{
 
-		
+
 		Vector<IAttribute> av1, av2;
-		
-		
+
+
 		node.setSymbolScope(_symbolTable.currentScope());
 
 		node._node1.accept(this, symbol); //EC
 		node._node2.accept(this, symbol); //Klammer auf
 		av1 = node._node3.accept(this, symbol); //GF oder Z()
-		//av1 = node._node4.accept(this, symbol); 
-		
-		
-		
+		//av1 = node._node4.accept(this, symbol);
+
+
+
 		IAttribute a1;
 		IToken t1;
 		FFaplNodeSequence s1;
 		node.setSymbolScope(_symbolTable.currentScope());
-	
+
 		if(node._node4.ispresent()){
-			
+
 			for(Iterator<INode> itr = node._node4.iterator(); itr.hasNext();){
 				s1 = (FFaplNodeSequence) itr.next();
 				t1 = ((FFaplNodeToken)s1.elementAt(1)).getToken();
 				av2 = s1.elementAt(3).accept(this, symbol);
-				
-				
+
+
 				if (!t1.toString().equals("a1") && !t1.toString().equals("a2") && !t1.toString().equals("a3") && !t1.toString().equals("a4") && !t1.toString().equals("a6"))
 				{
 					Object[] arguments = {"'" + t1.toString() + "'"};
 					throw new FFaplException(arguments, ICompilerError.WRONG_EC_PARAMETER, t1); //Text anpassen
 				}
-				
-				
+
+
 				if (node._node3 instanceof ASTExpr && av2.firstElement().getType().typeID() != FFaplTypeCrossTable.FFAPLINTEGER && av2.firstElement().getType().typeID() != FFaplTypeCrossTable.FFAPLPRIME)
 				{
 					Object[] arguments = {"'" + t1.toString() + "'"};
 					throw new FFaplException(arguments, ICompilerError.WRONG_EC_PARAMETER_TYPE, t1); //Text anpassen
 				}
-				
+
 				if (node._node3 instanceof ASTGF && av2.firstElement().getType().typeID() != FFaplTypeCrossTable.FFAPLPOLYNOMIAL && av2.firstElement().getType().typeID() != FFaplTypeCrossTable.FFAPLPOLYNOMIALRESIDUE)
 				{
 					Object[] arguments = {"'" + t1.toString() + "'"};
 					throw new FFaplException(arguments, ICompilerError.WRONG_EC_PARAMETER_TYPE, t1); //Text anpassen
 				}
-				
-			}	
+
+			}
 		}
-		
+
 		node._node5.accept(this, symbol); //Klammer zu
 
-		
+
 		return null;
 	}
 
-	
-	
+
+
 	public Vector<IAttribute> visit(ASTECPoint node, Object symbol) throws FFaplException{
 		Vector<IAttribute> av1, av2;
 
@@ -915,61 +908,61 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 		node._node3.accept(this, null);
 		av2 = node._node4.accept(this, null);
 		node._node5.accept(this, null);
-		
+
 		Object[] arguments = {""};
 
 		if (av1.firstElement().getType().typeID() != FFaplTypeCrossTable.FFAPLINTEGER && av1.firstElement().getType().typeID() != FFaplTypeCrossTable.FFAPLPRIME && av1.firstElement().getType().typeID() != FFaplTypeCrossTable.FFAPLPOLYNOMIAL && av1.firstElement().getType().typeID() != FFaplTypeCrossTable.FFAPLPOLYNOMIALRESIDUE && av1.firstElement().getType().typeID() != FFaplTypeCrossTable.FFAPLGF)
 		{
-			throw new FFaplException(arguments, ICompilerError.WRONG_EC_COORDINATE, null); 
+			throw new FFaplException(arguments, ICompilerError.WRONG_EC_COORDINATE, null);
 		}
 		if (av2.firstElement().getType().typeID() != FFaplTypeCrossTable.FFAPLINTEGER && av2.firstElement().getType().typeID() != FFaplTypeCrossTable.FFAPLPRIME && av2.firstElement().getType().typeID() != FFaplTypeCrossTable.FFAPLPOLYNOMIAL && av2.firstElement().getType().typeID() != FFaplTypeCrossTable.FFAPLPOLYNOMIALRESIDUE && av2.firstElement().getType().typeID() != FFaplTypeCrossTable.FFAPLGF)
 		{
-			throw new FFaplException(arguments, ICompilerError.WRONG_EC_COORDINATE, null); 
+			throw new FFaplException(arguments, ICompilerError.WRONG_EC_COORDINATE, null);
 		}
-		
+
 		if ((av1.firstElement().getType().typeID() == FFaplTypeCrossTable.FFAPLINTEGER || av1.firstElement().getType().typeID() == FFaplTypeCrossTable.FFAPLPRIME) && (av2.firstElement().getType().typeID() != FFaplTypeCrossTable.FFAPLINTEGER && av2.firstElement().getType().typeID() != FFaplTypeCrossTable.FFAPLPRIME))
 		{
-			throw new FFaplException(arguments, ICompilerError.WRONG_EC_COORDINATE, null); 
+			throw new FFaplException(arguments, ICompilerError.WRONG_EC_COORDINATE, null);
 		}
 		if ((av1.firstElement().getType().typeID() != FFaplTypeCrossTable.FFAPLINTEGER && av1.firstElement().getType().typeID() != FFaplTypeCrossTable.FFAPLPRIME) && (av2.firstElement().getType().typeID() == FFaplTypeCrossTable.FFAPLINTEGER || av2.firstElement().getType().typeID() == FFaplTypeCrossTable.FFAPLPRIME))
 		{
 			throw new FFaplException(arguments, ICompilerError.WRONG_EC_COORDINATE, null);
 		}
-		
+
 		if ((av1.firstElement().getType().typeID() == FFaplTypeCrossTable.FFAPLPOLYNOMIAL || av1.firstElement().getType().typeID() == FFaplTypeCrossTable.FFAPLPOLYNOMIALRESIDUE && av1.firstElement().getType().typeID() == FFaplTypeCrossTable.FFAPLGF) && (av2.firstElement().getType().typeID() != FFaplTypeCrossTable.FFAPLPOLYNOMIAL && av2.firstElement().getType().typeID() != FFaplTypeCrossTable.FFAPLPOLYNOMIALRESIDUE && av2.firstElement().getType().typeID() != FFaplTypeCrossTable.FFAPLGF))
 		{
-			throw new FFaplException(arguments, ICompilerError.WRONG_EC_COORDINATE, null); 
+			throw new FFaplException(arguments, ICompilerError.WRONG_EC_COORDINATE, null);
 		}
 		if ((av1.firstElement().getType().typeID() != FFaplTypeCrossTable.FFAPLPOLYNOMIAL && av1.firstElement().getType().typeID() != FFaplTypeCrossTable.FFAPLPOLYNOMIALRESIDUE && av1.firstElement().getType().typeID() != FFaplTypeCrossTable.FFAPLGF) && (av2.firstElement().getType().typeID() == FFaplTypeCrossTable.FFAPLPOLYNOMIAL || av2.firstElement().getType().typeID() == FFaplTypeCrossTable.FFAPLPOLYNOMIALRESIDUE && av2.firstElement().getType().typeID() == FFaplTypeCrossTable.FFAPLGF))
 		{
 			throw new FFaplException(arguments, ICompilerError.WRONG_EC_COORDINATE, null);
 		}
-		
-		
+
+
 		/*
 		if (node._node2 instanceof ASTExpr && !(node._node4 instanceof ASTExpr))
 		{
-			
+
 		}
 		*/
-		
+
 		Vector<IAttribute> av3 = new Vector<IAttribute>();
 		av1.add(new FFaplAttribute(IAttribute.REGISTER, new FFaplEllipticCurve()));
 		return av3;
 	}
-	
+
 
 	public Vector<IAttribute> visit(ASTECPAI node, Object symbol) throws FFaplException
 	{
 		return null;
 	}
-	
+
 
 	public Vector<IAttribute> visit(ASTECRandom node, Object symbol) throws FFaplException
 	{
 		return null;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see ffapl.visitor.interfaces.IVoidVisitor#visit(ffapl.ast.nodes.ASTIdTerm)
 	 */
@@ -977,7 +970,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 	public Vector<IAttribute> visit(ASTIdTerm node, Object symbol) throws FFaplException{
 		Vector<IAttribute> av1;
 		node.setSymbolScope(_symbolTable.currentScope());
-		
+
 		if(node._node1.getToken().toString().equals("x")){
 			node._node1.accept(this, symbol);
 			if(node._node2.ispresent()){
@@ -1032,9 +1025,9 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 		FFaplNodeSequence s1;
 		node.setSymbolScope(_symbolTable.currentScope());
 		av1 = node._node1.accept(this, symbol);
-		
+
 		if(node._node2.ispresent()){
-			
+
 			for(Iterator<INode> itr = node._node2.iterator(); itr.hasNext();){
 				s1 = (FFaplNodeSequence) itr.next();
 				t1 = ((FFaplNodeToken)((ASTMulOp)s1.elementAt(0))._node1.getNode()).getToken();
@@ -1042,7 +1035,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 				a1 = this._attribOperation.op2(av1.firstElement(), t1, av2.firstElement());
 				av1 = new Vector<IAttribute>(0,1);
 				av1.add(a1);
-			}	
+			}
 		}
 		return av1;
 	}
@@ -1089,9 +1082,9 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 		FFaplNodeSequence s1;
 		node.setSymbolScope(_symbolTable.currentScope());
 		av1 = node._node1.accept(this, symbol);
-		
+
 		if(node._node2.ispresent()){
-			
+
 			for(Iterator<INode> itr = node._node2.iterator(); itr.hasNext();){
 				s1 = (FFaplNodeSequence) itr.next();
 				t1 = ((FFaplNodeToken)s1.elementAt(0)).getToken();
@@ -1099,7 +1092,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 				a1 = this._attribOperation.pow(av1.firstElement(), t1, av2.firstElement());
 				av1 = new Vector<IAttribute>(0,1);
 				av1.add(a1);
-			}	
+			}
 		}
 		return av1;
 	}
@@ -1117,19 +1110,19 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 		//FFaplNodeOpt t2;
 		ISymbol s1, found;
 		node.setSymbolScope(_symbolTable.currentScope());
-		
+
 		switch(node._node1.getPos()){
-		
+
 		case 2: //means ProcFuncCall
 			attribv = node._node1.accept(this, symbol);
 			if(attribv.firstElement().getType() == null){
 				t1 = ((ASTProcFuncCall)node._node1.getNode())._node1;
 				Object[] arguments = {t1.toString()};
-				throw new FFaplException(arguments, 
+				throw new FFaplException(arguments,
 						ICompilerError.PROC_NOT_FUNC_EXPR, t1.getToken());
 			}
 			break;
-		
+
 		case 3: //means Variable
 			if (!(node._node1.getNode() instanceof FFaplNodeSequence)){// Control if node sequence
 				Object[] arguments = {"PrimaryExpr"};
@@ -1140,12 +1133,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 			s1 = new FFaplSymbol(t1.getToken().toString(), t1.getToken(), ISymbol.VARIABLE);
 			s1.setReference(true);
 			found = _symbolTable.lookup(s1);
-			//if(found.getType() instanceof FFaplArray){
-			//	System.out.println(found.hashCode());
-			//System.out.println(found + " - " + found.getType() + " - " + 
-			//		((FFaplArray)found.getType()).getDim() + " - " + found.isInitialized());
-			//}
-			if(found == null){
+						if(found == null){
 				Object[] arguments = {"'" + t1.getToken() + "'"};
 				throw new FFaplException(arguments, ICompilerError.IDENT_NOT_DECL, t1.getToken());
 			}else if(!found.isInitialized()){
@@ -1155,50 +1143,44 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 				attribv = node._node1.accept(this, found);
 				if(((FFaplNodeOpt)
 						((FFaplNodeSequence)node._node1.getNode()).elementAt(1)).ispresent()){
-					//System.out.println(attribv.firstElement().getType());
 				}else{
 					attribv.clear();
 					attribv.add(new FFaplAttribute(IAttribute.ADDRESS, found.getType()));
 				}
 			}
 			break;
-		
+
 		case 5: //argument List
 			try{
-				if(symbol != null && symbol instanceof FFaplArray){   
-					//System.out.println(((FFaplArray) symbol).subarray(1));
+				if(symbol != null && symbol instanceof FFaplArray){
 					attribv = node._node1.accept(this, ((FFaplArray) symbol).subarray(1));
 					attribv = FFaplTypeConversation.castTo(attribv, ((FFaplArray) symbol).subarray(1));
 					type = attribv.firstElement().getType();
 					int len = -1;
 					if(type.typeID() == FFaplTypeCrossTable.FFAPLARRAY){
 						len = ((FFaplArray) type).getLength();
-						
+
 						for(int i = 1; i < attribv.size(); i++){
-							
+
 							arr = (FFaplArray) attribv.elementAt(i).getType();
-							//System.out.println(len + " here " + arr.getLength());
 							if(len != arr.getLength()){
 								Object[] arguments = {len, arr.getLength()};
 								throw new FFaplException(arguments, ICompilerError.INVALID_SUBARRAY_LENGTH);
 							}
-						}						
+						}
 						arr = new FFaplArray(((FFaplArray)type).baseType(), ((FFaplArray)type).getDim() +1);
 						arr.setLength(attribv.size());
 					}else{
-						//System.out.println(type);
-						//TODO: ARRAY initialsierung beachten
 						arr = new FFaplArray(type, 1);
 						arr.setLength(attribv.size());
 					}
-					
+
 				}else{
 					Object[] arguments = {""};
-					throw new FFaplException(arguments, ICompilerError.ARGUMENTLIST_NOT_ALLOWED); 
+					throw new FFaplException(arguments, ICompilerError.ARGUMENTLIST_NOT_ALLOWED);
 				}
 				attribv.clear();
 				attribv.add(new FFaplAttribute(IAttribute.REGISTER, arr));
-				//System.out.println(attribv);
 			}catch(FFaplException fe){
 				fe.addToken(
 						((FFaplNodeToken)
@@ -1206,22 +1188,22 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 				throw fe;
 			}
 			break;
-			
+
 		default:
 			attribv = node._node1.accept(this, symbol);
 		}
-		
+
 		if(symbol != null && symbol instanceof Type){
 			if(((Type)symbol).typeID() != FFaplTypeCrossTable.FFAPLARRAY){
 				if(((Type)symbol).typeID() == FFaplTypeCrossTable.FFAPLEC && (attribv.firstElement().getType().typeID() == FFaplTypeCrossTable.FFAPLINTEGER || attribv.firstElement().getType().typeID() == FFaplTypeCrossTable.FFAPLPRIME) ){
-					
+
 				}
 				else{
 					attribv = FFaplTypeConversation.castToMax(attribv, (Type) symbol);
 				}
 			}
 		}
-		
+
 		return attribv;
 	}
 
@@ -1242,7 +1224,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 		    node.setSymbolScope(_symbolTable.currentScope());
 			node._node1.accept(this, symbol);
 			node._node2.accept(this, symbol);
-		_symbolTable.addSymbol(new FFaplProcFuncSymbol(node._node2.getToken().toString(), 
+		_symbolTable.addSymbol(new FFaplProcFuncSymbol(node._node2.getToken().toString(),
                     node._node2.getToken(),
                     null,
                     ISymbol.PROCEDURE, node));
@@ -1299,18 +1281,18 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 	@Override
 	public Vector<IAttribute> visit(ASTProgram node, Object symbol) throws FFaplException {
 		FFaplSymbol program;
-		
-		    program = new FFaplSymbol(node._node2.getToken().toString(), 
+
+		    program = new FFaplSymbol(node._node2.getToken().toString(),
 					node._node2.getToken(), ISymbol.PROGRAM);//Program Symbol
-			
+
 			_symbolTable.openScope(program, true);//opens the scope
 			//only program scope is Global
-			
+
 			node.setSymbolScope(_symbolTable.currentScope());//sets the scope of the current node
-			
+
 			//Predefined procedures
 			FFaplPredefinedProcFuncDeclaration.fill(_symbolTable, _logger, _thread);
-			
+
 			node._node1.accept(this, symbol);
 			node._node2.accept(this, symbol);
 			node._node3.accept(this, symbol);
@@ -1319,19 +1301,19 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 			//Proc Func
 			node._node5.accept(this, symbol);
 			//--------------
-			//Decl - no more global 
+			//Decl - no more global
 			program = new FFaplSymbol("_MainBlock", null, ISymbol.BLOCK);
 			_symbolTable.openScope(program, false);
 				//Decl
 				node._node6.accept(this, symbol);
 				//Statementlist
 				node._node7.accept(this, symbol);
-			
+
 			_symbolTable.closeScope();
 			//--------------
 			node._node8.accept(this, symbol);
 			node._node9.accept(this, symbol);
-		
+
 		_symbolTable.closeScope(); //close the scope
 		return null;
 	}
@@ -1418,7 +1400,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 			throw new FFaplException(arguments,
 					ICompilerError.ILLEGAL_TYPE_ARGUMENT, node._node1.getToken());
 		}
-		
+
 		if (node._node4.ispresent()){
 			av2 = node._node4.accept(this, symbol);
 			//first element of value in sequence is EXPR
@@ -1460,14 +1442,14 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 		FFaplNodeSequence s1;
 		node.setSymbolScope(_symbolTable.currentScope());
 		av1 = node._node1.accept(this, symbol);
-		
+
 		if(node._node2.ispresent()){
 				s1 = (FFaplNodeSequence) node._node2.getNode();
 				t1 = ((FFaplNodeToken)((ASTRelOp)s1.elementAt(0))._node1.getNode()).getToken();
 				av2 = s1.elementAt(1).accept(this, symbol);
 				a1 = this._attribOperation.relop(av1.firstElement(), t1, av2.firstElement());
 				av1 = new Vector<IAttribute>(0,1);
-				av1.add(a1);	
+				av1.add(a1);
 		}
 		return av1;
 	}
@@ -1499,48 +1481,48 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 		return a1;
 	}
 
-	
-	
-	
-	
+
+
+
+
 
 	@Override
 	public Vector<IAttribute> visit(ASTSameAs node, Object symbol) throws FFaplException {
 		node.setSymbolScope(_symbolTable.currentScope());
 
-		
+
 		ISymbol s1, found;
-		
+
 		s1 = new FFaplSymbol(node._node1.getToken().toString(), node._node1.getToken(), ISymbol.VARIABLE);
 		s1.setReference(true);
 		found = _symbolTable.lookup(s1);
-		
+
 		if (found == null)
 		{
 			Object[] arguments = {"'" + node._node1.getToken() + "'"};
 			throw new FFaplException(arguments, ICompilerError.IDENT_NOT_DECL, node._node1.getToken());
 		}
-			
+
 
 		return node._node1.accept(this,symbol);
 	}
-	
-	
-	
-	
+
+
+
+
 
 	@Override
 	public Vector<IAttribute> visit(ASTECBaseField node, Object symbol) throws FFaplException {
 		node.setSymbolScope(_symbolTable.currentScope());
 
-		
+
 
 		return node._node1.accept(this,symbol);
 	}
-	
-	
-	
-	
+
+
+
+
 	/* (non-Javadoc)
 	 * @see ffapl.visitor.interfaces.IVoidVisitor#visit(ffapl.ast.nodes.ASTSelector)
 	 */
@@ -1552,7 +1534,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 		FFaplArray a1;
 		Vector<IAttribute> av1 = null;
 		FFaplNodeSequence ns1;
-		
+
 		if (symbol == null){// Control if symbol is set
 			Object[] arguments = {"Selector"};
 			throw new FFaplException(arguments, ICompilerError.INTERNAL);
@@ -1562,14 +1544,14 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 			ns1 = (FFaplNodeSequence) node._node1.getNode();
 			//check if array type
 			if(!(((ISymbol)symbol).getType().typeID() == FFaplTypeCrossTable.FFAPLARRAY)){
-				Object[] arguments = {((ISymbol)symbol).getType(), 
+				Object[] arguments = {((ISymbol)symbol).getType(),
 						FFaplTypeCrossTable.TYPE_Name[FFaplTypeCrossTable.FFAPLARRAY]};
 				throw new FFaplException(arguments,
 						ICompilerError.SELECTOR_NOT_ARRAY, ((FFaplNodeToken)ns1.elementAt(0)).getToken());
 			}
-			
-			
-						
+
+
+
 			a1 = (FFaplArray) ((ISymbol)symbol).getType();
 			((ISymbol)symbol).setType(a1.subarray(1));//decrease dimension
 			av1 = node._node1.accept(this, symbol);
@@ -1577,7 +1559,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 			t1 = (FFaplNodeToken) ns1.elementAt(0);
 			if(!(av1.firstElement().getType().typeID() == FFaplTypeCrossTable.FFAPLINTEGER ||
 					av1.firstElement().getType().typeID() == FFaplTypeCrossTable.FFAPLPRIME)){
-					Object[] arguments = {av1.firstElement().getType(), 
+					Object[] arguments = {av1.firstElement().getType(),
 							FFaplTypeCrossTable.TYPE_Name[FFaplTypeCrossTable.FFAPLARRAY],
 							"[" + FFaplTypeCrossTable.TYPE_Name[FFaplTypeCrossTable.FFAPLINTEGER] + ", " +
 							FFaplTypeCrossTable.TYPE_Name[FFaplTypeCrossTable.FFAPLPRIME] + "]"
@@ -1587,8 +1569,8 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 					}
 			while(av1.size() > 1){
 				av1.remove(0); //fix Type, because argument types are filled from beginn
-			}		
-			
+			}
+
 			if(!((FFaplNodeOpt)(
 					(FFaplNodeSequence)
 							node._node1.getNode()).elementAt(3)).ispresent()){
@@ -1601,9 +1583,9 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 			//System.out.println("ttu: " + av1.firstElement().getType());
 			break;
 		case 1://Recordelement
-			
+
 			if(!(((ISymbol)symbol).getType() instanceof FFaplRecord)){
-				Object[] arguments = {((ISymbol)symbol).getType(), 
+				Object[] arguments = {((ISymbol)symbol).getType(),
 						FFaplTypeCrossTable.TYPE_Name[FFaplTypeCrossTable.FFAPLRECORD]};
 				throw new FFaplException(arguments,
 						ICompilerError.SELECTOR_NOT_RECORD,
@@ -1616,7 +1598,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 				Object[] arguments = {"'" + t1.getToken() + "'"};
 				throw new FFaplException(arguments, ICompilerError.IDENT_NOT_DECL, t1.getToken());
 			}
-			
+
 			av1 = node._node1.accept(this, s2);
 			if(!((FFaplNodeOpt)(
 					(FFaplNodeSequence)
@@ -1630,8 +1612,8 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 			Object[] arguments = {"Selector"};
 			throw new FFaplException(arguments, ICompilerError.INTERNAL);
 		}
-		
-		
+
+
 		return av1;
 	}
 
@@ -1644,7 +1626,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 		node._node1.accept(this, symbol);
 		return null;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see ffapl.visitor.interfaces.IVoidVisitor#visit(ffapl.ast.nodes.ASTBlockStatement)
 	 */
@@ -1682,7 +1664,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 					Object[] arguments = { av1.firstElement().getType(), FFaplTypeCrossTable.TYPE_Name[FFaplTypeCrossTable.FFAPLPOLYNOMIAL],
 											"[" + FFaplTypeCrossTable.TYPE_Name[FFaplTypeCrossTable.FFAPLINTEGER] + ", " +
 											FFaplTypeCrossTable.TYPE_Name[FFaplTypeCrossTable.FFAPLPRIME] + "]"};
-					throw new FFaplException(arguments, 
+					throw new FFaplException(arguments,
 						ICompilerError.TYPE_ILLEGAL_USE);
 					}
 			av2 = ns1.elementAt(1).accept(this, symbol);
@@ -1695,7 +1677,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 			Object[] arguments = {"Term"};
 			throw new FFaplException(arguments, ICompilerError.INTERNAL);
 		}
-		
+
 		return av1;
 	}
 
@@ -1712,7 +1694,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 			av1 = ((FFaplNodeSequence)(node._node1.getNode())).elementAt(0).accept(this, symbol);
 			t1 = (FFaplNodeListOpt)((FFaplNodeSequence)(node._node1.getNode())).elementAt(1);
 			if(t1.size() > 0){
-				a1 = new FFaplAttribute(IAttribute.TYPE, 
+				a1 = new FFaplAttribute(IAttribute.TYPE,
 						new FFaplArray(av1.firstElement().getType(), t1.size()));
 				av1.clear();//must be removed, simulates replace
 				av1.add(a1);
@@ -1725,11 +1707,11 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 			ASTSameAs sa = (ASTSameAs)node._node1.getNode();
 			sa.accept(this,symbol);
 			ISymbol s1, found;
-			
+
 			s1 = new FFaplSymbol(sa._node1.getToken().toString(), sa._node1.getToken(), ISymbol.VARIABLE);
 			s1.setReference(true);
 			found = _symbolTable.lookup(s1);
-			
+
 			a1 = new FFaplAttribute(IAttribute.TYPE, found.getType());
 			av1 = new Vector<IAttribute>();
 			av1.add(a1);
@@ -1748,10 +1730,10 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 			{
 				a1 = new FFaplAttribute(IAttribute.TYPE,new FFaplResidueClass());
 			}
-			
+
 			av1 = new Vector<IAttribute>();
 			av1.add(a1);
-			
+
 			return av1;
 		}
 		else{//rest no arrays
@@ -1759,7 +1741,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 			return av1;
 		}
 	}
-	
+
 	@Override
 	public Vector<IAttribute> visit(ASTContainerType node, Object symbol)
 			throws FFaplException {
@@ -1777,7 +1759,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 			attrib = ((FFaplNodeSequence)(node._node1.getNode())).elementAt(0).accept(this, symbol);
 			t1 = (FFaplNodeListOpt)((FFaplNodeSequence)(node._node1.getNode())).elementAt(1);
 			if(t1.size() > 0){
-				attrib.add( new FFaplAttribute(IAttribute.TYPE, 
+				attrib.add( new FFaplAttribute(IAttribute.TYPE,
 						new FFaplArray(attrib.firstElement().getType(), t1.size())));
 				attrib.remove(0);//must be removed, simulates replace
 				return attrib;
@@ -1820,25 +1802,25 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 			nc = (FFaplNodeChoice)node._node1.getNode();
 			switch(nc.getPos()){
 			case 0: //addop
-				a2.add( 
+				a2.add(
 						this._attribOperation.op1(
-						((FFaplNodeToken)((ASTAddOp) nc.getNode())._node1.getNode()).getToken(), 
+						((FFaplNodeToken)((ASTAddOp) nc.getNode())._node1.getNode()).getToken(),
 						a1.firstElement())
 						);
 				break;
 			case 1: // not operator
-				a2.add( 
+				a2.add(
 						this._attribOperation.op1(
-						((FFaplNodeToken) nc.getNode()).getToken(), 
+						((FFaplNodeToken) nc.getNode()).getToken(),
 						a1.firstElement())
 						);
 				break;
 			}
-			
-			
+
+
 			a1 = a2;
 		}
-		
+
 			return a1;
 	}
 
@@ -1868,9 +1850,9 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 	@Override
 	public Vector<IAttribute> visit(FFaplNodeList node, Object symbol) throws FFaplException{
 		Vector<IAttribute> attribv = new Vector<IAttribute>(0,1);
-		
+
 		for (final Iterator<INode> e = node.iterator(); e.hasNext();) {
-			appendElement(attribv, e.next().accept(this, symbol)); 
+			appendElement(attribv, e.next().accept(this, symbol));
 		}
 		return attribv;
 	}
@@ -1881,7 +1863,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 	@Override
 	public Vector<IAttribute> visit(FFaplNodeListOpt node, Object symbol) throws FFaplException{
 		Vector<IAttribute> attribv = null;
-		
+
 		if(node.ispresent()){
 			attribv = new Vector<IAttribute>(0,1);
 			for (final Iterator<INode> e = node.iterator(); e.hasNext();) {
@@ -1908,7 +1890,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 	@Override
 	public Vector<IAttribute> visit(FFaplNodeSequence node, Object symbol) throws FFaplException{
 		Vector<IAttribute> attribv = new Vector<IAttribute>(0,1);
-		
+
 		for (final Iterator<INode> e = node.iterator(); e.hasNext();) {
 			  attribv = appendElement(attribv, e.next().accept(this, symbol));
 		}

@@ -119,7 +119,6 @@ public class BInteger extends BigInteger implements IJavaType<BInteger>, IAlgebr
 
 	@Override
 	public BigInteger mod(BigInteger val){
-		//System.out.println(this + " MOD " + val);
 		return new BInteger(super.mod(val), _thread);
 	}
 

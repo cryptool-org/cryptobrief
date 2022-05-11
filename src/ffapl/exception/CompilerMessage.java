@@ -31,7 +31,6 @@ public class CompilerMessage {
 	public static void printError(ICompilerError err, String programName)
 	{
 		
-		System.out.println(getError(err,programName));
 		if (err.errorNumber() == ICompilerError.INTERNAL && err instanceof Throwable)
 			((Throwable) err).printStackTrace();
 	}

@@ -230,7 +230,6 @@ public class FFaplTypeConversation implements FFaplTypeCrossTable {
 				}else {
 				
 					type = max(a.getType(), symbolType);
-					//System.out.println(type);
 					if(type.typeID() != symbolType.typeID()){
 						Object[] arguments = {a, symbolType};
 						throw new FFaplException(arguments, ICompilerError.IMPLICIT_CAST_ERROR);

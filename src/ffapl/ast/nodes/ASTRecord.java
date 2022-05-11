@@ -37,8 +37,13 @@ public class ASTRecord extends FFaplNode {
 		_node1.setParent(this);
 		_node2.setParent(this);
 		_node3.setParent(this);
-		
+		//loop over the number of nodes in node2
+//		for(int i= 0; i<node2._nodes.size();i++){
+//			getNodeInfo(node2,i);
+//		}
+
 	}
+
 
 	/* (non-Javadoc)
 	 * @see ffapl.ast.nodes.interfaces.INode#accept(ffapl.visitor.interfaces.IVoidVisitor)
