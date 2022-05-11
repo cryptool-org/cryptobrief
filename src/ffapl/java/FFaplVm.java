@@ -2283,8 +2283,8 @@ public class FFaplVm implements IVm {
 
     public JSONObject getJSON() {
         GsonBuilder gsonMapBuilder = new GsonBuilder();
-        JSONObject crunchifyObject = new JSONObject(recordMap._record.get(Print.recordName.getName()));
-        return crunchifyObject;
+        JSONObject jsObject = new JSONObject(recordMap._record.get(Print.recordName.getName()));
+        return jsObject;
     }
 
     public void buildRecordScope(int index, ISymbol node, ISymbol recordN) {
@@ -2302,8 +2302,8 @@ public class FFaplVm implements IVm {
         String nodeName = node.getName();
         HashMap buildListInput = buildList(node.getName());
         recordMap._record.put(nodeName, buildListInput);
-        JSONObject crunchifyObject = new JSONObject(buildListInput);
-        recordJSON.put(nodeName, crunchifyObject);
+        JSONObject jsObject = new JSONObject(buildListInput);
+        recordJSON.put(nodeName, jsObject);
     }
 
     public String buildTreeJson() {
