@@ -38,7 +38,7 @@ public class CRT implements IPredefinedProcFunc {
             Array moduli = (Array) b;
             Array congruences = (Array) a;
 
-            if (congruences.getBaseType() == IJavaType.INTEGER && moduli.getBaseType() == IJavaType.INTEGER) {
+            if (congruences.getBaseType() == FFaplTypeCrossTable.FFAPLINTEGER && moduli.getBaseType() == FFaplTypeCrossTable.FFAPLINTEGER) {
                 BInteger[] congr = new BInteger[congruences.length()];
                 for (int i = 0; i < congr.length; i++) {
                     congr[i] = (BInteger) congruences.getValue(i);
@@ -55,7 +55,7 @@ public class CRT implements IPredefinedProcFunc {
                                     result,
                                     result[0].clone(),
                                     result[0].getThread()));
-            } else if (congruences.getBaseType() == IJavaType.BOOLEAN && moduli.getBaseType() == IJavaType.BOOLEAN) { // TODO - DOMINIC - 08.12.2021: BOOLEAN is given but ... that's actually wrong! POLYNOMIALRC is expected. There must a bug somewhere where the java type enum is assigned
+            } else if (congruences.getBaseType() == FFaplTypeCrossTable.FFAPLPOLYNOMIALRESIDUE && moduli.getBaseType() == FFaplTypeCrossTable.FFAPLPOLYNOMIALRESIDUE) {
                 PolynomialRC[] congr = new PolynomialRC[congruences.length()];
                 for (int i = 0; i < congr.length; i++) {
                     congr[i] = (PolynomialRC) congruences.getValue(i);
