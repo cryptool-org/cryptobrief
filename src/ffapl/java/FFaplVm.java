@@ -6,6 +6,7 @@ import java.util.Stack;
 import java.util.Vector;
 
 import ffapl.FFaplInterpreter;
+import ffapl.exception.FFaplWarning;
 import ffapl.java.classes.Array;
 import ffapl.java.classes.BInteger;
 import ffapl.java.classes.EllipticCurve;
@@ -23,7 +24,16 @@ import ffapl.java.interfaces.IAlgebraicError;
 import ffapl.java.interfaces.IJavaType;
 import ffapl.java.interfaces.IRandomGenerator;
 import ffapl.java.logging.FFaplLogger;
+import ffapl.java.math.isomorphism.GaloisFieldIsomorphismCast;
+import ffapl.java.math.isomorphism.calculation.CachingIsomorphismCalculation;
+import ffapl.java.math.isomorphism.calculation.cache.GaloisFieldSpecification;
+import ffapl.java.math.isomorphism.calculation.cache.IsomorphismCache;
+import ffapl.java.math.isomorphism.calculation.LinearFactorIsomorphismCalculation;
+import ffapl.java.math.isomorphism.calculation.TimeRestrictedIsomorphismCalculation;
+import ffapl.java.util.IsomorphismCalculationTimeLimitUtil;
+import ffapl.java.util.RootFindingUtil;
 import ffapl.lib.interfaces.ISymbol;
+import ffapl.lib.interfaces.IToken;
 import ffapl.lib.interfaces.IVm;
 import ffapl.types.FFaplArray;
 import ffapl.types.FFaplTypeCrossTable;
@@ -56,8 +66,8 @@ public class FFaplVm implements IVm {
 	// simulates globalMemory Type
 	private List<Integer> _globalMemoryTypes;
 	
-	// Logger not used yet
-	//private FFaplLogger _logger;
+	// logs errors, warnings and other messages
+	private FFaplLogger _logger;
 	
 	//Frame pointer for procedureStack
 	private int _fp;
@@ -69,6 +79,10 @@ public class FFaplVm implements IVm {
 	private IJavaType _rt;
 	
 	Thread _thread;
+
+	// used for casting galois field elements between isomorphic fields
+	GaloisFieldIsomorphismCast _isomorphicGaloisFieldCasting;
+	private Stack<IToken> tokenStack;
 	
 	public FFaplVm(FFaplLogger logger, Thread thread){
 		_expressionStack = new Stack<Object>();
@@ -77,12 +91,20 @@ public class FFaplVm implements IVm {
 		_procedureStackSymbols = new Vector<ISymbol>(0,1);
 		_globalMemory = new Vector<Object>(0,1);
 		_globalMemoryTypes = new Vector<Integer>(0,1);
-		//_logger = logger;
+		_logger = logger;
 		_fp = 0;
 		_sp = 0;
 		_rt = null;
 		_thread = thread;
-		
+		this.tokenStack = new Stack<>();
+
+		_isomorphicGaloisFieldCasting = new GaloisFieldIsomorphismCast(
+				new CachingIsomorphismCalculation(
+						new TimeRestrictedIsomorphismCalculation(
+							new LinearFactorIsomorphismCalculation(
+									RootFindingUtil.getRootFindingStrategyType().strategy()),
+								IsomorphismCalculationTimeLimitUtil.getIsomorphismCalculationTimeLimitInSeconds()),
+						new IsomorphismCache()));
 	}
         
 	@Override
@@ -987,6 +1009,16 @@ public class FFaplVm implements IVm {
 	@Override
 	public boolean isStackOffsetAllocated(int offset){
 		return ((_fp + offset) < _sp);
+	}
+
+	@Override
+	public void pushCurrentToken(IToken token) {
+		this.tokenStack.push(token);
+	}
+
+	@Override
+	public IToken popCurrentToken() {
+		return this.tokenStack.pop();
 	}
 
 	/**
@@ -1925,6 +1957,15 @@ public class FFaplVm implements IVm {
 			}else if(fromobj.typeID() == IJavaType.GALOISFIELD){//GaloisField
 				if(((GaloisField)toobj).equalGF((GaloisField)(fromobj))){
 					return fromobj.clone();
+				}
+
+				if(((GaloisField)toobj).isIsomorphicTo((GaloisField)(fromobj))){
+					Object[] arguments = {
+						"'" + new GaloisFieldSpecification((GaloisField)fromobj) + "'",
+						"'" + new GaloisFieldSpecification((GaloisField)toobj) + "'"};//for warning
+					_logger.log(new FFaplWarning(arguments,IAlgebraicError.WARNING_IMPLICIT_CAST,
+							tokenStack.empty() ? null : tokenStack.peek()));
+					return _isomorphicGaloisFieldCasting.cast((GaloisField) fromobj, (GaloisField) toobj);
 				}
 			}else if(fromobj instanceof IRandomGenerator){
 				result = ((GaloisField)toobj).clone();

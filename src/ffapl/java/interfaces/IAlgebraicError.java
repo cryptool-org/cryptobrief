@@ -150,6 +150,11 @@ public interface IAlgebraicError {
 	/** Characteristics of moduli array and congruences array are not equal **/
 	public static final int CRT_CHARACTERISTICS_MISMATCH = 1304;
 
+	/** Isomorphism calculation timed out **/
+	public static final int ISO_TIMEOUT = 1400;
+	/** Fields are not equal **/
+	public static final int FIELDS_UNEQUAL = 1401;
+
 
     /**
 	 * Return the compiler error number.
