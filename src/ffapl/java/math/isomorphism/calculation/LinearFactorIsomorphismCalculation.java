@@ -77,4 +77,9 @@ public class LinearFactorIsomorphismCalculation implements IsomorphismCalculatio
             throw new FFaplAlgebraicException(new Object[]{"isomorphism calculation"}, IAlgebraicError.INTERNAL);
         }
     }
+
+    @Override
+    public String toString() {
+        return "LinearFactorIsomorphismCalculation with " + _rootFindingStrategy;
+    }
 }

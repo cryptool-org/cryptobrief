@@ -1,0 +1,9 @@
+program calculate{
+    a : GF(11, [x^6+x+6]);
+    b : GF(11, [x^6+x^3+1]);
+
+    a := [x];
+    b := a;
+
+    println(b);
+}

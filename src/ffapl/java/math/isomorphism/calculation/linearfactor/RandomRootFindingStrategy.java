@@ -53,6 +53,11 @@ public class RandomRootFindingStrategy implements RootFindingStrategy {
         }
         return null;
     }
+
+    @Override
+    public String toString() {
+        return "RandomRootFindingStrategy";
+    }
 }
 
 

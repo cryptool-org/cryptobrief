@@ -203,4 +203,9 @@ public class NewRabinRootFindingStrategy implements RootFindingStrategy {
 
         return g;
     }
+
+    @Override
+    public String toString() {
+        return "NewRabinRootFindingStrategy";
+    }
 }

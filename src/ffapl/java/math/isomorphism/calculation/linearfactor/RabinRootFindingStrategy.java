@@ -195,4 +195,9 @@ public class RabinRootFindingStrategy implements RootFindingStrategy {
 
         return g;
     }
+
+    @Override
+    public String toString() {
+        return "RabinRootFindingStrategy";
+    }
 }
