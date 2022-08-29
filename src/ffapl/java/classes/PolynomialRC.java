@@ -447,6 +447,25 @@ public class PolynomialRC extends Polynomial {
 		}
 		return result.value();
 	}
+
+	/**
+	 * @param val
+	 * @return the result of the polynomial if x = val and val is another polynomial
+	 * @throws FFaplAlgebraicException
+	 */
+	public PolynomialRC calculate(Polynomial val) throws FFaplAlgebraicException {
+		BigInteger currentCoefficient;
+		Polynomial result = new Polynomial("0", _thread);
+
+		for (BigInteger currentPower : _polynomialMap.keySet()) {
+			currentCoefficient = _polynomialMap.get(currentPower);
+			result.add(
+					val.powR(currentPower)
+							.scalarMultR(currentCoefficient));
+		}
+
+		return new PolynomialRC(result.polynomial(), _characteristic, _thread);
+	}
 	
 	/**
 	 * Calculates coefficients modulus characteristic
