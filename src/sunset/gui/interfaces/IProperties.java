@@ -36,6 +36,8 @@ public class IProperties {
 	public final static String GUI_MAXIMIZED = "GUI.MAXIMIZED";
 	public final static String GUI_SEARCH_PAIRS = "GUI.SEARCH.PAIRS";
 	public final static String LOGGER_MODE = "LOGGER.MODE";
+	public final static String ISOMORPHISM_CALCULATION_TIME_LIMIT = "ISOCALC.TIMELIMIT";
+	public final static String ISOMORPHISM_CALCULATION_ROOT_FINDING_STRATEGY = "ISOCALC.ROOTFINDING";
 	public final static String SYSTEM = "SYSTEM";
 
 	public static String getInstallPath() {

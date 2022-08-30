@@ -160,8 +160,8 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 					s = (FFaplNodeSequence) n;
 					addOp = (ASTAddOp)s.elementAt(0);
 					tk = ((FFaplNodeToken) addOp._node1.getNode()).getToken();
-					n.accept(this, argument);
-					
+                    _interpreter.pushCurrentToken(tk);
+                    n.accept(this, argument);
 					switch(addOp._node1.getPos()){
 					case 0: //+
 					    _interpreter.add();
@@ -169,7 +169,8 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 					case 1: // -
 						_interpreter.sub();
 						break;
-					}	
+					}
+                    _interpreter.popCurrentToken();
 				}
 			}
 		}catch(FFaplAlgebraicException e){
@@ -265,6 +266,7 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 			throws FFaplException {
 		ISymbol s1;
 		try{
+            _interpreter.pushCurrentToken(node._node1.getToken());
 			s1 = new FFaplSymbol(node._node2.getToken().toString(), node._node2.getToken(), ISymbol.VARIABLE);
 			s1 = _symbolTable.lookup(s1);
 			if(s1.getType().typeID() == FFaplTypeCrossTable.FFAPLRECORD){
@@ -278,6 +280,7 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 			}
 			
 			_interpreter.arrayLen();
+            _interpreter.popCurrentToken();
 		}catch(FFaplAlgebraicException e){
 			e.addToken(node._node1.getToken());
 			throw e;
@@ -293,6 +296,7 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 		Array arr;
 			//error on left site of assignment
 		try{
+            _interpreter.pushCurrentToken(node._node3.getToken());
 			_symbolTable.setScope(node.getSymbolScope());
 		
 		//node._node1.accept(this, symbol);
@@ -343,6 +347,7 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 				node._node4.accept(this, s1);
 				_interpreter.storeValue(s1.getOffset(), false);
 			}
+            _interpreter.popCurrentToken();
 		}catch(FFaplAlgebraicException e){
 				e.addToken(node._node3.getToken());
 			throw e;
@@ -378,10 +383,11 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 				for(Iterator<INode> itr = node._node2.iterator(); itr.hasNext();){
 					n = itr.next();
 					tk = ((FFaplNodeToken) ((FFaplNodeSequence) n).elementAt(0)).getToken();
-					
+                    _interpreter.pushCurrentToken(tk);
 					n.accept(this, argument);
 					//System.out.println(_interpreter);
-						_interpreter.and();	
+					_interpreter.and();
+                    _interpreter.popCurrentToken();
 				}
 			}
 		}catch(FFaplAlgebraicException e){
@@ -407,10 +413,11 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 				for(Iterator<INode> itr = node._node2.iterator(); itr.hasNext();){
 					n = itr.next();
 					tk = ((FFaplNodeToken) ((FFaplNodeSequence) n).elementAt(0)).getToken();
-					
+                    _interpreter.pushCurrentToken(tk);
 					n.accept(this, argument);
 					//System.out.println(_interpreter);
-						_interpreter.or();	
+                    _interpreter.or();
+                    _interpreter.popCurrentToken();
 				}
 			}
 		}catch(FFaplAlgebraicException e){
@@ -437,11 +444,13 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 		//node._node1.accept(this, null);
 		//node._node2.accept(this, null);
 		try{
+            _interpreter.pushCurrentToken(node._node1.getToken());
 			Array initArray = (Array) _interpreter.popStack();
 			node._node3.accept(this, null);
 			//System.out.println(_interpreter);
 			
 			_interpreter.allocArray(node._arrayType, initArray);
+            _interpreter.popCurrentToken();
 		}catch(FFaplAlgebraicException e){
 				e.addToken(node._node1.getToken());
 			throw e;
@@ -580,6 +589,7 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 		
 		ISymbol constant;
 		try{//Type
+            _interpreter.pushCurrentToken(node._node3.getToken());
 			constant = new FFaplSymbol(node._node2.getToken().toString(), 
 	                node._node2.getToken(),
 	                null,
@@ -588,14 +598,17 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 			constant = _symbolTable.lookup(constant);
 			node._node4.accept(this, argument);
 			constant.setOffset(_interpreter.allocGlobal(constant.getType()));
+            _interpreter.popCurrentToken();
 		}catch(FFaplException fe){
 			fe.addToken(node._node3.getToken());
 			throw fe;
 		}
 		
 		try{//Expr
+            _interpreter.pushCurrentToken(node._node5.getToken());
 			node._node6.accept(this, constant);
 			_interpreter.storeValue(constant.getOffset(), true);
+            _interpreter.popCurrentToken();
 		}catch(FFaplException fe){
 			fe.addToken(node._node5.getToken());
 			throw fe;
@@ -661,6 +674,7 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 					s = (FFaplNodeSequence) n; 
 					equalOp = (ASTEqualOp)s.elementAt(0);
 					tk = ((FFaplNodeToken)equalOp._node1.getNode()).getToken();
+                    _interpreter.pushCurrentToken(tk);
 					node._node2.accept(this, argument);
 					switch(equalOp._node1.getPos()){
 					case 0: //'=='
@@ -670,7 +684,8 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 						_interpreter.isEqual();
 						_interpreter.not();
 						break;
-					}	
+					}
+                    _interpreter.popCurrentToken();
 			}
 		}catch(FFaplAlgebraicException e){
 			if(tk != null){
@@ -709,9 +724,11 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 					for(Iterator<INode> itr = o1.iterator(); itr.hasNext();){
 						n = itr.next();
 						tk = ((FFaplNodeToken) ((FFaplNodeSequence) n).elementAt(0)).getToken();
-						n.accept(this, argument);
+                        _interpreter.pushCurrentToken(tk);
+                        n.accept(this, argument);
 						//System.out.println(_interpreter);
-						_interpreter.xor();	
+						_interpreter.xor();
+                        _interpreter.popCurrentToken();
 					}
 				}
 			}catch(FFaplAlgebraicException e){
@@ -827,7 +844,7 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 		JBoolean condition;
 		
 		try{
-		
+            _interpreter.pushCurrentToken(node._node1.getToken());
 			_symbolTable.setScope(node.getSymbolScope());
 			//node._node1.accept(this, argument);
 			//node._node2.accept(this, argument);
@@ -910,6 +927,7 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 					condition = new JBoolean(false);
 				}*/
 			}
+            _interpreter.popCurrentToken();
 		}catch(FFaplException e){
 			e.addToken(node._node1.getToken());
 			throw e;
@@ -955,6 +973,7 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 		
 		
 		try{
+        _interpreter.pushCurrentToken(node._node1.getToken());
 		Polynomial irr;
 		BigInteger c;
 		node._node3.accept(this, argument);
@@ -969,6 +988,7 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 		
 		_interpreter.pushStack(new GaloisField(c, irr, _thread));
 		//node._node6.accept(this, argument);
+        _interpreter.popCurrentToken();
 		}catch(FFaplAlgebraicException e){
 				e.addToken(node._node1.getToken());
 			throw e;
@@ -990,7 +1010,8 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 		
  		if (node._node3 instanceof ASTGF)
 		{
-			try {	
+			try {
+                _interpreter.pushCurrentToken(node._node1.getToken());
 				GaloisField gf;
 				Polynomial a1 = new Polynomial(0,0, _thread), a2 = new Polynomial(0,0, _thread), a3 = new Polynomial(0,0, _thread), a4 = new Polynomial(0,0, _thread), a6 = new Polynomial(0,0, _thread);
 				
@@ -1043,14 +1064,16 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 				
 				
 				_interpreter.pushStack(new EllipticCurve(gf, a1, a2, a3, a4, a6, _thread));
-			}catch (FFaplAlgebraicException e){
+			    _interpreter.popCurrentToken();
+            }catch (FFaplAlgebraicException e){
 				e.addToken(node._node1.getToken());
 				throw e;
 			}
 		}
 		else if (node._node3 instanceof ASTExpr)
 		{
-			try {	
+			try {
+                _interpreter.pushCurrentToken(node._node1.getToken());
 				BInteger a1 = new BInteger("0",_thread);
 				BInteger a2 = new BInteger("0",_thread);
 				BInteger a3 = new BInteger("0",_thread);
@@ -1128,7 +1151,8 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 				
 				
 				_interpreter.pushStack(new EllipticCurve(new ResidueClass(modulus), a1, a2, a3, a4, a6, _thread));
-			}catch (FFaplAlgebraicException e){
+                _interpreter.popCurrentToken();
+            }catch (FFaplAlgebraicException e){
 				e.addToken(node._node1.getToken());
 				throw e;
 			}
@@ -1151,7 +1175,7 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 		
 		
 		try{
-	
+	        _interpreter.pushCurrentToken(node._node1.getToken());
 			node._node2.accept(this, null);
 			x = _interpreter.popStack();
 			node._node4.accept(this, null);
@@ -1175,7 +1199,7 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 				y_gf = (Polynomial) ((GaloisField)y).value();
 				_interpreter.pushStack(new EllipticCurve(x_gf,y_gf, _thread));
 			}
-			
+            _interpreter.popCurrentToken();
 		}catch (FFaplAlgebraicException e){
 			e.addToken(node._node1.getToken());
 			throw e;
@@ -1302,6 +1326,7 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 					s = (FFaplNodeSequence) n;
 					mulOp = (ASTMulOp)s.elementAt(0);
 					tk = ((FFaplNodeToken) mulOp._node1.getNode()).getToken();
+                    _interpreter.pushCurrentToken(tk);
 					switch(mulOp._node1.getPos()){
 					
 					case 0: //*
@@ -1364,7 +1389,7 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 						
 						
 					}
-					
+                    _interpreter.popCurrentToken();
 					i++;
 				}
 			}else{
@@ -1451,10 +1476,12 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 			if(node._node2.ispresent()){
 				for(Iterator<INode> itr = node._node2.iterator(); itr.hasNext();){
 					n = itr.next();
-					tk = ((FFaplNodeToken)((FFaplNodeSequence)n).elementAt(0)).getToken();  
-					n.accept(this, FFaplTypeCrossTable.FFAPLINTEGER);
+					tk = ((FFaplNodeToken)((FFaplNodeSequence)n).elementAt(0)).getToken();
+                    _interpreter.pushCurrentToken(tk);
+                    n.accept(this, FFaplTypeCrossTable.FFAPLINTEGER);
 					
 					_interpreter.pow();
+                    _interpreter.popCurrentToken();
 				}
 			}
 		}catch(FFaplAlgebraicException e){
@@ -1599,6 +1626,7 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 		s1 = node._procfuncSymbol;
 		
 		try{
+            _interpreter.pushCurrentToken(node._node1.getToken());
 			node._node3.accept(this, null);//Arguments
 			
 			if(s1 instanceof FFaplProcFuncSymbol){
@@ -1611,6 +1639,7 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 				Object[] arguments = {"Interpreter ASTProcFuncCall"};
 				throw new FFaplAlgebraicException(arguments, IAlgebraicError.INTERNAL);
 			}
+            _interpreter.popCurrentToken();
 		}catch(FFaplException fe){
 			fe.addToken(node._node1.getToken());
 			throw fe;
@@ -1723,7 +1752,7 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 				s = (FFaplNodeSequence) n;
 				relop = (ASTRelOp)s.elementAt(0);
 				tk = ((FFaplNodeToken)relop._node1.getNode()).getToken();
-				
+                _interpreter.pushCurrentToken(tk);
 				node._node2.accept(this, argument);
 				
 				switch(relop._node1.getPos()){
@@ -1739,7 +1768,8 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 				case 3: // '<'
 					_interpreter.isLess();
 					break;
-				}	
+				}
+                _interpreter.popCurrentToken();
 			}
 		}catch(FFaplAlgebraicException e){
 			if(tk != null){
@@ -1941,6 +1971,7 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 			throws FFaplException {
 		//node._node1.accept(this, argument);
 		try{
+            _interpreter.pushCurrentToken(node._node1.getToken());
 			JBoolean val;
 			node._node2.accept(this, argument);
 			val = (JBoolean) _interpreter.popStack();
@@ -1959,6 +1990,7 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 				node._node2.accept(this, argument);
 				val = (JBoolean) _interpreter.popStack();
 			}
+            _interpreter.popCurrentToken();
 		}catch(FFaplException e){
 				e.addToken(node._node1.getToken());
 			throw e;

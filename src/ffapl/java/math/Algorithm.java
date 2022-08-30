@@ -9,6 +9,7 @@ import ffapl.java.interfaces.IAlgebraicError;
 import ffapl.java.interfaces.ILevel;
 import ffapl.java.interfaces.IRandomGenerator;
 import ffapl.java.logging.FFaplLogger;
+import ffapl.java.math.isomorphism.calculation.linearfactor.PolynomialGF;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -438,6 +439,49 @@ public class Algorithm {
 		}		
 		return s;
 	}
+
+
+	/**
+	 * Repeated square-and-multiply algorithm for exponentiation
+	 * calculates g^k
+	 * @param g
+	 * @param k
+	 * @return
+	 * @throws FFaplAlgebraicException
+	 */
+	public static PolynomialGF squareAndMultiply(PolynomialGF g,
+											   BigInteger k) throws FFaplAlgebraicException{
+		PolynomialGF s, G;
+		Thread thread = g.getThread();
+		//s=1
+		GaloisField oneCoefficient = g.field();
+		oneCoefficient.setValue(new Polynomial(ONE, ZERO, thread));
+		s = new PolynomialGF(oneCoefficient, ZERO, g.field(), thread);;
+
+		//If k = 0 then return (s)
+		if(k.equals(ZERO)){
+			return s;
+		}
+		//G <- g
+		G = g.clone();
+
+		if(k.testBit(0)){
+			s = g.clone();
+		}
+
+		for (int i = 1; i < k.bitLength() ; i++){
+			//G <- G^2
+			isRunning(thread);//to interrupt calculation
+			G.multiply(G);
+			//if ki = 1
+			if(k.testBit(i)){
+				//s <- G*s
+				s.multiply(G);
+			}
+		}
+		return s;
+	}
+
 
 	/**
 	 * Repeated square-and-multiply algorithm for exponentiation 

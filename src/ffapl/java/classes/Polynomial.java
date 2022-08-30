@@ -609,11 +609,21 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 	}
 	
 	/**
-	 * Return String representation of a Polynomial
-	 * @param ply
+	 * Return String representation of a Polynomial using 'x' as indeterminate
+	 * @param ply the polynomial to be represented
 	 * @return
 	 */
 	public static String plyToString(Polynomial ply){
+		return plyToString(ply, 'x');
+	}
+
+	/**
+	 * Return String representation of a Polynomial with a given character used to represent the indeterminate
+	 * @param ply the polynomial to be represented
+	 * @param indeterminateRepresentation the character representation of the indeterminate
+	 * @return
+	 */
+	public static String plyToString(Polynomial ply, char indeterminateRepresentation){
 		ply.clearZeroCoefficients();
 		TreeMap<BigInteger, BigInteger> polynomialTable = ply.polynomial();
 		StringBuilder stringBuilder = new StringBuilder();
@@ -647,9 +657,9 @@ public class Polynomial implements IJavaType<Polynomial>, IAlgebraicOperations<P
 
 				if (!e.equals(ZERO)) {
 					if (!e.equals(ONE)) {
-						stringBuilder.append("x^").append(e);
+						stringBuilder.append(indeterminateRepresentation).append("^").append(e);
 					} else {
-						stringBuilder.append("x");
+						stringBuilder.append(indeterminateRepresentation);
 					}
 				}
 			}
