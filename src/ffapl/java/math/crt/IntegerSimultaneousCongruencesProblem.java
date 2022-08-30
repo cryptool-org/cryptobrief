@@ -64,13 +64,13 @@ public class IntegerSimultaneousCongruencesProblem {
     }
 
     /**
-     * Solving simultaneous congruences with given congruences and moduli. Calculates the value which solves those congruences
-     * using the Chinese remainder theorem or throws an exception if no solution exists.
-     * If there are pairs of non-coprime moduli, those are tried to be solved directly. As soon as all moduli are coprime,
-     * the CRT is applied directly.
+     * Solving simultaneous congruences with given congruences and moduli.
+     * Reduces the given system of simultaneous congruences to a single one using a combination of the Chinese remainder theorem
+     * and an algorithm for solving a pair of simultaneous congruences with noncoprime moduli or throws an exception if
+     * no solution exists.
      * @throws FFaplAlgebraicException
      */
-    public BInteger solve() throws FFaplAlgebraicException {
+    public BInteger[] solve() throws FFaplAlgebraicException {
         List<BInteger> currentCongruences = new ArrayList<>(Arrays.asList(congruences));
         List<BInteger> currentModuli = new ArrayList<>(Arrays.asList(moduli));
 
@@ -109,7 +109,7 @@ public class IntegerSimultaneousCongruencesProblem {
      * @throws FFaplAlgebraicException
      *          <INTERRUPT> if thread is interrupted
      */
-    private BInteger solveForCoprimeModuli(List<BInteger> congruences, List<BInteger> moduli) throws FFaplAlgebraicException {
+    private BInteger[] solveForCoprimeModuli(List<BInteger> congruences, List<BInteger> moduli) throws FFaplAlgebraicException {
         BInteger moduliProduct = productSum(moduli);
         BInteger result = new BInteger(ZERO, thread);
         BInteger n;
@@ -122,7 +122,8 @@ public class IntegerSimultaneousCongruencesProblem {
                             .multiply(congruences.get(i))
                             .mod(moduliProduct));
         }
-        return result;
+        result = (BInteger)result.mod(moduliProduct);
+        return new BInteger[] {result, moduliProduct};
     }
 
     /**
