@@ -14,10 +14,7 @@ import ffapl.lib.FFaplSymbol;
 import ffapl.lib.interfaces.ISymbol;
 import ffapl.lib.interfaces.ISymbolTable;
 import ffapl.lib.interfaces.IVm;
-import ffapl.types.FFaplArray;
-import ffapl.types.FFaplInteger;
-import ffapl.types.FFaplPolynomial;
-import ffapl.types.FFaplPolynomialResidue;
+import ffapl.types.*;
 
 /**
  * Calculates the value 'x' which satisfies a number of simultaneous congruences "congruences" for different moduli "moduli"
@@ -41,7 +38,7 @@ public class CRT implements IPredefinedProcFunc {
             Array moduli = (Array) b;
             Array congruences = (Array) a;
 
-            if (congruences.getBaseType() == IJavaType.INTEGER && moduli.getBaseType() == IJavaType.INTEGER) {
+            if (congruences.getBaseType() == FFaplTypeCrossTable.FFAPLINTEGER && moduli.getBaseType() == FFaplTypeCrossTable.FFAPLINTEGER) {
                 BInteger[] congr = new BInteger[congruences.length()];
                 for (int i = 0; i < congr.length; i++) {
                     congr[i] = (BInteger) congruences.getValue(i);
@@ -52,9 +49,13 @@ public class CRT implements IPredefinedProcFunc {
                     mod[i] = (BInteger) moduli.getValue(i);
                 }
 
-                interpreter.pushStack(
-                        new IntegerSimultaneousCongruencesProblem(congr, mod).solve());
-            } else if (congruences.getBaseType() == IJavaType.BOOLEAN && moduli.getBaseType() == IJavaType.BOOLEAN) { // TODO - DOMINIC - 08.12.2021: BOOLEAN is given but ... that's actually wrong! POLYNOMIALRC is expected. There must a bug somewhere where the java type enum is assigned
+                BInteger[] result = new IntegerSimultaneousCongruencesProblem(congr, mod).solve();
+                interpreter.pushStack(new Array(FFaplTypeCrossTable.FFAPLINTEGER,
+                                    1,
+                                    result,
+                                    result[0].clone(),
+                                    result[0].getThread()));
+            } else if (congruences.getBaseType() == FFaplTypeCrossTable.FFAPLPOLYNOMIALRESIDUE && moduli.getBaseType() == FFaplTypeCrossTable.FFAPLPOLYNOMIALRESIDUE) {
                 PolynomialRC[] congr = new PolynomialRC[congruences.length()];
                 for (int i = 0; i < congr.length; i++) {
                     congr[i] = (PolynomialRC) congruences.getValue(i);
@@ -65,8 +66,12 @@ public class CRT implements IPredefinedProcFunc {
                     mod[i] = (PolynomialRC) moduli.getValue(i);
                 }
 
-                interpreter.pushStack(
-                        new PolynomialSimultaneousCongruencesProblem(congr, mod).solve());
+                PolynomialRC[] result = new PolynomialSimultaneousCongruencesProblem(congr, mod).solve();
+                interpreter.pushStack(new Array(FFaplTypeCrossTable.FFAPLPOLYNOMIALRESIDUE,
+                        1,
+                        result,
+                        result[0].clone(),
+                        result[0].getThread()));
             } else {
                 System.err.println("error in CRT.execute");
             }
@@ -88,7 +93,7 @@ public class CRT implements IPredefinedProcFunc {
         //crt(congruences,moduli) Integer-Array - Integer-Array
         s = new FFaplPreProcFuncSymbol("crt",
                 null,
-                new FFaplInteger(),
+                new FFaplArray(new FFaplInteger(), 1),
                 ISymbol.FUNCTION);
         s.setProcFunc(new CRT());
         symbolTable.addSymbol(s);
@@ -109,7 +114,7 @@ public class CRT implements IPredefinedProcFunc {
         //crt(congruences,moduli) Z()[x]-Array - Z()[x]-Array
         s = new FFaplPreProcFuncSymbol("crt",
                 null,
-                new FFaplPolynomial(),
+                new FFaplArray(new FFaplPolynomialResidue(), 1),
                 ISymbol.FUNCTION);
         s.setProcFunc(new CRT());
         symbolTable.addSymbol(s);

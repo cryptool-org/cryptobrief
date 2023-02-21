@@ -292,6 +292,14 @@ public interface IVm {
 	 */
 	public boolean isStackOffsetAllocated(int offset);
 
-	
-	
+	/**
+	 * Pushes the token currently processed by the interpreter to the token stack of IVm.
+	 * @param token the currently processed token
+	 */
+	public void pushCurrentToken(IToken token);
+	/**
+	 * Pops the current token from the token stack of IVm after processing of the token has finished.
+	 * @return the token on top of the token stack
+	 */
+	public IToken popCurrentToken();
 }

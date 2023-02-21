@@ -21,6 +21,7 @@ import sunset.gui.listener.ActionListenerCloseWindow;
 import sunset.gui.listener.ActionListenerPreferencesOk;
 import sunset.gui.listener.JTreeSelectionListenerPreferences;
 import sunset.gui.panel.JPanelInterpreter;
+import sunset.gui.panel.JPanelIsomorphismCalculation;
 import sunset.gui.panel.JPanelLanguage;
 import sunset.gui.util.SunsetBundle;
 import sunset.gui.util.TranslateGUIElements;
@@ -50,7 +51,7 @@ public class JDialogPreference extends FFaplJDialog {
 				jPanelControlLayout.setAlignment(FlowLayout.RIGHT);
 				jPanelControl.setLayout(jPanelControlLayout);
 				getContentPane().add(jPanelControl, BorderLayout.SOUTH);
-				jPanelControl.setPreferredSize(new java.awt.Dimension(384, 32));
+				jPanelControl.setPreferredSize(new java.awt.Dimension(364, 45));
 				jPanelControl.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.gray));
 				{
 					jButton_ok = new JButton();
@@ -74,7 +75,7 @@ public class JDialogPreference extends FFaplJDialog {
 				getContentPane().add(jTree_Preferences, BorderLayout.WEST);
 				jTree_Preferences.setBounds(new Rectangle(2,2));
 				jTree_Preferences.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.gray));
-				jTree_Preferences.setPreferredSize(new java.awt.Dimension(116, 230));
+				jTree_Preferences.setPreferredSize(new java.awt.Dimension(136, 230));
 				//jTree_Preferences.removeAll();
 			}
 			{
@@ -85,7 +86,7 @@ public class JDialogPreference extends FFaplJDialog {
 			}
 			
 			
-			this.setSize(400, 250);
+			this.setSize(550, 260);
 			initComponents();
 			//pack();
 		} catch (Exception e) {
@@ -112,6 +113,9 @@ public class JDialogPreference extends FFaplJDialog {
 		root.insert(node, 0);
 		node = createTreeNode("preftree_interpreter", "Interpreter");
 		node.addComponent(new JPanelInterpreter((FFaplJFrame) this.getOwner()));
+		root.insert(node, 0);
+		node = createTreeNode("preftree_isomorphism_calculation", "Isomorphism Calculation");
+		node.addComponent(new JPanelIsomorphismCalculation());
 		root.insert(node, 0);
 		TreePath initPath = new TreePath(node.getPath());
 		model.setRoot(root);
