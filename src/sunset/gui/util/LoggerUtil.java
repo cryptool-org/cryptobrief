@@ -1,4 +1,4 @@
-package ffapl.java.util;
+package sunset.gui.util;
 
 import sunset.gui.interfaces.IProperties;
 import sunset.gui.logic.GUIPropertiesLogic;

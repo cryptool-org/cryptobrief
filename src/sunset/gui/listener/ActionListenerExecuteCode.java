@@ -20,10 +20,10 @@ import sunset.gui.lib.ExecuteThread;
 import sunset.gui.logic.GUIPropertiesLogic;
 import sunset.gui.panel.JPanelCode;
 import sunset.gui.tabbedpane.JTabbedPaneCode;
+import sunset.gui.util.LoggerUtil;
 import ffapl.FFaplInterpreter;
-import ffapl.java.logging.FFaplConsoleHandler;
 import ffapl.java.logging.FFaplLogger;
-import ffapl.java.util.LoggerUtil;
+import sunset.gui.logging.JTextPaneConsoleHandler;
 import sunset.gui.panel.JPanelTabTitle;
 
 /**
@@ -33,13 +33,12 @@ import sunset.gui.panel.JPanelTabTitle;
  */
 public class ActionListenerExecuteCode implements ActionListener {
 
-	
 	private JTabbedPaneCode _tabbedPane_code;
 	private Thread _running;
 	private Vector<Component> _startComp;
 	private Vector<Component> _stopComp;
 
-	private FFaplConsoleHandler consoleHandler;
+	private JTextPaneConsoleHandler consoleHandler;
 	/**
 	 * @param tabbedPane_code
 	 * @param startComp
@@ -50,7 +49,7 @@ public class ActionListenerExecuteCode implements ActionListener {
 		_startComp = startComp;
 		_stopComp = stopComp;
 	}
-	
+
 	@Override
 	public void actionPerformed(ActionEvent ev) {
 		FFaplCodeTextPane textPane;
@@ -61,28 +60,28 @@ public class ActionListenerExecuteCode implements ActionListener {
 		button = (Component) ev.getSource();
 		textPane = (FFaplCodeTextPane) _tabbedPane_code.currentCodePane();
 		textPane_console = ((JPanelCode)_tabbedPane_code.currentCodePanel()).getConsole();
-		//reset Errors
+		// reset Errors
 		textPane.getLineHandler().resetHandler();
 		textPane.repaint();
-		
-		if(_running != null){
-			if(!_running.isAlive()){
+
+		if (_running != null) {
+			if (!_running.isAlive()) {
 				_running = null;
-			}//else{
+			} //else {
 				//System.out.println("Error in Thread");
 			//}
 		}
-		
-		if(button.getName().equals(IFFaplLang.BUTTON_RUN)){
+
+		if (button.getName().equals(IFFaplLang.BUTTON_RUN)) {
 			logger = new FFaplLogger("FFaplLog");
-			consoleHandler = new FFaplConsoleHandler(textPane, textPane_console, LoggerUtil.getLoggerMode());
+			consoleHandler = new JTextPaneConsoleHandler(textPane, textPane_console, LoggerUtil.getLoggerMode());
 			logger.addObserver(consoleHandler);
-			//EXECUTE
-			if(textPane != null && _running == null){
+			// EXECUTE
+			if (textPane != null && _running == null) {
 				textPane_console.setText("");
-		  	   	Reader reader = new StringReader(textPane.getText());
-		  	   	
-				try {                                       
+				Reader reader = new StringReader(textPane.getText());
+
+				try {
 					_running = new FFaplInterpreter(logger, reader);
 					executeThread = new ExecuteThread(_running, _startComp, _stopComp);
 					executeThread.start();
@@ -91,22 +90,19 @@ public class ActionListenerExecuteCode implements ActionListener {
 					e.printStackTrace();
 				}
 			}
-			
-	}else if(button.getName().equals(IFFaplLang.BUTTON_TERMINATE)){
-		//STOP
-		stopRunningThread();	
-		
+		} else if (button.getName().equals(IFFaplLang.BUTTON_TERMINATE)) {
+			// STOP
+			stopRunningThread();
+		}
 	}
-	}
-	
-	
+
 	/**
 	 * stops running Thread
 	 * @return returns true if success, false if error occurred
 	 */
 	public boolean stopRunningThread() {
-		//STOP
-		if(_running != null){
+		// STOP
+		if (_running != null) {
 			_running.interrupt();
 			try {
 				_running.join();
@@ -116,7 +112,7 @@ public class ActionListenerExecuteCode implements ActionListener {
 				return false;
 			}
 			_running = null;
-		}	
+		}
 		return true;
 	}
 
@@ -124,8 +120,8 @@ public class ActionListenerExecuteCode implements ActionListener {
 	 * @return true if Execution Thread is running, false otherwise
 	 */
 	public boolean isRunning() {
-		if(_running != null){
-			if(_running.isAlive()){
+		if (_running != null) {
+			if (_running.isAlive()) {
 				return true;
 			}
 		}
