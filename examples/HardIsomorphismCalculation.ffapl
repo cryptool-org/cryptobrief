@@ -1,4 +1,4 @@
-program calculate{
+program FieldIsomorphism1 {
     a : GF(11, [x^6+x+6]);
     b : GF(11, [x^6+x^3+1]);
 

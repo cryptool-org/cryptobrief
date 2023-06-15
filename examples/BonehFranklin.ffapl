@@ -1,4 +1,4 @@
-program calculate{
+program BonehFranklinEncryptionDemo {
   const P: EC(GF(13,[x^2-2]), a6 := [6]) := << [6],[1] >>; // system parameter
   const p: Integer := 7; //Ordnung von P
  

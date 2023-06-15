@@ -1,4 +1,4 @@
-program calculate{
+program FieldIsomorphism2 {
     a : GF(2, [x^3+x+1]);
     b : GF(2, [x^3+x^2+1]);
 

@@ -1,4 +1,4 @@
-program calculate{
+program arraysDemo {
 	a: Prime[][];
 	b: Z(3)[];
 	

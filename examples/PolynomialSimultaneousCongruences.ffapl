@@ -1,4 +1,4 @@
-program calculate{
+program ChineseRemainderingOverPolynomials {
 	
 	procedure two_coprime_moduli() {
 		congruences, moduli : Z(5)[x][];

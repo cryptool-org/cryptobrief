@@ -1,4 +1,4 @@
-program calculate{
+program AESDemo {
 	m,c,k: Integer;
 	X: RandomGenerator(0:2^600-1);	// enforce several blocks and padding
 	Y: RandomGenerator(0:100);	// only one (underfull) block
