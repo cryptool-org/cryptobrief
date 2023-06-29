@@ -26,6 +26,7 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants, FF
 
   private static String _programName = "";
   private FFaplLogger _logger;
+  private FFaplRuntimeProperties _runtimeProperties;
   private FFaplSymbolTypeCheckingVisitor _symbolVisit;
   private FFaplJavaInterpreterVisitor _javaInterpreter;
   private FFaplSymbolTable _symbolTable;
@@ -38,12 +39,13 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants, FF
    * @param logger
    * @param reader
    */
-  public FFaplInterpreter(FFaplLogger logger, Reader reader) {
+  public FFaplInterpreter(FFaplLogger logger, FFaplRuntimeProperties properties, Reader reader) {
     this(reader);
     this.disable_tracing();
     this.token_source.setDebugStream(new java.io.PrintStream(OutputStream.nullOutputStream()));
 
     _logger = logger;
+    _runtimeProperties = properties;
     _interrupted = false;
     _identTypeMapping = new ASTNodeMessageBroker<String,Type>();
   }
@@ -52,12 +54,13 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants, FF
    * @param logger
    * @param stream
    */
-  public FFaplInterpreter(FFaplLogger logger, InputStream stream) {
+  public FFaplInterpreter(FFaplLogger logger, FFaplRuntimeProperties properties, InputStream stream) {
     this(stream, Charset.forName("UTF-8"));
     this.disable_tracing();
     this.token_source.setDebugStream(new java.io.PrintStream(OutputStream.nullOutputStream()));
 
     _logger = logger;
+    _runtimeProperties = properties;
     _interrupted = false;
     _identTypeMapping = new ASTNodeMessageBroker<String,Type>();
   }
@@ -78,7 +81,7 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants, FF
       _symbolVisit = new FFaplSymbolTypeCheckingVisitor(_symbolTable, _logger, this);
       _symbolVisit.visit(_root, null);
       // interpret
-      _javaInterpreter = new FFaplJavaInterpreterVisitor(_symbolTable, _logger, this);
+      _javaInterpreter = new FFaplJavaInterpreterVisitor(_symbolTable, _logger, _runtimeProperties, this);
       _javaInterpreter.visit(_root, null);
     } catch(ParseException pe) {
       _logger.log(ILevel.ERROR,
@@ -3148,6 +3151,19 @@ t7 = new FFaplNodeToken(t1);
     finally { jj_save(11, xla); }
   }
 
+  private boolean jj_3R_48()
+ {
+    if (!jj_rescan) trace_call("CreationExpr(LOOKING AHEAD...)");
+    if (jj_scan_token(NEW)) { if (!jj_rescan) trace_return("CreationExpr(LOOKAHEAD FAILED)"); return true; }
+    { if (!jj_rescan) trace_return("CreationExpr(LOOKAHEAD SUCCEEDED)"); return false; }
+  }
+
+  private boolean jj_3R_68()
+ {
+    if (jj_3R_72()) return true;
+    return false;
+  }
+
   private boolean jj_3R_49()
  {
     Token xsp;
@@ -3591,19 +3607,6 @@ t7 = new FFaplNodeToken(t1);
     if (!jj_rescan) trace_call("ArrayLen(LOOKING AHEAD...)");
     if (jj_scan_token(HASH_KEY)) { if (!jj_rescan) trace_return("ArrayLen(LOOKAHEAD FAILED)"); return true; }
     { if (!jj_rescan) trace_return("ArrayLen(LOOKAHEAD SUCCEEDED)"); return false; }
-  }
-
-  private boolean jj_3R_48()
- {
-    if (!jj_rescan) trace_call("CreationExpr(LOOKING AHEAD...)");
-    if (jj_scan_token(NEW)) { if (!jj_rescan) trace_return("CreationExpr(LOOKAHEAD FAILED)"); return true; }
-    { if (!jj_rescan) trace_return("CreationExpr(LOOKAHEAD SUCCEEDED)"); return false; }
-  }
-
-  private boolean jj_3R_68()
- {
-    if (jj_3R_72()) return true;
-    return false;
   }
 
   /** Generated Token Manager. */

@@ -20,9 +20,11 @@ import sunset.gui.lib.ExecuteThread;
 import sunset.gui.logic.GUIPropertiesLogic;
 import sunset.gui.panel.JPanelCode;
 import sunset.gui.tabbedpane.JTabbedPaneCode;
+import sunset.gui.util.IsomorphismCalculationUtil;
 import sunset.gui.util.LoggerUtil;
 import ffapl.FFaplInterpreter;
 import ffapl.java.logging.FFaplLogger;
+import ffapl.java.util.FFaplRuntimeProperties;
 import sunset.gui.logging.JTextPaneConsoleHandler;
 import sunset.gui.panel.JPanelTabTitle;
 
@@ -54,6 +56,7 @@ public class ActionListenerExecuteCode implements ActionListener {
 	public void actionPerformed(ActionEvent ev) {
 		FFaplCodeTextPane textPane;
 		FFaplLogger logger;
+		FFaplRuntimeProperties properties;
 		Component button;
 		Thread executeThread;
 		JTextPane textPane_console;
@@ -76,13 +79,18 @@ public class ActionListenerExecuteCode implements ActionListener {
 			logger = new FFaplLogger("FFaplLog");
 			consoleHandler = new JTextPaneConsoleHandler(textPane, textPane_console, LoggerUtil.getLoggerMode());
 			logger.addObserver(consoleHandler);
+
+			properties = new FFaplRuntimeProperties(
+					IsomorphismCalculationUtil.getRootFindingStrategyType(),
+					IsomorphismCalculationUtil.getTimeLimitInSeconds());
+
 			// EXECUTE
 			if (textPane != null && _running == null) {
 				textPane_console.setText("");
 				Reader reader = new StringReader(textPane.getText());
 
 				try {
-					_running = new FFaplInterpreter(logger, reader);
+					_running = new FFaplInterpreter(logger, properties, reader);
 					executeThread = new ExecuteThread(_running, _startComp, _stopComp);
 					executeThread.start();
 				} catch (Exception e) {
