@@ -172,7 +172,7 @@ public class JDialogCredits extends FFaplJDialog {
 		
 		jEditorPane_license.setText("The following persons contributed to Sunset/FFapl: <br><br> Alexander O. Ortner: initial concept, language definition, compiler and GUI"
 				+ "<br>Johannes Winkler: full support of elliptic curves (in affine coordinates)<br>Volker Bugl, Markus Wiltsche: support for user input and GUI improvements"
-				+ "<br>Max-Julian Jakobitsch: generation of random points on elliptic curves of degree 2<br>Manuel Langer: established upwards compatibility with Java 9 and later, implemented the normal, advanced and regular expression search and replace function in the IDE");
+				+ "<br>Max-Julian Jakobitsch: generation of random points on elliptic curves of degree 2<br>Manuel Langer: established upwards compatibility with Java 9 and later, implemented the normal, advanced and regular expression search and replace function in the IDE<br>Dominic Weinberger: support for typecasts by isomorphism between Galois fields of the same order");
 
 	}
 	

@@ -62,6 +62,7 @@ Contributions by the following people so far is thankfully acknowledged:
 * Markus Wiltsche: API extensions
 * Max-Julian Jakobitsch: Implemented random points on elliptic curves over fields of degree 2, plus fixing various bugs 
 * Manuel Langer: fixed compatibility issues with Java 9 (removal of deprecated classes like JAXB), numerous bugfixes and integration of advanced search & replace function in the GUI
+* Dominic Weinberger: support for typecasts by isomorphism between Galois fields of the same order
 
 For questions and other inquiries, feel free to send an email to the repository maintainer [Stefan Rass](mailto:stefan.rass@aau.at?subject=Sunset-FFapl)
 
