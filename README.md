@@ -68,6 +68,8 @@ For questions and other inquiries, feel free to send an email to the repository 
 # Installation Instructions
 The folder [nsis_installer](https://github.com/stefan-rass/sunset-ffapl/tree/master/nsis_installer) contains a Windows installer that can be downloaded and installed as it is. For all other platforms, feel free to copy the subfolder [nsis_installer/sunset](https://github.com/stefan-rass/sunset-ffapl/tree/master/nsis_installer/sunset) to any place on your computer and run `sunset.jar` (requires Java 9 Runtime or later).
 
+**Note**: to avoid a bug in the JDK Swing classes [reported here](https://stackoverflow.com/questions/13575224/comparison-method-violates-its-general-contract-timsort-and-gridlayout), make sure to add the `-Djava.util.Arrays.useLegacyMergeSort=true` option when starting Sunset/FFapl, i.e., run `sunset.jar` on the command line as `java -jar -Djava.util.Arrays.useLegacyMergeSort=true -jar Sunset.jar`, for otherwise, the "File open" dialog may not work. Opening files by dragging and dropping them into the IDE will alternatively work too.
+
 ## Compiling from source
 Alternatively, the project can also be compiled from source. 
 This repository contains IDE project configurations for Eclipse and IntelliJ 
