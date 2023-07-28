@@ -1194,7 +1194,9 @@ public class Algorithm {
 
 			TreeMap<BigInteger, BigInteger> tmp;
 			if (factorizationCache != null && ((tmp = factorizationCache.get(n)) != null)) {
-				return (TreeMap<BigInteger, BigInteger>) tmp.clone();
+				@SuppressWarnings("unchecked")
+				TreeMap<BigInteger, BigInteger> clone = (TreeMap<BigInteger, BigInteger>) tmp.clone();
+				return clone;
 
 			} else if (isProbablePrime(n, 100)) {
 				addPrimeFactor(result, n);
