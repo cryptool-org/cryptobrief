@@ -14,7 +14,7 @@ schemes as *native data types*. For example, to work in the group of residuals
 modulo some prime number p, one simply declares the prime as a constant and the
 variables to work with in the group.
 ```Java
-const: p: Prime := 13;
+const p: Prime := 13;
 g: Z(p);  // this puts all computations on g into the finite field of size (and characteristic) p
 g := 7^(-1);  // compute the inverse of 7 mod 13 directly
 g := 10^246434565635423565234454352; // do fast exponentiation
