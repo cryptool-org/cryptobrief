@@ -13,3 +13,6 @@ out/
 *.iws
 *.iml
 *.ipr
+
+# Maven
+.flattened-pom.xml
