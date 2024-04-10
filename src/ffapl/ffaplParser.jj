@@ -1,6 +1,6 @@
 options
 {
-  JDK_VERSION = "1.8";
+  JDK_VERSION = "1.11";
   UNICODE_INPUT = true;
   JAVA_UNICODE_ESCAPE = true;
 }
@@ -88,10 +88,14 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants {
       _javaInterpreter.visit(_root, null);
     } catch(ParseException pe) {
       _logger.log(ILevel.ERROR,
-                  CompilerMessage.getError((ICompilerError) pe, _programName));
+                  CompilerMessage.getError((ICompilerError) pe, _programName),
+                  pe.errorLine(),
+                  pe.errorColumn());
     } catch(TokenMgrException te) {
       _logger.log(ILevel.ERROR,
-                  CompilerMessage.getError((ICompilerError) te, _programName));
+                  CompilerMessage.getError((ICompilerError) te, _programName),
+                  te.errorLine(),
+                  te.errorColumn());
     } catch(FFaplAlgebraicException e) {
       _logger.log(ILevel.ERROR,
                   CompilerMessage.getError((ICompilerError) e, _programName),

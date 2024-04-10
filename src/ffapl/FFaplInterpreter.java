@@ -82,10 +82,14 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants, FF
       _javaInterpreter.visit(_root, null);
     } catch(ParseException pe) {
       _logger.log(ILevel.ERROR,
-                  CompilerMessage.getError((ICompilerError) pe, _programName));
+                  CompilerMessage.getError((ICompilerError) pe, _programName),
+                  pe.errorLine(),
+                  pe.errorColumn());
     } catch(TokenMgrException te) {
       _logger.log(ILevel.ERROR,
-                  CompilerMessage.getError((ICompilerError) te, _programName));
+                  CompilerMessage.getError((ICompilerError) te, _programName),
+                  te.errorLine(),
+                  te.errorColumn());
     } catch(FFaplAlgebraicException e) {
       _logger.log(ILevel.ERROR,
                   CompilerMessage.getError((ICompilerError) e, _programName),
@@ -3144,6 +3148,23 @@ t7 = new FFaplNodeToken(t1);
     finally { jj_save(11, xla); }
   }
 
+  private boolean jj_3R_49()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_52()) {
+    jj_scanpos = xsp;
+    if (jj_3R_53()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_52()
+ {
+    if (jj_3R_31()) return true;
+    return false;
+  }
+
   private boolean jj_3R_35()
  {
     if (!jj_rescan) trace_call("IdTerm(LOOKING AHEAD...)");
@@ -3582,23 +3603,6 @@ t7 = new FFaplNodeToken(t1);
   private boolean jj_3R_68()
  {
     if (jj_3R_72()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_49()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_52()) {
-    jj_scanpos = xsp;
-    if (jj_3R_53()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3R_52()
- {
-    if (jj_3R_31()) return true;
     return false;
   }
 
