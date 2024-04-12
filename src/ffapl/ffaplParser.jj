@@ -32,6 +32,7 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants {
 
   private static String _programName = "";
   private FFaplLogger _logger;
+  private FFaplReader _inputReader;
   private FFaplRuntimeProperties _runtimeProperties;
   private FFaplSymbolTypeCheckingVisitor _symbolVisit;
   private FFaplJavaInterpreterVisitor _javaInterpreter;
@@ -45,12 +46,13 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants {
    * @param logger
    * @param reader
    */
-  public FFaplInterpreter(FFaplLogger logger, FFaplRuntimeProperties properties, Reader reader) {
+  public FFaplInterpreter(FFaplLogger logger, FFaplRuntimeProperties properties, FFaplReader inputReader, Reader reader) {
     this(reader);
     this.disable_tracing();
     this.token_source.setDebugStream(new java.io.PrintStream(OutputStream.nullOutputStream()));
 
     _logger = logger;
+    _inputReader = inputReader;
     _runtimeProperties = properties;
     _interrupted = false;
     _identTypeMapping = new ASTNodeMessageBroker<String,Type>();
@@ -60,12 +62,13 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants {
    * @param logger
    * @param stream
    */
-  public FFaplInterpreter(FFaplLogger logger, FFaplRuntimeProperties properties, InputStream stream) {
+  public FFaplInterpreter(FFaplLogger logger, FFaplRuntimeProperties properties, FFaplReader inputReader, InputStream stream) {
     this(stream, Charset.forName("UTF-8"));
     this.disable_tracing();
     this.token_source.setDebugStream(new java.io.PrintStream(OutputStream.nullOutputStream()));
 
     _logger = logger;
+    _inputReader = inputReader;
     _runtimeProperties = properties;
     _interrupted = false;
     _identTypeMapping = new ASTNodeMessageBroker<String,Type>();
@@ -84,7 +87,7 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants {
       // generate SymbolTable
       _symbolTable = new FFaplSymbolTable();
       // Symbol and Type checking
-      _symbolVisit = new FFaplSymbolTypeCheckingVisitor(_symbolTable, _logger, this);
+      _symbolVisit = new FFaplSymbolTypeCheckingVisitor(_symbolTable, _logger, _inputReader, this);
       _symbolVisit.visit(_root, null);
       // interpret
       _javaInterpreter = new FFaplJavaInterpreterVisitor(_symbolTable, _logger, _runtimeProperties, this);

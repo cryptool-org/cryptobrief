@@ -26,6 +26,7 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants, FF
 
   private static String _programName = "";
   private FFaplLogger _logger;
+  private FFaplReader _inputReader;
   private FFaplRuntimeProperties _runtimeProperties;
   private FFaplSymbolTypeCheckingVisitor _symbolVisit;
   private FFaplJavaInterpreterVisitor _javaInterpreter;
@@ -39,12 +40,13 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants, FF
    * @param logger
    * @param reader
    */
-  public FFaplInterpreter(FFaplLogger logger, FFaplRuntimeProperties properties, Reader reader) {
+  public FFaplInterpreter(FFaplLogger logger, FFaplRuntimeProperties properties, FFaplReader inputReader, Reader reader) {
     this(reader);
     this.disable_tracing();
     this.token_source.setDebugStream(new java.io.PrintStream(OutputStream.nullOutputStream()));
 
     _logger = logger;
+    _inputReader = inputReader;
     _runtimeProperties = properties;
     _interrupted = false;
     _identTypeMapping = new ASTNodeMessageBroker<String,Type>();
@@ -54,12 +56,13 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants, FF
    * @param logger
    * @param stream
    */
-  public FFaplInterpreter(FFaplLogger logger, FFaplRuntimeProperties properties, InputStream stream) {
+  public FFaplInterpreter(FFaplLogger logger, FFaplRuntimeProperties properties, FFaplReader inputReader, InputStream stream) {
     this(stream, Charset.forName("UTF-8"));
     this.disable_tracing();
     this.token_source.setDebugStream(new java.io.PrintStream(OutputStream.nullOutputStream()));
 
     _logger = logger;
+    _inputReader = inputReader;
     _runtimeProperties = properties;
     _interrupted = false;
     _identTypeMapping = new ASTNodeMessageBroker<String,Type>();
@@ -78,7 +81,7 @@ public class FFaplInterpreter extends Thread implements FFaplASTreeConstants, FF
       // generate SymbolTable
       _symbolTable = new FFaplSymbolTable();
       // Symbol and Type checking
-      _symbolVisit = new FFaplSymbolTypeCheckingVisitor(_symbolTable, _logger, this);
+      _symbolVisit = new FFaplSymbolTypeCheckingVisitor(_symbolTable, _logger, _inputReader, this);
       _symbolVisit.visit(_root, null);
       // interpret
       _javaInterpreter = new FFaplJavaInterpreterVisitor(_symbolTable, _logger, _runtimeProperties, this);
@@ -3151,6 +3154,30 @@ t7 = new FFaplNodeToken(t1);
     finally { jj_save(11, xla); }
   }
 
+  private boolean jj_3R_46()
+ {
+    if (!jj_rescan) trace_call("UnaryExpr(LOOKING AHEAD...)");
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_49()) jj_scanpos = xsp;
+    if (jj_3R_50()) { if (!jj_rescan) trace_return("UnaryExpr(LOOKAHEAD FAILED)"); return true; }
+    { if (!jj_rescan) trace_return("UnaryExpr(LOOKAHEAD SUCCEEDED)"); return false; }
+  }
+
+  private boolean jj_3R_62()
+ {
+    if (!jj_rescan) trace_call("RelExpr(LOOKING AHEAD...)");
+    if (jj_3R_70()) { if (!jj_rescan) trace_return("RelExpr(LOOKAHEAD FAILED)"); return true; }
+    { if (!jj_rescan) trace_return("RelExpr(LOOKAHEAD SUCCEEDED)"); return false; }
+  }
+
+  private boolean jj_3R_61()
+ {
+    if (!jj_rescan) trace_call("ArrayLen(LOOKING AHEAD...)");
+    if (jj_scan_token(HASH_KEY)) { if (!jj_rescan) trace_return("ArrayLen(LOOKAHEAD FAILED)"); return true; }
+    { if (!jj_rescan) trace_return("ArrayLen(LOOKAHEAD SUCCEEDED)"); return false; }
+  }
+
   private boolean jj_3R_48()
  {
     if (!jj_rescan) trace_call("CreationExpr(LOOKING AHEAD...)");
@@ -3583,30 +3610,6 @@ t7 = new FFaplNodeToken(t1);
  {
     if (jj_3R_30()) return true;
     return false;
-  }
-
-  private boolean jj_3R_46()
- {
-    if (!jj_rescan) trace_call("UnaryExpr(LOOKING AHEAD...)");
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_49()) jj_scanpos = xsp;
-    if (jj_3R_50()) { if (!jj_rescan) trace_return("UnaryExpr(LOOKAHEAD FAILED)"); return true; }
-    { if (!jj_rescan) trace_return("UnaryExpr(LOOKAHEAD SUCCEEDED)"); return false; }
-  }
-
-  private boolean jj_3R_62()
- {
-    if (!jj_rescan) trace_call("RelExpr(LOOKING AHEAD...)");
-    if (jj_3R_70()) { if (!jj_rescan) trace_return("RelExpr(LOOKAHEAD FAILED)"); return true; }
-    { if (!jj_rescan) trace_return("RelExpr(LOOKAHEAD SUCCEEDED)"); return false; }
-  }
-
-  private boolean jj_3R_61()
- {
-    if (!jj_rescan) trace_call("ArrayLen(LOOKING AHEAD...)");
-    if (jj_scan_token(HASH_KEY)) { if (!jj_rescan) trace_return("ArrayLen(LOOKAHEAD FAILED)"); return true; }
-    { if (!jj_rescan) trace_return("ArrayLen(LOOKAHEAD SUCCEEDED)"); return false; }
   }
 
   /** Generated Token Manager. */

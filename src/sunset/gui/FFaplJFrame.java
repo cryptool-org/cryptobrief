@@ -241,7 +241,7 @@ public class FFaplJFrame extends javax.swing.JFrame {
 						IsomorphismCalculationUtil.getRootFindingStrategyType(),
 						IsomorphismCalculationUtil.getTimeLimitInSeconds());
 
-				FFaplInterpreter _running = new FFaplInterpreter(logger, properties, reader);
+				FFaplInterpreter _running = new FFaplInterpreter(logger, properties, null, reader);
 				ExecuteThread executeThread = new ExecuteThread(_running, null, null);
 				executeThread.start();
 			} catch (Exception e) {
