@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import sunset.gui.enums.Language;
+import ffapl.java.enums.Language;
 
 public class LanguageUtil {
 

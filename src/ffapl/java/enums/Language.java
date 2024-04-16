@@ -1,4 +1,4 @@
-package sunset.gui.enums;
+package ffapl.java.enums;
 
 import java.util.Locale;
 

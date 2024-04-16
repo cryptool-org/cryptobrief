@@ -3,7 +3,7 @@ package sunset.gui.util;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import sunset.gui.enums.Language;
+import ffapl.java.enums.Language;
 
 public class SunsetProperties {
 	

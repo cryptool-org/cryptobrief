@@ -161,6 +161,7 @@ public class Matrix<V extends IAlgebraicOperations<V>>
                 pos.set(1, j);
                 // unsafe cast as unavoidable consequence of the nested Object[]
                 // data structure used in ffapl.java.classes.Array
+                @SuppressWarnings("unchecked")
                 V value = (V) array.getValue(pos);
                 this.set(i + 1, j + 1, value);
             }

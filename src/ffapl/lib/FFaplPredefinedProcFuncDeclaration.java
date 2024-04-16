@@ -2,6 +2,7 @@ package ffapl.lib;
 
 import ffapl.exception.FFaplException;
 import ffapl.java.logging.FFaplLogger;
+import ffapl.java.util.FFaplReader;
 import ffapl.java.predefined.function.AESDecrypt;
 import ffapl.java.predefined.function.AESEncrypt;
 import ffapl.java.predefined.function.AESRawDecrypt;
@@ -54,8 +55,7 @@ public class FFaplPredefinedProcFuncDeclaration {
 	 * @param thread
 	 * @throws FFaplException
 	 */
-	public static void fill(ISymbolTable symbolTable, FFaplLogger logger, Thread thread) throws FFaplException{
-		
+	public static void fill(ISymbolTable symbolTable, FFaplLogger logger, FFaplReader reader, Thread thread) throws FFaplException{
 		Print.registerProcFunc(symbolTable, logger);
 		MaxBIntegerBInteger.registerProcFunc(symbolTable);
 		MinBIntegerBInteger.registerProcFunc(symbolTable);
@@ -82,26 +82,22 @@ public class FFaplPredefinedProcFuncDeclaration {
 		GetPolynomial.registerProcFunc(symbolTable);
 		ConvertToString.registerProcFunc(symbolTable);
 		Hash.registerProcFunc(symbolTable);
-		ReadFunctions.registerProcFunc(symbolTable, logger);
+		ReadFunctions.registerProcFunc(symbolTable, reader, logger);
 		Sqrt.registerProcFunc(symbolTable);
 		LegendreSymbol.registerProcFunc(symbolTable);
 		getXasInteger.registerProcFunc(symbolTable);
 		getYasInteger.registerProcFunc(symbolTable);
 		getXasPolynomial.registerProcFunc(symbolTable);
 		getYasPolynomial.registerProcFunc(symbolTable);
-		
+
 		TatePairing.registerProcFunc(symbolTable);
 		TatePairingWithOrder.registerProcFunc(symbolTable);
 		GetECPointOrder.registerProcFunc(symbolTable);
 		getECParameter.registerProcFunc(symbolTable);
-		
+
 		AESEncrypt.registerProcFunc(symbolTable);
 		AESDecrypt.registerProcFunc(symbolTable);
 		AESRawEncrypt.registerProcFunc(symbolTable);
 		AESRawDecrypt.registerProcFunc(symbolTable);
 	}
-	
-	
-	
-	
 }

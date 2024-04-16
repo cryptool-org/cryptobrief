@@ -102,6 +102,7 @@ import ffapl.java.interfaces.IJavaType;
 import ffapl.java.interfaces.IPseudoRandomGenerator;
 import ffapl.java.interfaces.ITrueRandomGenerator;
 import ffapl.java.logging.FFaplLogger;
+import ffapl.java.util.FFaplRuntimeProperties;
 import ffapl.lib.FFaplPreProcFuncSymbol;
 import ffapl.lib.FFaplProcFuncSymbol;
 import ffapl.lib.FFaplSymbol;
@@ -137,11 +138,11 @@ public class FFaplJavaInterpreterVisitor implements IRetArgVisitor<Object, Objec
 	 * @param logger
 	 * @param thread
 	 */
-	public FFaplJavaInterpreterVisitor(ISymbolTable symbolTable, FFaplLogger logger, Thread thread) {
+	public FFaplJavaInterpreterVisitor(ISymbolTable symbolTable, FFaplLogger logger, FFaplRuntimeProperties properties, Thread thread) {
 		_symbolTable = symbolTable;
 		_logger = logger;
 		_thread = thread;
-		_interpreter = new FFaplVm(_logger, _thread);
+		_interpreter = new FFaplVm(_logger, properties, _thread);
 		
 	}
 

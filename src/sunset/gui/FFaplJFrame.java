@@ -55,6 +55,7 @@ import javax.swing.tree.TreeSelectionModel;
 import ffapl.FFaplInterpreter;
 import ffapl.java.logging.FFaplConsoleHandler;
 import ffapl.java.logging.FFaplLogger;
+import ffapl.java.util.FFaplRuntimeProperties;
 
 import sunset.gui.api.APITreeCellRenderer;
 import sunset.gui.api.MutableTreeNodeHead;
@@ -100,6 +101,7 @@ import sunset.gui.search.listener.ActionListenerOpenReplaceDialog;
 import sunset.gui.search.listener.ActionListenerOpenSearchDialog;
 import sunset.gui.tabbedpane.JTabbedPaneCode;
 import sunset.gui.tabbedpane.JTabbedPaneNamed;
+import sunset.gui.util.IsomorphismCalculationUtil;
 import sunset.gui.util.SunsetBundle;
 import sunset.gui.util.TranslateGUIElements;
 
@@ -234,7 +236,12 @@ public class FFaplJFrame extends javax.swing.JFrame {
 
 				FFaplLogger logger = new FFaplLogger("FFaplLog");
 				logger.addObserver(new FFaplConsoleHandler());
-				FFaplInterpreter _running = new FFaplInterpreter(logger, reader);
+
+				FFaplRuntimeProperties properties = new FFaplRuntimeProperties(
+						IsomorphismCalculationUtil.getRootFindingStrategyType(),
+						IsomorphismCalculationUtil.getTimeLimitInSeconds());
+
+				FFaplInterpreter _running = new FFaplInterpreter(logger, properties, null, reader);
 				ExecuteThread executeThread = new ExecuteThread(_running, null, null);
 				executeThread.start();
 			} catch (Exception e) {

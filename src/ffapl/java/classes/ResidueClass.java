@@ -196,28 +196,29 @@ public class ResidueClass implements IJavaType<ResidueClass>, IAlgebraicOperatio
 	 * @throws FFaplAlgebraicException
 	 */
 	public void pow(BigInteger value) throws FFaplAlgebraicException{
-		//Algorithm from Montgomery Powering Ladder
-		List<Byte> v  = toByteList(value.abs());
-     	BigInteger r0 = ONE;
-		BigInteger r1;
+		////Algorithm from Montgomery Powering Ladder
+		//List<Byte> v  = toByteList(value.abs());
+		//BigInteger r0 = ONE;
+		//BigInteger r1;
 
-		if(value.compareTo(ZERO) <= 0){
-			 r1 = this.inverse().value();
-		}else{
-			 r1 = _value;
-		}
+		//if(value.compareTo(ZERO) <= 0){
+		//	 r1 = this.inverse().value();
+		//}else{
+		//	 r1 = _value;
+		//}
 
-		for (Byte bit : v) {
-			isRunning();
-			if (bit == 0) {
-				r1 = r0.multiply(r1).mod(_modulus);
-				r0 = r0.multiply(r0).mod(_modulus);
-			} else {
-				r0 = r1.multiply(r0).mod(_modulus);
-				r1 = r1.multiply(r1).mod(_modulus);
-			}
-		}
-        _value = r0;
+		//for (Byte bit : v) {
+		//	isRunning();
+		//	if (bit == 0) {
+		//		r1 = r0.multiply(r1).mod(_modulus);
+		//		r0 = r0.multiply(r0).mod(_modulus);
+		//	} else {
+		//		r0 = r1.multiply(r0).mod(_modulus);
+		//		r1 = r1.multiply(r1).mod(_modulus);
+		//	}
+		//}
+		//_value = r0;
+		_value = _value.modPow(value, _modulus);
 	}
 
 	/**

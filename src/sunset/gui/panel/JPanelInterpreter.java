@@ -10,8 +10,8 @@ import sunset.gui.interfaces.IFFaplComponent;
 import sunset.gui.interfaces.IProperties;
 import sunset.gui.logic.GUIPropertiesLogic;
 import sunset.gui.util.TranslateGUIElements;
+import sunset.gui.util.LoggerUtil;
 import ffapl.java.enums.LoggerMode;
-import ffapl.java.util.LoggerUtil;
 
 
 @SuppressWarnings("serial")
