@@ -19,6 +19,7 @@
 			<resource>
 				<directory>${project.build.sourceDirectory}/</directory>
 				<excludes>
+					<exclude>web/</exclude>
 					<exclude>**/*.java</exclude>
 					<exclude>**/*.jj</exclude>
 					<exclude>**/*pom.xml</exclude>
@@ -29,6 +30,11 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>web/</exclude>
+					</excludes>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>io.github.tulipcc</groupId>

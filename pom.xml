@@ -110,5 +110,17 @@
 				<module>src/sunset/pom.xml</module>
 			</modules>
 		</profile>
+		<profile>
+			<id>web</id>
+			<activation>
+				<property>
+					<name>web</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<modules>
+				<module>src/web/pom.xml</module>
+			</modules>
+		</profile>
 	</profiles>
 </project>
