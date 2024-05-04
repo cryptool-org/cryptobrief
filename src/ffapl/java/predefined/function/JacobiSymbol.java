@@ -40,7 +40,7 @@ public class JacobiSymbol implements IPredefinedProcFunc {
         b = (IJavaType) interpreter.popStack();
         a = (IJavaType) interpreter.popStack();
 
-        if (a.typeID() == IJavaType.GALOISFIELD && b.typeID() == IJavaType.GALOISFIELD) {
+        if (a.typeID() == IJavaType.POLYNOMIALRC && b.typeID() == IJavaType.POLYNOMIALRC) {
 
             result = Algorithm.jacobiSymbol((PolynomialRC) a, (PolynomialRC) b);
 
