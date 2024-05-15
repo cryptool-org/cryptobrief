@@ -48,7 +48,7 @@
 				<executions>
 					<execution>
 						<id>default-jar</id>
-						<phase>null</phase>
+						<phase>none</phase>
 					</execution>
 				</executions>
 			</plugin>
@@ -73,13 +73,11 @@
 					<groupId>org.teavm</groupId>
 					<artifactId>teavm-classlib</artifactId>
 					<version>${teavm.version}</version>
-					<scope>provided</scope>
 				</dependency>
 				<dependency>
 					<groupId>org.teavm</groupId>
 					<artifactId>teavm-jso-apis</artifactId>
 					<version>${teavm.version}</version>
-					<scope>provided</scope>
 				</dependency>
 			</dependencies>
 			<build>

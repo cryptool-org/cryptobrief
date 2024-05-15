@@ -7,13 +7,13 @@
 		<groupId>ao2.crypto</groupId>
 		<artifactId>sunset-ffapl</artifactId>
 		<version>2.1.2</version>
-		<relativePath>../../pom.xml</relativePath>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>sunset</artifactId>
 	<packaging>jar</packaging>
 	<build>
-		<sourceDirectory>../</sourceDirectory>
-		<directory>../../target/</directory>
+		<sourceDirectory>./</sourceDirectory>
+		<directory>../target/</directory>
 		<finalName>${project.artifactId}</finalName>
 		<resources>
 			<resource>
@@ -48,6 +48,27 @@
 							<Main-Class>sunset.gui.FFaplJFrame</Main-Class>
 						</manifestEntries>
 					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<skip>false</skip>
+					<executable>java</executable>
+					<arguments>
+						<argument>-classpath</argument>
+						<classpath />
+						<argument>sunset.gui.FFaplJFrame</argument>
+					</arguments>
 				</configuration>
 			</plugin>
 		</plugins>
