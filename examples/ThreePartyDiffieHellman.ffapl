@@ -1,4 +1,4 @@
-program calculate {
+program ThreePartyDiffieHellmanKeyExchange {
   const G: EC(GF(127,[x^2+1]), a4 := [5]) := << [121] , [95] >>;
 
   const g: Integer := 64; // order of G

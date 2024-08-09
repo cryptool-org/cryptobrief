@@ -1,0 +1,32 @@
+{
+  "author": "cryptool.org",
+  "license": "GPLv3",
+  "name": "cryptobrief-web",
+  "version": "2.1.2",
+  "files": [
+    "dist/cryptobrief-web.js",
+    "dist/cryptobrief-web.js.map"
+  ],
+  "main": "dist/cryptobrief-web.js",
+  "scripts": {
+    "compile": "mvn compile -P web",
+    "package": "node esbuild.mjs",
+    "build": "npm run compile && npm run package"
+  },
+  "browserslist": [
+    "chrome 64",
+    "edge 79",
+    "firefox 67",
+    "opera 51",
+    "safari 12"
+  ],
+  "devDependencies": {
+    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
+    "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
+    "browserify-cipher": "^1.0.1",
+    "browserslist": "^4.23.0",
+    "create-hash": "^1.2.0",
+    "esbuild": "^0.20.2",
+    "esbuild-plugin-browserslist": "^0.11.1"
+  }
+}

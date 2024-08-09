@@ -9,7 +9,7 @@ Unicode True
 ;--------------------------------
 ; Constants
 ;--------------------------------
-!define GET_JAVA_URL "http://www.java.com"
+!define GET_JAVA_URL "https://openjdk.org/"
  
 ;--------------------------------
 ; Variables
@@ -25,10 +25,10 @@ Unicode True
 
 # General Symbol Definitions
 !define REGKEY "SOFTWARE\$(^Name)"
-!define VERSION 2.1.2
-!define PRODUCT_VERSION 2.1.2.0
-!define COMPANY "Alpen-Adria Universitaet Klagenfurt"
-!define COPYRIGHT "Copyright 2013-2019, Alpen-Adria Universitaet Klagenfurt"
+!define VERSION 2.1.5
+!define PRODUCT_VERSION 2.1.5.0
+!define COMPANY "Johannes Kepler Universität Linz, Alpen-Adria Universitaet Klagenfurt"
+!define COPYRIGHT "Copyright 2013-2023, Johannes Kepler Universität Linz, Alpen-Adria Universitaet Klagenfurt"
 !define FILEDESCRIPTION "IDE for FFapl-Developer"
 
 
@@ -155,7 +155,7 @@ Function controlJava
     IDYES +1 IDNO +3
     StrCpy $JAVA_EXE ""
     Exec '"explorer.exe" ${GET_JAVA_URL}'
-    Abort
+    #Abort
  
     Done:
 FunctionEnd
@@ -286,17 +286,17 @@ FunctionEnd
 ;AUTHOR: Ashwin Jayaprakash
 ;WEBSITE: http://www.JavaForU.com
 ;--------------------------------
-LangString NOTINSTALLED_1 ${LANG_GERMAN} "Java Runtime Environment (JRE) ist nicht installiert auf ihrem System.$\nSie benötigen Version"
+LangString NOTINSTALLED_1 ${LANG_GERMAN} "Java Runtime Environment (JRE) ist scheinbar nicht registriert auf ihrem System.$\nSie benötigen Version"
 LangString NOTINSTALLED_2 ${LANG_GERMAN} "oder neuer um Sunset auszuführen. $\n$\nVersuchen Sie es erneut, sobald Sie die richtige JRE Version installiert haben. $\n$\nJava Runtime Environment jetzt laden?"
 
-LangString NOTINSTALLED_1 ${LANG_ENGLISH} "Java Runtime Environment (JRE) is not installed on your computer. $\nYou need version"
+LangString NOTINSTALLED_1 ${LANG_ENGLISH} "Java Runtime Environment (JRE) is seemingly not registered on your computer. $\nYou need version"
 LangString NOTINSTALLED_2 ${LANG_ENGLISH} "or newer to run Sunset.$\n$\nTry again as soon as you installed the right JRE version.  $\n$\nGet Java Runtime Environment now?"
 
-LangString WRONGVERSION_1 ${LANG_ENGLISH} "The version of Java Runtime Environment (JRE) installed on your computer is"
+LangString WRONGVERSION_1 ${LANG_ENGLISH} "The version of Java Runtime Environment (JRE) registered on your computer is"
 LangString WRONGVERSION_2 ${LANG_ENGLISH} ". $\nVersion"
 LangString WRONGVERSION_3 ${LANG_ENGLISH} "or newer is required to run this program.$\n$\nTry again as soon as you installed the right JRE version.$\n$\nGet Java Runtime Environment now?"
 
-LangString WRONGVERSION_1 ${LANG_GERMAN} "Die installierte Java Runtime Environment (JRE) Version auf ihrem System ist"
+LangString WRONGVERSION_1 ${LANG_GERMAN} "Die registrierte Java Runtime Environment (JRE) Version auf ihrem System ist"
 LangString WRONGVERSION_2 ${LANG_GERMAN} ". $\nVersion"
 LangString WRONGVERSION_3 ${LANG_GERMAN} "oder neuer wird benötigt um Sunset auszuführen.$\n$\nVersuchen Sie es erneut, sobald Sie die richtige JRE Version installiert haben.$\n$\nJava Runtime Environment jetzt laden?"
 

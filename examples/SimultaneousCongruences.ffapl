@@ -1,0 +1,95 @@
+program SimultaneousCongruencesTests{
+	
+	procedure three_coprime_moduli() {
+		moduli, congruences : Integer[];
+		result : Integer[];
+
+		moduli := {5, 11, 17};
+		congruences := {3, 7, 16};
+
+		result := crt(congruences, moduli);
+		println(str(result[0]) + " mod " + str(result[1]));	// should be 458 mod 935
+
+		if (result[0] == 458 AND result[1] == 935) {
+    			println("three_coprime_moduli - Test OKAY.");
+    		}
+	}
+
+	procedure partially_noncoprime_moduli() {
+		moduli, congruences : Integer[];
+		result : Integer[];
+
+		moduli := {1473,1234,1827};
+		congruences := {1031,1141,50};
+
+		result := crt(congruences, moduli);
+		println(str(result[0]) + " mod " + str(result[1]));	// should be 458 mod 935
+
+		if (result[0] == 1024360583 AND result[1] == 1106968338) {
+    			println("partially_noncoprime_moduli - Test OKAY.");
+    		}
+	}
+
+	procedure only_one_congruence() {
+		moduli, congruences : Integer[];
+		result : Integer[];
+
+		moduli := {1473};
+		congruences := {1031};
+
+		result := crt(congruences, moduli);
+		println(str(result[0]) + " mod " + str(result[1]));	// should be 1031 mod 1473
+
+		if (result[0] == 1031 AND result[1] == 1473) {
+    			println("only_one_congruence - Test OKAY.");
+    		}
+	}
+
+	procedure congruence_larger_than_module() {
+		moduli, congruences : Integer[];
+		result : Integer[];
+
+		moduli := {2};
+		congruences := {7};
+
+		result := crt(congruences, moduli);
+		println(str(result[0]) + " mod " + str(result[1]));	// should be 1 mod 2
+
+		if (result[0] == 1 AND result[1] == 2) {
+    			println("congruence_larger_than_module - Test OKAY.");
+    		}
+	}
+
+	procedure duplicated_congruence_equations() {
+		moduli, congruences : Integer[];
+		result : Integer[];
+
+		moduli := {7, 7};
+		congruences := {2, 2};
+
+		result := crt(congruences, moduli);
+		println(str(result[0]) + " mod " + str(result[1]));	// should be 2 mod 7
+
+		if (result[0] == 2 AND result[1] == 7) {
+    			println("duplicated_congruence_equations - Test OKAY.");
+    		}
+	}
+
+	procedure unsuccessful_crt_throws_error() {
+		moduli, congruences : Integer[];
+		result : Integer[];
+
+		moduli := {60, 81};
+		congruences := {2, 3};
+
+		result := crt(congruences, moduli);
+		println(result);
+	}
+	
+	three_coprime_moduli();
+	partially_noncoprime_moduli();
+	only_one_congruence();
+	congruence_larger_than_module();
+	duplicated_congruence_equations();
+	unsuccessful_crt_throws_error();
+}

@@ -1,0 +1,9 @@
+program FieldIsomorphism_easy {
+    a : GF(2, [x^3+x+1]);
+    b : GF(2, [x^3+x^2+1]);
+
+    a := [x];
+    b := a;
+
+    println(b);
+}

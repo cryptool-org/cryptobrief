@@ -1357,6 +1357,11 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 	}
 
 	public boolean equalEC(EllipticCurve ec) throws FFaplAlgebraicException{
+		// if one of the values is a literal with no associated curve,
+		// the values are regarded as compatible
+		if (!this.parametersSet() || !ec.parametersSet())
+			return true;
+
 		if (this.isGf() != ec.isGf())
 		{
 			return false;
@@ -1517,7 +1522,7 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 
 					// thus y = +- sqrt( -C(x) )
 					// however, in GF(2^n) these two solutions are identical
-					_y_gf = Algorithm.sqrt(c).value();
+					_y_gf = Algorithm.sqrt(c,null).value();
 
 				} else { // B(x) != 0
 
@@ -1582,7 +1587,7 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 				d.divide(valueOf(4));
 				d.subtract(c); //b^2/4 - c
 
-				d.setValue(Algorithm.sqrt(d).value());
+				d.setValue(Algorithm.sqrt(d,null).value());
 				
 				foo.setValue(b.value());
 				foo.divide(TWO);
@@ -1755,26 +1760,25 @@ public class EllipticCurve implements IJavaType<EllipticCurve>, Comparable<Ellip
 
 	public boolean equals(EllipticCurve ec) throws FFaplAlgebraicException
 	{
-		/*
-		 * Wenn beide Point at Infinity sind
-		 * UND mindestens eines der beiden ein Literal ist (parametersSet==true)
-		 * dann sind sie gleich --> return true;
-		 *
-		 * Wenn beide Point at Infinity sind
-		 * und sie denselben Grundkörper haben
-		 * dann sind sie ebenfalls gleich --> return true;
-		 */
-		if (this._isPAI && ec._isPAI && (!this.parametersSet() || !ec.parametersSet()))
-		{
-			return true;
-		}
-		else if (this._isPAI && ec._isPAI && this.equalEC(ec))
-		{
-			return true;
+		// note: the following structure guarantees that no literal <<PAI>> values
+		// will be handed to .equalEC
+
+		// if one is PAI, it suffices to check if the other is PAI as well (and compatible)
+		if (this._isPAI || ec._isPAI) {
+			// if the other is not PAI, they are clearly not equal
+			if (!(this._isPAI && ec._isPAI))
+				return false;
+
+			// if one is a literal (not associated with any specific EC), they are compatible
+			if (!this.parametersSet() || !ec.parametersSet())
+				return true;
+
+			// otherwise, compare their ECs
+			return this.equalEC(ec);
 		}
 
 		/*
-		 * Ansonsten wird ÌberprÌft ob es sich um denselben Grundkörper handelt
+		 * Ansonsten wird ueberprueft ob es sich um denselben Grundkörper handelt
 		 */
 		if (! this.equalEC(ec))
 		{

@@ -25,15 +25,19 @@ public class IProperties {
 	public final static String LASTDIRSAVE = "LAST.DIR.SAVED";
 	public final static String GUIFontFamily = "Sans-Serif";
 	public final static String IMAGEPATH = "sunset/gui/images/";
+	public final static String SEARCHHELPPATH = "sunset/gui/search/help/";
 	public final static String APPTITLE = "FFapl {0} Sunset";
 	public final static String APPVERSION = "2.1";
 	public final static String SHOW_API = "SHOW.API";
 	public final static String GUI_WIDTH = "GUI.WIDTH";
 	public final static String GUI_HEIGHT = "GUI.HEIGHT";
-	public final static String GUI_DIVIDER_CONSOLE = "DIVIDER.CONSOLE";
-	public final static String GUI_DIVIDER_API = "DIVIDER.API";
+	public final static String GUI_DIVIDER_CONSOLE = "GUI.DIVIDER.CONSOLE";
+	public final static String GUI_DIVIDER_API = "GUI.DIVIDER.API";
 	public final static String GUI_MAXIMIZED = "GUI.MAXIMIZED";
+	public final static String GUI_SEARCH_PAIRS = "GUI.SEARCH.PAIRS";
 	public final static String LOGGER_MODE = "LOGGER.MODE";
+	public final static String ISOMORPHISM_CALCULATION_TIME_LIMIT = "ISOCALC.TIMELIMIT";
+	public final static String ISOMORPHISM_CALCULATION_ROOT_FINDING_STRATEGY = "ISOCALC.ROOTFINDING";
 	public final static String SYSTEM = "SYSTEM";
 
 	public static String getInstallPath() {

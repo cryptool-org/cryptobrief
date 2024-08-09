@@ -3,7 +3,7 @@ package ffapl.utils;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import sunset.gui.enums.Language;
+import ffapl.java.enums.Language;
 
 public class FFaplProperties {
 	

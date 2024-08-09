@@ -4,7 +4,7 @@
 package ffapl.java.classes;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
+//import java.security.SecureRandom;
 
 import ffapl.java.exception.FFaplAlgebraicException;
 import ffapl.java.interfaces.IJavaType;
@@ -25,7 +25,7 @@ public class PRNG_Standard implements IPseudoRandomGenerator {
 
 	private Thread _thread;
 	private BInteger _seed;
-	private SecureRandom rg ;
+	//private SecureRandom rg ;
 	private BInteger _max;
 	private JString _current; // current value of the hash chain
 	private int _exp;  // exponent to stretch the 256 bit hash into the sought length (not claiming this to be anyhow cryptographically justified or advisable)
@@ -41,8 +41,8 @@ public class PRNG_Standard implements IPseudoRandomGenerator {
 	 */
 	public PRNG_Standard (BigInteger seed, BigInteger max, Thread thread) throws FFaplAlgebraicException{
 		
-		rg = new SecureRandom();
-		rg.setSeed(seed.toByteArray());
+		//rg = new SecureRandom();
+		//rg.setSeed(seed.toByteArray());
 		
 		_thread = thread;
 		_seed = new BInteger(seed, thread);	

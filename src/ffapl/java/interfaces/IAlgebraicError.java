@@ -139,6 +139,23 @@ public interface IAlgebraicError {
 	public static final int NOT_IMPLEMENTED = 9999;
 
 
+	/** Different array lengths for congruences and moduli **/
+	public static final int CRT_DIFFERENT_ARRAY_LENGTHS = 1300;
+	/** Array is empty, non-empty expected **/
+	public static final int CRT_ARRAY_EMPTY = 1301;
+	/** Zeroes or negative values in moduli array detected **/
+	public static final int CRT_ZERO_OR_NEGATIVE_MODULES = 1302;
+	/** No solution for given simultaneous congruences problem **/
+	public static final int CRT_NO_SOLUTION = 1303;
+	/** Characteristics of moduli array and congruences array are not equal **/
+	public static final int CRT_CHARACTERISTICS_MISMATCH = 1304;
+
+	/** Isomorphism calculation timed out **/
+	public static final int ISO_TIMEOUT = 1400;
+	/** Fields are not equal **/
+	public static final int FIELDS_UNEQUAL = 1401;
+
+
     /**
 	 * Return the compiler error number.
 	 * @return error number

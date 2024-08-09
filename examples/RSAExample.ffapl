@@ -8,7 +8,7 @@ program RSAExample{
 	X: RandomGenerator(n);
 	m := 123456789;	// this is our message
 	e := 2*X+1;    // draw an odd random number	
-	d := 1/e;  // determine e such that e*d = 1 (mod n)	
+	d := 1/e;  // determine e such that e*d = 1 (mod phi)	
 	c := m^e;  // encryption of the message m	
 	m := c^d;  // decryption of the ciphertext c
 	println("c = " + c);

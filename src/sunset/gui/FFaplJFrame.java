@@ -6,9 +6,16 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.Image;
+import java.awt.KeyboardFocusManager;
 import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.text.MessageFormat;
@@ -25,6 +32,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -47,6 +55,7 @@ import javax.swing.tree.TreeSelectionModel;
 import ffapl.FFaplInterpreter;
 import ffapl.java.logging.FFaplConsoleHandler;
 import ffapl.java.logging.FFaplLogger;
+import ffapl.java.util.FFaplRuntimeProperties;
 
 import sunset.gui.api.APITreeCellRenderer;
 import sunset.gui.api.MutableTreeNodeHead;
@@ -87,7 +96,12 @@ import sunset.gui.logic.ApiLogic;
 import sunset.gui.logic.GUIPropertiesLogic;
 import sunset.gui.panel.JPanelCode;
 import sunset.gui.panel.JPanelTabTitle;
+import sunset.gui.search.SearchReplaceDialogOwner;
+import sunset.gui.search.listener.ActionListenerOpenReplaceDialog;
+import sunset.gui.search.listener.ActionListenerOpenSearchDialog;
 import sunset.gui.tabbedpane.JTabbedPaneCode;
+import sunset.gui.tabbedpane.JTabbedPaneNamed;
+import sunset.gui.util.IsomorphismCalculationUtil;
 import sunset.gui.util.SunsetBundle;
 import sunset.gui.util.TranslateGUIElements;
 
@@ -112,10 +126,11 @@ public class FFaplJFrame extends javax.swing.JFrame {
 	private JMenu jMenuFile;
 	private JMenu jMenuExtras;
 	private JMenu jMenuEdit;
+	private JMenu jMenuSearch;
 	private JMenu jMenuRun;
 	private JMenu jMenuView;
-	private JTabbedPane jTabbedPane_info;
-	private JTabbedPane jTabbedPane_Code;
+	private JTabbedPaneNamed jTabbedPane_info;
+	private static JTabbedPane jTabbedPane_Code;
 	private JSplitPane jSplitPane_main;
 	private JSplitPane jSplitPane_mainmain;
 	// private JSplitPane jSplitPane_API;
@@ -163,6 +178,8 @@ public class FFaplJFrame extends javax.swing.JFrame {
 	private JCheckBoxMenuItem jCheckBoxMenuItem_Api;
 	private JMenuItem jMenuItem_ZoomIn;
 	private JMenuItem jMenuItem_ZoomOut;
+	private JMenuItem jMenuItem_Search;
+	private JMenuItem jMenuItem_Replace;
 	private JMenu jMenuHelp;
 	private JLabel _lineColumnPosition;
 	private JLabel _lineColumnTxt;
@@ -219,7 +236,12 @@ public class FFaplJFrame extends javax.swing.JFrame {
 
 				FFaplLogger logger = new FFaplLogger("FFaplLog");
 				logger.addObserver(new FFaplConsoleHandler());
-				FFaplInterpreter _running = new FFaplInterpreter(logger, reader);
+
+				FFaplRuntimeProperties properties = new FFaplRuntimeProperties(
+						IsomorphismCalculationUtil.getRootFindingStrategyType(),
+						IsomorphismCalculationUtil.getTimeLimitInSeconds());
+
+				FFaplInterpreter _running = new FFaplInterpreter(logger, properties, null, reader);
 				ExecuteThread executeThread = new ExecuteThread(_running, null, null);
 				executeThread.start();
 			} catch (Exception e) {
@@ -251,6 +273,7 @@ public class FFaplJFrame extends javax.swing.JFrame {
 		}
 
 		List<Image> icons = new ArrayList<Image>();
+		
 		icons.add((new ImageIcon(getClass().getClassLoader().getResource(
 				IProperties.IMAGEPATH + "sunset16.png")).getImage()));
 		icons.add((new ImageIcon(getClass().getClassLoader().getResource(
@@ -325,19 +348,15 @@ public class FFaplJFrame extends javax.swing.JFrame {
 	 * Store the GUI Properties to the file
 	 */
 	public void storeGUIProperties() {
-		GUIPropertiesLogic.getInstance().setProperty(IProperties.GUI_HEIGHT,
-				String.valueOf(this.getHeight()));
-		GUIPropertiesLogic.getInstance().setIntegerProperty(
-				IProperties.GUI_WIDTH, this.getWidth());
+		if (!(this.getExtendedState() == Frame.MAXIMIZED_BOTH)) {
+			GUIPropertiesLogic.getInstance().setProperty(IProperties.GUI_HEIGHT,
+					String.valueOf(this.getHeight()));
+			GUIPropertiesLogic.getInstance().setIntegerProperty(
+					IProperties.GUI_WIDTH, this.getWidth());
+		}
 		GUIPropertiesLogic.getInstance().setBooleanProperty(
 				IProperties.GUI_MAXIMIZED,
 				this.getExtendedState() == Frame.MAXIMIZED_BOTH);
-		GUIPropertiesLogic.getInstance().setIntegerProperty(
-				IProperties.GUI_DIVIDER_API,
-				jSplitPane_mainmain.getDividerLocation());
-		GUIPropertiesLogic.getInstance().setIntegerProperty(
-				IProperties.GUI_DIVIDER_CONSOLE,
-				jSplitPane_main.getDividerLocation());
 		GUIPropertiesLogic.getInstance().storePropertyFile();
 	}
 
@@ -517,6 +536,9 @@ public class FFaplJFrame extends javax.swing.JFrame {
 
 				getContentPane().add(jSplitPane_mainmain, BorderLayout.CENTER);
 				jSplitPane_mainmain.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+				jSplitPane_mainmain.setResizeWeight(0.7);
+				jSplitPane_mainmain.setContinuousLayout(true);
+				
 				// jSplitPane_mainmain.setPreferredSize(new
 				// java.awt.Dimension(954, 489));
 
@@ -566,6 +588,8 @@ public class FFaplJFrame extends javax.swing.JFrame {
 				jSplitPane_mainmain.add(jSplitPane_main, JSplitPane.TOP);
 				// getContentPane().add(jSplitPane_main, BorderLayout.CENTER);
 				jSplitPane_main.setOrientation(JSplitPane.VERTICAL_SPLIT);
+				jSplitPane_main.setResizeWeight(0.55);
+				jSplitPane_main.setContinuousLayout(true);
 
 				{
 					jTabbedPane_Code = new JTabbedPaneCode();
@@ -589,6 +613,8 @@ public class FFaplJFrame extends javax.swing.JFrame {
 						if (((JPanelCode) jPanel_code).loadFile(_openFile)) {
 							filename = _openFile.getName();
 						}
+						jPanel_code.getInputMap()
+						.put(KeyStroke.getKeyStroke("ctrl H"), "none");
 						jTabbedPane_Code.addTab(filename, jPanel_code);
 						jTabbedPane_Code.setTabComponentAt(0,
 								new JPanelTabTitle(jTabbedPane_Code,
@@ -599,10 +625,12 @@ public class FFaplJFrame extends javax.swing.JFrame {
 						this.setTitle(MessageFormat.format(
 								IProperties.APPTITLE, "- " + filename + " -"));
 						jTabbedPane_Code.setSelectedIndex(0);
+						getCurrentCodePanel().getCodePane().getInputMap()
+						.put(KeyStroke.getKeyStroke("ctrl H"), "none");
 					}
 				}
 				{
-					jTabbedPane_info = new JTabbedPane();
+					jTabbedPane_info = new JTabbedPaneNamed();
 					jSplitPane_main.add(jTabbedPane_info, JSplitPane.BOTTOM);
 					// jTabbedPane_info.setPreferredSize(new
 					// java.awt.Dimension(952, 162));
@@ -617,7 +645,7 @@ public class FFaplJFrame extends javax.swing.JFrame {
 						jPanel_console.add(jScrollPane_Console, BorderLayout.CENTER);
 						jPanel_console.add(jTextField_input, BorderLayout.AFTER_LAST_LINE);
 						jTabbedPane_info.addTab("Console", null,
-								jPanel_console, null);
+								jPanel_console, null, "tabbedPane_tabconsole");
 						jScrollPane_Console
 						.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 						// jScrollPane_Console.setAutoscrolls(true);
@@ -843,6 +871,27 @@ public class FFaplJFrame extends javax.swing.JFrame {
 								KeyEvent.VK_V, ActionEvent.CTRL_MASK));
 					}
 
+					jMenuSearch = new JMenu();
+					jMenuBarMain.add(jMenuSearch);
+					jMenuSearch.setText("Search");
+					jMenuSearch.setName("menu_search");
+					{
+						jMenuItem_Search = new JMenuItem();
+						jMenuSearch.add(jMenuItem_Search);
+						jMenuItem_Search.setText("Search");
+						jMenuItem_Search.setName("menuitem_search");
+						jMenuItem_Search.setAccelerator(KeyStroke.getKeyStroke(
+								KeyEvent.VK_F, ActionEvent.CTRL_MASK));
+						
+						jMenuItem_Replace = new JMenuItem();
+						jMenuSearch.add(jMenuItem_Replace);
+						jMenuItem_Replace.setText("Replace");
+						jMenuItem_Replace.setName("menuitem_replace");
+						jMenuItem_Replace.setAccelerator(KeyStroke.getKeyStroke(
+								KeyEvent.VK_H, ActionEvent.CTRL_MASK));
+						
+					}
+					
 					jMenuRun = new JMenu();
 					jMenuBarMain.add(jMenuRun);
 					jMenuRun.setText("Run");
@@ -970,22 +1019,17 @@ public class FFaplJFrame extends javax.swing.JFrame {
 				if (GUIPropertiesLogic.getInstance().getBooleanProperty(
 						IProperties.GUI_MAXIMIZED)) {
 					this.setExtendedState(Frame.MAXIMIZED_BOTH);
-				} else {
-					this.setSize(
-							GUIPropertiesLogic.getInstance()
-							.getIntegerProperty(IProperties.GUI_WIDTH),
-							GUIPropertiesLogic.getInstance()
-							.getIntegerProperty(
-									(IProperties.GUI_HEIGHT)));
 				}
-				// pack();
-				jSplitPane_main.setDividerLocation(GUIPropertiesLogic
-						.getInstance().getIntegerProperty(
-								IProperties.GUI_DIVIDER_CONSOLE));
-				jSplitPane_mainmain.setDividerLocation(GUIPropertiesLogic
-						.getInstance().getIntegerProperty(
-								IProperties.GUI_DIVIDER_API));
-
+				
+				this.setSize(
+						GUIPropertiesLogic.getInstance()
+						.getIntegerProperty(IProperties.GUI_WIDTH),
+						GUIPropertiesLogic.getInstance()
+						.getIntegerProperty(
+								(IProperties.GUI_HEIGHT)));
+				
+				jSplitPane_main.setDividerLocation((int)(this.getHeight()*0.55));
+				jSplitPane_mainmain.setDividerLocation((int)(this.getWidth()*0.7));
 			} catch (Exception ee) {
 				this.setSize(970, 600);
 				jSplitPane_main.setDividerLocation(380);
@@ -1077,9 +1121,12 @@ public class FFaplJFrame extends javax.swing.JFrame {
 		setDropTarget(new DropTarget(this, new DropTargetListenerFile(this,
 				(JTabbedPaneCode) jTabbedPane_Code, _undoComp, _redoComp,
 				_saveComp, _saveAllComp, _lineColumnPosition)));
+		SearchReplaceDialogOwner searchReplaceDialogOwner = new SearchReplaceDialogOwner(this);
+		jMenuItem_Search.addActionListener(new ActionListenerOpenSearchDialog(searchReplaceDialogOwner));
+		jMenuItem_Replace.addActionListener(new ActionListenerOpenReplaceDialog(searchReplaceDialogOwner));
 		jTabbedPane_Code.addChangeListener(new ChangeListenerSelectedTab(this,
 				jScrollPane_Console, jTextField_input, _undoComp, _redoComp, _saveComp,
-				_saveAllComp, _closeTabComp, _closeAllTabComp, jPanel_status));
+				_saveAllComp, _closeTabComp, _closeAllTabComp, jPanel_status, searchReplaceDialogOwner));
 		_lineColumnPosition.addMouseListener(new MouseListenerChooseLineNumber(
 				this, (JTabbedPaneCode) jTabbedPane_Code));
 		_lineColumnTxt.addMouseListener(new MouseListenerChooseLineNumber(this,
@@ -1212,5 +1259,9 @@ public class FFaplJFrame extends javax.swing.JFrame {
 
 	public static Vector<Component> getStartComp(){
 		return _startComp;
+	}
+	
+	public static JPanelCode getCurrentCodePanel() {		
+		return (JPanelCode)jTabbedPane_Code.getSelectedComponent();
 	}
 }

@@ -83,6 +83,7 @@ import ffapl.ast.nodes.FFaplNodeType;
 import ffapl.ast.nodes.interfaces.INode;
 import ffapl.exception.FFaplException;
 import ffapl.java.logging.FFaplLogger;
+import ffapl.java.util.FFaplReader;
 import ffapl.lib.FFaplAttribute;
 import ffapl.lib.FFaplAttributeOperation;
 import ffapl.lib.FFaplPredefinedProcFuncDeclaration;
@@ -117,15 +118,17 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 	private ISymbolTable _symbolTable;
 	private IAttributeOperation _attribOperation;
 	private FFaplLogger _logger;
+	private FFaplReader _inputReader;
 	private Thread _thread;
-	
-	public FFaplSymbolTypeCheckingVisitor( ISymbolTable symbolTable, FFaplLogger logger, Thread thread) {
+
+	public FFaplSymbolTypeCheckingVisitor(ISymbolTable symbolTable, FFaplLogger logger, FFaplReader reader, Thread thread) {
 		_symbolTable = symbolTable;
 		_logger = logger;
+		_inputReader = reader;
 		_thread = thread;
 		_attribOperation = new FFaplAttributeOperation(_logger);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see ffapl.visitor.interfaces.IVoidVisitor#visit(ffapl.ast.nodes.ASTAddExpr)
 	 */
@@ -1309,7 +1312,7 @@ public class FFaplSymbolTypeCheckingVisitor implements IRetArgVisitor<Vector<IAt
 			node.setSymbolScope(_symbolTable.currentScope());//sets the scope of the current node
 			
 			//Predefined procedures
-			FFaplPredefinedProcFuncDeclaration.fill(_symbolTable, _logger, _thread);
+			FFaplPredefinedProcFuncDeclaration.fill(_symbolTable, _logger, _inputReader, _thread);
 			
 			node._node1.accept(this, symbol);
 			node._node2.accept(this, symbol);

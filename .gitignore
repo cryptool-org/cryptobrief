@@ -13,3 +13,9 @@ out/
 *.iws
 *.iml
 *.ipr
+
+# Maven
+.flattened-pom.xml
+
+# NPM
+node_modules/

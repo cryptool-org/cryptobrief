@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import sunset.gui.FFaplJFrame;
@@ -21,6 +22,7 @@ import sunset.gui.FFaplJFrame;
 import sunset.gui.editor.FFaplCodeTextPane;
 import sunset.gui.interfaces.IProperties;
 import sunset.gui.panel.JPanelCode;
+import sunset.gui.search.SearchReplaceDialogOwner;
 import sunset.gui.tabbedpane.JTabbedPaneCode;
 
 
@@ -41,6 +43,7 @@ public class ChangeListenerSelectedTab implements ChangeListener {
         private JTextField _inputTextField;
 	private JFrame _owner;
 	private JPanel _lineNumber;
+	private SearchReplaceDialogOwner _searchReplaceDialogOwner;
 	
 	/**
 	 * 
@@ -52,7 +55,7 @@ public class ChangeListenerSelectedTab implements ChangeListener {
 	public ChangeListenerSelectedTab(JFrame owner, Container consoleContainer, JTextField inputTextField, Vector<Component> undoComp, Vector<Component> redoComp, 
 									 Vector<Component> saveComp, Vector<Component> saveAllComp,
 									 Vector<Component> closeTabComp, Vector<Component> closeAllTabComp,
-									 JPanel lineNumber) {
+									 JPanel lineNumber, SearchReplaceDialogOwner searchReplaceDialogOwner) {
 		_undoComp = undoComp;
 		_redoComp = redoComp;
 		_saveComp = saveComp;
@@ -63,6 +66,7 @@ public class ChangeListenerSelectedTab implements ChangeListener {
 		_closeTabComp = closeTabComp;
 		_closeAllTabComp = closeAllTabComp;
 		_lineNumber = lineNumber;
+		_searchReplaceDialogOwner = searchReplaceDialogOwner;
 	}
 
 	/* (non-Javadoc)
@@ -78,6 +82,7 @@ public class ChangeListenerSelectedTab implements ChangeListener {
 		Component comp;
 		if(codeTextPane != null){
 			_owner.setTitle(MessageFormat.format(IProperties.APPTITLE,"- " + codePanel.getTitle() + " -"));
+			codeTextPane.getInputMap().put(KeyStroke.getKeyStroke("ctrl H"), "none");
 			setEnabled(_undoComp, codeTextPane.getManager().canUndo());
 			setEnabled(_redoComp, codeTextPane.getManager().canRedo());
 			setEnabled(_saveComp, !codeTextPane.isSaved());
@@ -85,6 +90,7 @@ public class ChangeListenerSelectedTab implements ChangeListener {
 			setEnabled(_closeAllTabComp, true);
 			setEnabled(_closeTabComp, true);
 			_lineNumber.setVisible(true);
+			_searchReplaceDialogOwner.setFileOpened(true);
 			for (int i = 0; i < tabbedPane.getTabCount(); i++){
 				comp = tabbedPane.getComponentAt(i);
 				if(comp instanceof JPanelCode){
@@ -130,6 +136,7 @@ public class ChangeListenerSelectedTab implements ChangeListener {
 			setEnabled(_saveComp, false);
 			setEnabled(_saveAllComp, false);
 			_lineNumber.setVisible(false);
+			_searchReplaceDialogOwner.setFileOpened(false);
 		}
 	}
 

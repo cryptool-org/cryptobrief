@@ -1,4 +1,4 @@
-program calculate{
+program IODemo {
 	P,Q,R: EC(Z(107), a4 := -1);
 	x,y,z: EC(Z(31), a4 := -1);
 	k: Integer;

@@ -2,10 +2,14 @@ package ffapl.java.math;
 
 import ffapl.FFaplInterpreter;
 import ffapl.exception.FFaplException;
+import ffapl.exception.FFaplWarning;
 import ffapl.java.classes.*;
 import ffapl.java.exception.FFaplAlgebraicException;
 import ffapl.java.interfaces.IAlgebraicError;
+import ffapl.java.interfaces.ILevel;
 import ffapl.java.interfaces.IRandomGenerator;
+import ffapl.java.logging.FFaplLogger;
+import ffapl.java.math.isomorphism.calculation.linearfactor.PolynomialGF;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -225,7 +229,7 @@ public class Algorithm {
 		
 		return g;
 	}
-	
+
 	/**
 	 * Great common divisor of g(x) and h(x)
 	 * based on: Handbook of applied Cryptography Algorithm: 2.218
@@ -436,6 +440,49 @@ public class Algorithm {
 		return s;
 	}
 
+
+	/**
+	 * Repeated square-and-multiply algorithm for exponentiation
+	 * calculates g^k
+	 * @param g
+	 * @param k
+	 * @return
+	 * @throws FFaplAlgebraicException
+	 */
+	public static PolynomialGF squareAndMultiply(PolynomialGF g,
+											   BigInteger k) throws FFaplAlgebraicException{
+		PolynomialGF s, G;
+		Thread thread = g.getThread();
+		//s=1
+		GaloisField oneCoefficient = g.field();
+		oneCoefficient.setValue(new Polynomial(ONE, ZERO, thread));
+		s = new PolynomialGF(oneCoefficient, ZERO, g.field(), thread);;
+
+		//If k = 0 then return (s)
+		if(k.equals(ZERO)){
+			return s;
+		}
+		//G <- g
+		G = g.clone();
+
+		if(k.testBit(0)){
+			s = g.clone();
+		}
+
+		for (int i = 1; i < k.bitLength() ; i++){
+			//G <- G^2
+			isRunning(thread);//to interrupt calculation
+			G.multiply(G);
+			//if ki = 1
+			if(k.testBit(i)){
+				//s <- G*s
+				s.multiply(G);
+			}
+		}
+		return s;
+	}
+
+
 	/**
 	 * Repeated square-and-multiply algorithm for exponentiation 
 	 * calculates g^k
@@ -552,10 +599,10 @@ public class Algorithm {
 	 * square root for gf elements
 	 * @throws FFaplAlgebraicException 
 	 */
-	public static GaloisField sqrt(GaloisField a) throws FFaplAlgebraicException
+	public static GaloisField sqrt(GaloisField a, FFaplLogger logger) throws FFaplAlgebraicException
 	{
 		a = a.clone(); //don't change the original value
-		GaloisField g,b,h, aux3, aux4;
+		GaloisField g,b,h, aux3, aux4, aux5;
 		g = a.clone();
 		b = a.clone();
 		h = a.clone();
@@ -617,9 +664,20 @@ public class Algorithm {
 			b = aux4.clone();
 			b.multiply(aux3);
 			
+			aux5 = b.clone();
+			aux5.multiply(aux5);
+			
+			// check if b is square root of a (b^2==a)
+			if (aux5.compareTo(a) != 0) {
+				// if not, a has no square root, therefore return 0
+				b.setValue(new Polynomial(ZERO,ZERO,a.getThread()));
+				
+				if (logger != null) {
+					logger.log(ILevel.WARNING, "Warning: " + a + " has no square root. Returning 0.\n");
+				}
+			}
 		}
-		
-		
+
 		return b;
 	}
 	
@@ -1136,7 +1194,9 @@ public class Algorithm {
 
 			TreeMap<BigInteger, BigInteger> tmp;
 			if (factorizationCache != null && ((tmp = factorizationCache.get(n)) != null)) {
-				return (TreeMap<BigInteger, BigInteger>) tmp.clone();
+				@SuppressWarnings("unchecked")
+				TreeMap<BigInteger, BigInteger> clone = (TreeMap<BigInteger, BigInteger>) tmp.clone();
+				return clone;
 
 			} else if (isProbablePrime(n, 100)) {
 				addPrimeFactor(result, n);
@@ -1902,7 +1962,7 @@ public class Algorithm {
 	  * @param thread
 	  * @throws FFaplException
 	  */
-	  private static void isRunning(Thread thread) throws FFaplAlgebraicException
+	  public static void isRunning(Thread thread) throws FFaplAlgebraicException
 	  {
 		if(thread != null){
 			if(thread.isInterrupted()){

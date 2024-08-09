@@ -2,6 +2,10 @@
 **Sunset** is the name of the integrated development enviroment that embodies
 the compiler for the **finite field application language (FFapl)**.
 
+Why? ...try locating yourself on any of the four grid places, to get an answer as to *why should I be interested?*
+
+![Where would you put yourself in terms of programming/number theory skills?](https://github.com/stefan-rass/sunset-ffapl/blob/master/why-sunset.png)
+
 Sunset/FFapl is an eLearning tool, following a simple philosophy: *implementing
 cryptographic protocols and algorithms should be easy!*
 
@@ -10,7 +14,7 @@ schemes as *native data types*. For example, to work in the group of residuals
 modulo some prime number p, one simply declares the prime as a constant and the
 variables to work with in the group.
 ```Java
-const: p: Prime := 13;
+const p: Prime := 13;
 g: Z(p);  // this puts all computations on g into the finite field of size (and characteristic) p
 g := 7^(-1);  // compute the inverse of 7 mod 13 directly
 g := 10^246434565635423565234454352; // do fast exponentiation
@@ -56,13 +60,16 @@ Contributions by the following people so far is thankfully acknowledged:
 * Johannes Winkler: elliptic curve support (including pairings)
 * Volker Bugl: I/O support and IDE additions
 * Markus Wiltsche: API extensions
-* Max-Julian Jakobitsch: Implemented random points on elliptic curves over fields of degree 2
-* Manuel Langer: fixed compatibility issues with Java 9 (removal of deprecated classes like JAXB)
+* Max-Julian Jakobitsch: Implemented random points on elliptic curves over fields of degree 2, plus fixing various bugs 
+* Manuel Langer: fixed compatibility issues with Java 9 (removal of deprecated classes like JAXB), numerous bugfixes and integration of advanced search & replace function in the GUI
+* Dominic Weinberger: support for typecasts by isomorphism between Galois fields of the same order
 
 For questions and other inquiries, feel free to send an email to the repository maintainer [Stefan Rass](mailto:stefan.rass@aau.at?subject=Sunset-FFapl)
 
 # Installation Instructions
 The folder [nsis_installer](https://github.com/stefan-rass/sunset-ffapl/tree/master/nsis_installer) contains a Windows installer that can be downloaded and installed as it is. For all other platforms, feel free to copy the subfolder [nsis_installer/sunset](https://github.com/stefan-rass/sunset-ffapl/tree/master/nsis_installer/sunset) to any place on your computer and run `sunset.jar` (requires Java 9 Runtime or later).
+
+**Note**: to avoid a bug in the JDK Swing classes [reported here](https://stackoverflow.com/questions/13575224/comparison-method-violates-its-general-contract-timsort-and-gridlayout), make sure to add the `-Djava.util.Arrays.useLegacyMergeSort=true` option when starting Sunset/FFapl, i.e., run `sunset.jar` on the command line as `java -jar -Djava.util.Arrays.useLegacyMergeSort=true -jar Sunset.jar`, for otherwise, the "File open" dialog may not work. Opening files by dragging and dropping them into the IDE will alternatively work too.
 
 ## Compiling from source
 Alternatively, the project can also be compiled from source. 

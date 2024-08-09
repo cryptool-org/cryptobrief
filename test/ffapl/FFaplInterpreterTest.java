@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import ffapl.java.logging.FFaplLogMessage;
 import ffapl.java.logging.FFaplLogger;
+import ffapl.java.util.FFaplRuntimeProperties;
 import ffapl.utils.Observable;
 import ffapl.utils.Observer;
 
@@ -27,7 +28,7 @@ public class FFaplInterpreterTest {
 			}
 		});
 
-		FFaplInterpreter interpreter = new FFaplInterpreter(logger, getClass().getResourceAsStream("test.ffapl"));
+		FFaplInterpreter interpreter = new FFaplInterpreter(logger, FFaplRuntimeProperties.defaults(), getClass().getResourceAsStream("test.ffapl"));
 
 		Executors.newCachedThreadPool().submit(interpreter).get();
 

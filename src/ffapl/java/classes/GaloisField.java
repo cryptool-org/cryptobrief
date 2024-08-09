@@ -107,6 +107,14 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 		return this._p;
 	}
 
+	/**
+	 * Returns the order of the GF
+	 * @return
+	 */
+	public BigInteger order() throws FFaplAlgebraicException {
+		return (BigInteger) this._p.pow(_irrply.degree());
+	}
+
 
 	/**
 	 * Adds the value of the GaloisField <Code> gf </Code>
@@ -363,6 +371,15 @@ public class GaloisField implements IJavaType<GaloisField>, Comparable<GaloisFie
 	 */
 	public boolean equalGF(GaloisField gf) throws FFaplAlgebraicException{
 		return this._irrply.equals(gf.irrPolynomial());
+	}
+
+	/**
+	 * Returns true if GaloisFields are isomorphic
+	 * @return true if characteristics are equal and irreducible polynomials have the same degree, false otherwise.
+	 */
+	public boolean isIsomorphicTo(GaloisField other) {
+		return this.characteristic().equals(other.characteristic())
+				&& this._irrply.degree().equals(other._irrply.degree());
 	}
 
 	/**
