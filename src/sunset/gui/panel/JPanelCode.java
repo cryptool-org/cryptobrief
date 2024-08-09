@@ -302,10 +302,10 @@ public class JPanelCode extends javax.swing.JPanel {
 		
 		if(!((FFaplCodeTextPane)jTextPane_Code).isSaved()){
 			txt = jTextPane_Code.getText();
-			byteBuffer = ByteBuffer.allocate(txt.length()+1); //necessary because of buffer overflow!
+			txtBytes = txt.getBytes();
+			byteBuffer = ByteBuffer.allocate(txtBytes.length);
 			if(_file != null){
 				//there exists a file in the background
-				txtBytes = txt.getBytes();
 				byteBuffer.put(txtBytes);
 				byteBuffer.flip();
 				try {
