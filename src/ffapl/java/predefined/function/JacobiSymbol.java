@@ -29,7 +29,6 @@ import ffapl.types.FFaplPolynomialResidue;
  */
 public class JacobiSymbol implements IPredefinedProcFunc {
 
-
     @Override
     public void execute(IVm interpreter) throws FFaplAlgebraicException {
         IJavaType a;
@@ -39,22 +38,20 @@ public class JacobiSymbol implements IPredefinedProcFunc {
 
         b = (IJavaType) interpreter.popStack();
         a = (IJavaType) interpreter.popStack();
-
         if (a.typeID() == IJavaType.POLYNOMIALRC && b.typeID() == IJavaType.POLYNOMIALRC) {
-
             result = Algorithm.jacobiSymbol((PolynomialRC) a, (PolynomialRC) b);
-
         } else if (a instanceof BInteger && b instanceof BInteger) {
-
-            if (((BInteger) a).compareTo(BigInteger.ZERO) < 0) {//must not be < 0
-                Object[] messages = {"jacobiSymbol(" + a + ", " + b + ")", a};
-                throw new FFaplAlgebraicException(messages, IAlgebraicError.VAL_LESS_ZERO);
-            } else if (((BInteger) b).compareTo(BigInteger.ZERO) < 0) {
+            if (((BInteger) b).compareTo(BigInteger.ZERO) < 0) {
                 Object[] messages = {"jacobiSymbol(" + a + ", " + b + ")", b};
                 throw new FFaplAlgebraicException(messages, IAlgebraicError.VAL_LESS_ZERO);
+            }else if (((BInteger) a).compareTo(BigInteger.ZERO) < 0) {
+                a = (BInteger)((BInteger) a).negate();
+                BigInteger modResult = ((BInteger) b).mod(BigInteger.valueOf(4));
+                result = Algorithm.jacobiSymbol(((BInteger) a), ((BInteger) b));
+                if(modResult.equals(BigInteger.valueOf(3))) result = result.multiply(BigInteger.valueOf(-1));
+            }else{
+                result = Algorithm.jacobiSymbol(((BInteger) a), ((BInteger) b));
             }
-            result = Algorithm.jacobiSymbol(((BInteger) a), ((BInteger) b));
-
         } else {
             System.err.println("error in JacobiSymbol.execute");
         }
@@ -112,7 +109,5 @@ public class JacobiSymbol implements IPredefinedProcFunc {
                         new FFaplPolynomialResidue(),
                         ISymbol.PARAMETER));
         symbolTable.closeScope();
-
     }
-
 }
