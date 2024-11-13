@@ -21,6 +21,7 @@ import ffapl.lib.interfaces.ISymbolTable;
 import ffapl.types.FFaplInteger;
 import ffapl.types.FFaplPolynomialResidue;
 
+
 /**
  * JacobiSymbol
  *
@@ -33,7 +34,6 @@ public class JacobiSymbol implements IPredefinedProcFunc {
     public void execute(IVm interpreter) throws FFaplAlgebraicException {
         IJavaType a;
         IJavaType b;
-
         BigInteger result = new BigInteger("-1");
 
         b = (IJavaType) interpreter.popStack();
@@ -41,10 +41,11 @@ public class JacobiSymbol implements IPredefinedProcFunc {
         if (a.typeID() == IJavaType.POLYNOMIALRC && b.typeID() == IJavaType.POLYNOMIALRC) {
             result = Algorithm.jacobiSymbol((PolynomialRC) a, (PolynomialRC) b);
         } else if (a instanceof BInteger && b instanceof BInteger) {
-            if (((BInteger) b).compareTo(BigInteger.ZERO) < 0) {
-                Object[] messages = {"jacobiSymbol(" + a + ", " + b + ")", b};
-                throw new FFaplAlgebraicException(messages, IAlgebraicError.VAL_LESS_ZERO);
-            }else if (((BInteger) a).compareTo(BigInteger.ZERO) < 0) {
+            Object[] messages = {"jacobiSymbol(" + a + ", " + b + ")", b};
+            if (((BInteger) b).mod(BigInteger.TWO).equals(BigInteger.ZERO) || ((BInteger) b).compareTo(BigInteger.valueOf(4)) < 0){
+                throw new FFaplAlgebraicException(messages,IAlgebraicError.NOT_DEFINED);
+            }
+            if (((BInteger) a).compareTo(BigInteger.ZERO) < 0) {
                 a = (BInteger)((BInteger) a).negate();
                 BigInteger modResult = ((BInteger) b).mod(BigInteger.valueOf(4));
                 result = Algorithm.jacobiSymbol(((BInteger) a), ((BInteger) b));
@@ -55,7 +56,6 @@ public class JacobiSymbol implements IPredefinedProcFunc {
         } else {
             System.err.println("error in JacobiSymbol.execute");
         }
-
         interpreter.pushStack(new BInteger(result, null));
         interpreter.funcReturn();
     }

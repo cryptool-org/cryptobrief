@@ -155,8 +155,11 @@ public interface IAlgebraicError {
 	/** Fields are not equal **/
 	public static final int FIELDS_UNEQUAL = 1401;
 
+	/** Jacobi Symbol is only defined for odd numbers n > 3 **/
+	public static final int NOT_DEFINED =  1500;
 
-    /**
+
+	/**
 	 * Return the compiler error number.
 	 * @return error number
 	 */
