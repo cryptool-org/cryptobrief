@@ -42,7 +42,7 @@ public class JacobiSymbol implements IPredefinedProcFunc {
             result = Algorithm.jacobiSymbol((PolynomialRC) a, (PolynomialRC) b);
         } else if (a instanceof BInteger && b instanceof BInteger) {
             Object[] messages = {"jacobiSymbol(" + a + ", " + b + ")", b};
-            if (((BInteger) b).mod(BigInteger.TWO).equals(BigInteger.ZERO) || ((BInteger) b).compareTo(BigInteger.valueOf(4)) < 0){
+            if (((BInteger) b).mod(BigInteger.TWO).equals(BigInteger.ZERO)){
                 throw new FFaplAlgebraicException(messages,IAlgebraicError.NOT_DEFINED);
             }
             if (((BInteger) a).compareTo(BigInteger.ZERO) < 0) {
