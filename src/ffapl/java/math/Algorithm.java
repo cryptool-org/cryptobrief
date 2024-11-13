@@ -536,9 +536,7 @@ public class Algorithm {
     public static BigInteger jacobiSymbol(BigInteger a, BigInteger n) {
         BigInteger three = new BigInteger("3");
         BigInteger s = ZERO;
-        if (!a.gcd(n).equals(ONE)){
-            return ZERO;
-        }
+
         a = a.mod(n);
         if (a.equals(ONE) || n.equals(ONE)) {
             return ONE;
