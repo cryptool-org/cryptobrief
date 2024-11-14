@@ -2,6 +2,7 @@ package ffapl.lib;
 
 import ffapl.exception.FFaplException;
 import ffapl.java.logging.FFaplLogger;
+import ffapl.java.predefined.function.*;
 import ffapl.java.util.FFaplReader;
 import ffapl.java.predefined.function.AESDecrypt;
 import ffapl.java.predefined.function.AESEncrypt;
@@ -85,6 +86,7 @@ public class FFaplPredefinedProcFuncDeclaration {
 		ReadFunctions.registerProcFunc(symbolTable, reader, logger);
 		Sqrt.registerProcFunc(symbolTable);
 		LegendreSymbol.registerProcFunc(symbolTable);
+		JacobiSymbol.registerProcFunc(symbolTable);
 		getXasInteger.registerProcFunc(symbolTable);
 		getYasInteger.registerProcFunc(symbolTable);
 		getXasPolynomial.registerProcFunc(symbolTable);
