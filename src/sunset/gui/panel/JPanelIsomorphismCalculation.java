@@ -1,8 +1,7 @@
 package sunset.gui.panel;
 
 import ffapl.java.math.isomorphism.calculation.linearfactor.RootFindingStrategyType;
-import ffapl.java.util.IsomorphismCalculationTimeLimitUtil;
-import ffapl.java.util.RootFindingUtil;
+import sunset.gui.util.IsomorphismCalculationUtil;
 import sunset.gui.interfaces.IFFaplComponent;
 import sunset.gui.interfaces.IProperties;
 import sunset.gui.logic.GUIPropertiesLogic;
@@ -56,7 +55,7 @@ public class JPanelIsomorphismCalculation extends javax.swing.JPanel implements 
                 gridBagConstraints.gridy = 1;
                 jTextField_IsomorphismCalculationTimeLimit = new JTextField();
                 thisLayout.setConstraints(jTextField_IsomorphismCalculationTimeLimit, gridBagConstraints);
-                jTextField_IsomorphismCalculationTimeLimit.setText(String.valueOf(IsomorphismCalculationTimeLimitUtil.getIsomorphismCalculationTimeLimitInSeconds()));
+                jTextField_IsomorphismCalculationTimeLimit.setText(String.valueOf(IsomorphismCalculationUtil.getTimeLimitInSeconds()));
                 this.add(jTextField_IsomorphismCalculationTimeLimit);
             }
             {
@@ -78,7 +77,7 @@ public class JPanelIsomorphismCalculation extends javax.swing.JPanel implements 
                 jComboBox_RootFindingStrategy = new JComboBox<>(RootFindingStrategyType.stringRepresentations());
                 this.add(jComboBox_RootFindingStrategy);
                 thisLayout.setConstraints(jComboBox_RootFindingStrategy, gridBagConstraints);
-                jComboBox_RootFindingStrategy.setSelectedItem(RootFindingUtil.getRootFindingStrategyType().stringRepresentation());
+                jComboBox_RootFindingStrategy.setSelectedItem(IsomorphismCalculationUtil.getRootFindingStrategyType().stringRepresentation());
             }
 
         } catch (Exception e) {

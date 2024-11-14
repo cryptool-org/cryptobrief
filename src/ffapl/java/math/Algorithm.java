@@ -800,7 +800,81 @@ public class Algorithm {
             Object[] arguments = {"Error in PolynomialRC monic function"};
             throw new FFaplAlgebraicException(arguments, IAlgebraicError.SQUARE_ROOT_DOES_NOT_EXIST);
         }
+		return result;
+	}
 
+	/**
+	 * Search for prime factors with Pollard's rho, Pollard's p-1 and linear search.
+	 * @param n
+	 * @return prime factors of n
+	 * @throws FFaplAlgebraicException
+	 */
+	public static TreeMap<BigInteger, BigInteger> FactorInteger(BInteger n) throws FFaplAlgebraicException{
+		BInteger fact1, fact2, B, Bdefault, nB, val;
+		BigInteger min, max;
+		Thread thread = n.getThread();
+		//boolean fact1Prime = false;
+		Stack<BInteger> factors = new Stack<BInteger>();
+		TreeMap<BigInteger, BigInteger> result = new TreeMap<BigInteger, BigInteger>();
+		TreeMap<BigInteger, BigInteger> primeFact;
+
+		if (n.compareTo(ONE) <= 0) {
+			if (n.compareTo(ZERO) >= 0) {
+				// for one and zero the factorization consists only of the number itself
+				addPrimeFactor(result, n);
+				return result;
+
+			} else {
+				// for negative numbers, factorize the absolute value and add negative one
+				result = FactorInteger(n.negateR());
+				addPrimeFactor(result, new BInteger(valueOf(-1), thread));
+			}
+		} else {
+
+			TreeMap<BigInteger, BigInteger> tmp;
+			if (factorizationCache != null && ((tmp = factorizationCache.get(n)) != null)) {
+				@SuppressWarnings("unchecked")
+				TreeMap<BigInteger, BigInteger> clone = (TreeMap<BigInteger, BigInteger>) tmp.clone();
+				return clone;
+
+			} else if (isProbablePrime(n, 100)) {
+				addPrimeFactor(result, n);
+				return result;
+
+			} else {
+
+				if (n.bitLength() > 35 && (Thread.currentThread() instanceof FFaplInterpreter))
+					((FFaplInterpreter) (Thread.currentThread())).getLogger().displaySlowOperationWarning();
+
+				Bdefault = BInteger.valueOf(100000, thread);
+				//prework find small prime factors
+				min = valueOf(2);
+				max = valueOf(997);//try first 168 primes
+
+				fact2 = n;
+				while (min.compareTo(max) <= 0) {
+					isRunning(thread);
+					primeFact = Algorithm.primeFactorInteger(fact2, min, max);
+
+					if (primeFact != null) {
+						//prime factor <= max found
+						fact1 = primeFactorValue(primeFact, thread);
+						combinePrimeFactor(result, primeFact);
+						min = primeFactor(primeFact, thread);
+						fact2 = (BInteger) fact2.divide(fact1);
+						//System.out.println(fact2);
+						if (isProbablePrime(fact2, 100)) {
+							addPrimeFactor(result, fact2);
+							break;//finished
+						} else if (fact2.compareTo(ONE) == 0) {
+							break;//finished
+						}
+					} else {
+						//prime factor higher than max
+						factors.push(fact2);
+						break;
+					}
+				}
         return result;
     }
 

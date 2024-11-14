@@ -30,8 +30,7 @@ import ffapl.java.math.isomorphism.calculation.cache.GaloisFieldSpecification;
 import ffapl.java.math.isomorphism.calculation.cache.IsomorphismCache;
 import ffapl.java.math.isomorphism.calculation.LinearFactorIsomorphismCalculation;
 import ffapl.java.math.isomorphism.calculation.TimeRestrictedIsomorphismCalculation;
-import ffapl.java.util.IsomorphismCalculationTimeLimitUtil;
-import ffapl.java.util.RootFindingUtil;
+import ffapl.java.util.FFaplRuntimeProperties;
 import ffapl.lib.interfaces.ISymbol;
 import ffapl.lib.interfaces.IToken;
 import ffapl.lib.interfaces.IVm;
@@ -83,8 +82,8 @@ public class FFaplVm implements IVm {
 	// used for casting galois field elements between isomorphic fields
 	GaloisFieldIsomorphismCast _isomorphicGaloisFieldCasting;
 	private Stack<IToken> tokenStack;
-	
-	public FFaplVm(FFaplLogger logger, Thread thread){
+
+	public FFaplVm(FFaplLogger logger, FFaplRuntimeProperties properties, Thread thread){
 		_expressionStack = new Stack<Object>();
 		_procedureStack = new Vector<Object>(0,1);
 		_procedureStackTypes = new Vector<Integer>(0,1);
@@ -101,15 +100,15 @@ public class FFaplVm implements IVm {
 		_isomorphicGaloisFieldCasting = new GaloisFieldIsomorphismCast(
 				new CachingIsomorphismCalculation(
 						new TimeRestrictedIsomorphismCalculation(
-							new LinearFactorIsomorphismCalculation(
-									RootFindingUtil.getRootFindingStrategyType().strategy()),
-								IsomorphismCalculationTimeLimitUtil.getIsomorphismCalculationTimeLimitInSeconds()),
+								new LinearFactorIsomorphismCalculation(
+										properties.getIsomorphismCalculationRootFindingStrategyType().strategy()),
+								properties.getIsomorphismCalculationTimeLimit()),
 						new IsomorphismCache()));
 	}
-        
+
 	@Override
 	public int allocStack(ISymbol symbol) throws FFaplAlgebraicException {
-		int result;		
+		int result;
 		this._procedureStackTypes.add(symbol.getType().typeID());
 		this._procedureStackSymbols.add(symbol);
 		//System.out.println(this);

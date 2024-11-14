@@ -64,7 +64,7 @@ Contributions by the following people so far is thankfully acknowledged:
 * Manuel Langer: fixed compatibility issues with Java 9 (removal of deprecated classes like JAXB), numerous bugfixes and integration of advanced search & replace function in the GUI
 * Dominic Weinberger: support for typecasts by isomorphism between Galois fields of the same order
 
-For questions and other inquiries, feel free to send an email to the repository maintainer [Stefan Rass](mailto:stefan.rass@aau.at?subject=Sunset-FFapl)
+For questions and other inquiries, feel free to send an email to the repository maintainer [Stefan Rass](mailto:stefan.rass@jku.at?subject=Sunset-FFapl/Cryptobrief)
 
 # Installation Instructions
 The folder [nsis_installer](https://github.com/stefan-rass/sunset-ffapl/tree/master/nsis_installer) contains a Windows installer that can be downloaded and installed as it is. For all other platforms, feel free to copy the subfolder [nsis_installer/sunset](https://github.com/stefan-rass/sunset-ffapl/tree/master/nsis_installer/sunset) to any place on your computer and run `sunset.jar` (requires Java 9 Runtime or later).

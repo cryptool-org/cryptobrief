@@ -17,8 +17,8 @@ import sunset.gui.enums.LineState;
 import sunset.gui.lib.FFaplUndoManager;
 import sunset.gui.view.FFaplStatusLine;
 import sunset.gui.view.LineHandler;
+import sunset.gui.util.LoggerUtil;
 import ffapl.java.enums.LoggerMode;
-import ffapl.java.util.LoggerUtil;
 
 /**
  * @author Alexander Ortner

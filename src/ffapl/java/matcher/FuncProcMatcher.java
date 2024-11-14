@@ -1,21 +1,32 @@
 package ffapl.java.matcher;
 
-import java.awt.Font;
+import java.awt.Color;
 
-import sunset.gui.editor.FFaplRegex;
+public class FuncProcMatcher extends RegexMatcher {
 
-
-public class FuncProcMatcher extends RegexMatcher{
-
-	public FuncProcMatcher(String regex){
+	public FuncProcMatcher(String regex) {
 		super(regex);
-		setFontWeight(Font.ITALIC);
-		setColor(FFaplRegex.BLACK);
 	}
-	
+
+	public FuncProcMatcher(String regex, int font, Color color) {
+		this(regex);
+		setFontWeight(font);
+		setColor(color);
+	}
+
+	public FuncProcMatcher(String regex, int font) {
+		this(regex);
+		setFontWeight(font);
+	}
+
+	public FuncProcMatcher(String regex, Color color) {
+		this(regex);
+		setColor(color);
+	}
+
 	public boolean find() {
 		boolean result = super.find();
-		if(result){
+		if (result) {
 			setEnd(end()-1);
 		}
 		return result;
