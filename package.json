@@ -24,9 +24,9 @@
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
     "browserify-cipher": "^1.0.1",
-    "browserslist": "^4.23.0",
+    "browserslist": "^4.24.2",
     "create-hash": "^1.2.0",
-    "esbuild": "^0.20.2",
-    "esbuild-plugin-browserslist": "^0.11.1"
+    "esbuild": "^0.24.0",
+    "esbuild-plugin-browserslist": "^0.15.0"
   }
 }
