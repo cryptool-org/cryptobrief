@@ -50,7 +50,7 @@ public class JacobiSymbol implements IPredefinedProcFunc {
                 BigInteger modResult = ((BInteger) b).mod(BigInteger.valueOf(4));
                 result = Algorithm.jacobiSymbol(((BInteger) a), ((BInteger) b));
                 if(modResult.equals(BigInteger.valueOf(3))) result = result.multiply(BigInteger.valueOf(-1));
-            }else{
+            } else {
                 result = Algorithm.jacobiSymbol(((BInteger) a), ((BInteger) b));
             }
         } else {

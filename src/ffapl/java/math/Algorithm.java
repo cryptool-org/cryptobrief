@@ -10,7 +10,6 @@ import ffapl.java.interfaces.ILevel;
 import ffapl.java.interfaces.IRandomGenerator;
 import ffapl.java.logging.FFaplLogger;
 import ffapl.java.math.isomorphism.calculation.linearfactor.PolynomialGF;
-import ffapl.java.predefined.function.JacobiSymbol;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -100,7 +99,6 @@ public class Algorithm {
                 ivspec = new IvParameterSpec(zeroPadding(IV));
             }
 
-
             byte[] input = m.toByteArray();
             if (!withPadding) {
                 // without padding, we work only on a single block, so throw an exception for anything more than 16 bytes
@@ -116,7 +114,6 @@ public class Algorithm {
             }
 
             result = new BigInteger(cipher.doFinal(input));
-
         } catch (InvalidKeyException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -176,7 +173,6 @@ public class Algorithm {
             }
 
             result = new BigInteger(cipher.doFinal(input));
-
         } catch (InvalidKeyException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -196,7 +192,6 @@ public class Algorithm {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
 
         return result;
     }
@@ -281,7 +276,6 @@ public class Algorithm {
             d = (PolynomialRC) g.clone();
             s = new PolynomialRC(ONE, ZERO, g.characteristic(), thread);
             t = new PolynomialRC(ZERO, ZERO, g.characteristic(), thread);
-
         } else {
             try {
                 s2 = new PolynomialRC(ONE, ZERO, g.characteristic(), thread);
@@ -372,7 +366,6 @@ public class Algorithm {
             d = a;
             x = x2;
             y = y2;
-
         }
 
         result[0] = d;
@@ -381,7 +374,6 @@ public class Algorithm {
 
         return result;
     }
-
 
     /**
      * Repeated square-and-multiply algorithm for exponentiation in F_p^m
@@ -395,8 +387,6 @@ public class Algorithm {
      * @throws FFaplAlgebraicException <CHARACTERISTIC_UNEQUAL> if characteristics of g and f are unequal
      * @throws FFaplAlgebraicException <INTERRUPTED> if execution is interrupted within thread
      */
-
-
     public static PolynomialRC squareAndMultiply(PolynomialRC g,
                                                  BigInteger k, PolynomialRC f) throws FFaplAlgebraicException {
         PolynomialRC s, G;
@@ -437,7 +427,6 @@ public class Algorithm {
         return s;
     }
 
-
     /**
      * Repeated square-and-multiply algorithm for exponentiation
      * calculates g^k
@@ -455,7 +444,6 @@ public class Algorithm {
         GaloisField oneCoefficient = g.field();
         oneCoefficient.setValue(new Polynomial(ONE, ZERO, thread));
         s = new PolynomialGF(oneCoefficient, ZERO, g.field(), thread);
-        ;
 
         //If k = 0 then return (s)
         if (k.equals(ZERO)) {
@@ -480,7 +468,6 @@ public class Algorithm {
         }
         return s;
     }
-
 
     /**
      * Repeated square-and-multiply algorithm for exponentiation
@@ -532,7 +519,6 @@ public class Algorithm {
      * @param n
      * @return BigInteger
      */
-
     public static BigInteger jacobiSymbol(BigInteger a, BigInteger n) {
         BigInteger three = new BigInteger("3");
         BigInteger s = ZERO;
@@ -598,18 +584,19 @@ public class Algorithm {
         p = new Prime(g.characteristic(), thrd);
         f.mod(g);
         alpha = f.leadingCoefficient();
-        if(f.degree().intValue() == 0){
+
+        if (f.degree().intValue() == 0) {
             return legendreSymbol(alpha,p).pow(g.degree().intValue());
-        }else{
+        } else {
             f.divide(alpha);
             result = legendreSymbol(alpha,p).pow(g.degree().intValue()).multiply(jacobiSymbol(g,f));
-            if(p.subtract(ONE).divide(TWO).mod(TWO).equals(ONE) && f.degree().mod(TWO).equals(ONE) && g.degree().mod(TWO).equals(ONE)){
-             result = result.negate();
+            if (p.subtract(ONE).divide(TWO).mod(TWO).equals(ONE) && f.degree().mod(TWO).equals(ONE) && g.degree().mod(TWO).equals(ONE)) {
+                result = result.negate();
             }
         }
-    return result;
-    }
 
+        return result;
+    }
 
     /**
      * Legendre Symbol for BigInteger
@@ -625,7 +612,6 @@ public class Algorithm {
         if (a.mod(p).equals(p.subtract(ONE))) return ONE.negate();
         return ZERO;
     }
-
 
     /**
      * Legendre Symbol for polynomial rings and galois fields
@@ -663,12 +649,10 @@ public class Algorithm {
             if ((p.subtract(ONE).divide(new BigInteger("2")).mod(new BigInteger("2")).equals(ONE)) && f.degree().mod(new BigInteger("2")).equals(ONE) && g.degree().mod(new BigInteger("2")).equals(ONE)) {
                 result = result.negate();
             }
-
         }
 
         return result;
     }
-
 
     /**
      * square root for gf elements
@@ -751,13 +735,11 @@ public class Algorithm {
         return b;
     }
 
-
     /**
      * square root for Z(p) elements
      *
      * @throws FFaplAlgebraicException
      */
-
     public static BigInteger sqrtMod(BigInteger a, BigInteger modulus, boolean checkForError) throws FFaplAlgebraicException {
         if (a.equals(ZERO)) {
             return ZERO;
@@ -793,91 +775,15 @@ public class Algorithm {
         r.pow(modulus.add(ONE).divide(new BigInteger("2")));
         r.mod(f);
 
-
         BigInteger result = r.coefficientAt(ZERO);
 
         if (checkForError && !result.modPow(new BigInteger("2"), modulus).equals(a)) {
             Object[] arguments = {"Error in PolynomialRC monic function"};
             throw new FFaplAlgebraicException(arguments, IAlgebraicError.SQUARE_ROOT_DOES_NOT_EXIST);
         }
-		return result;
-	}
 
-	/**
-	 * Search for prime factors with Pollard's rho, Pollard's p-1 and linear search.
-	 * @param n
-	 * @return prime factors of n
-	 * @throws FFaplAlgebraicException
-	 */
-	public static TreeMap<BigInteger, BigInteger> FactorInteger(BInteger n) throws FFaplAlgebraicException{
-		BInteger fact1, fact2, B, Bdefault, nB, val;
-		BigInteger min, max;
-		Thread thread = n.getThread();
-		//boolean fact1Prime = false;
-		Stack<BInteger> factors = new Stack<BInteger>();
-		TreeMap<BigInteger, BigInteger> result = new TreeMap<BigInteger, BigInteger>();
-		TreeMap<BigInteger, BigInteger> primeFact;
-
-		if (n.compareTo(ONE) <= 0) {
-			if (n.compareTo(ZERO) >= 0) {
-				// for one and zero the factorization consists only of the number itself
-				addPrimeFactor(result, n);
-				return result;
-
-			} else {
-				// for negative numbers, factorize the absolute value and add negative one
-				result = FactorInteger(n.negateR());
-				addPrimeFactor(result, new BInteger(valueOf(-1), thread));
-			}
-		} else {
-
-			TreeMap<BigInteger, BigInteger> tmp;
-			if (factorizationCache != null && ((tmp = factorizationCache.get(n)) != null)) {
-				@SuppressWarnings("unchecked")
-				TreeMap<BigInteger, BigInteger> clone = (TreeMap<BigInteger, BigInteger>) tmp.clone();
-				return clone;
-
-			} else if (isProbablePrime(n, 100)) {
-				addPrimeFactor(result, n);
-				return result;
-
-			} else {
-
-				if (n.bitLength() > 35 && (Thread.currentThread() instanceof FFaplInterpreter))
-					((FFaplInterpreter) (Thread.currentThread())).getLogger().displaySlowOperationWarning();
-
-				Bdefault = BInteger.valueOf(100000, thread);
-				//prework find small prime factors
-				min = valueOf(2);
-				max = valueOf(997);//try first 168 primes
-
-				fact2 = n;
-				while (min.compareTo(max) <= 0) {
-					isRunning(thread);
-					primeFact = Algorithm.primeFactorInteger(fact2, min, max);
-
-					if (primeFact != null) {
-						//prime factor <= max found
-						fact1 = primeFactorValue(primeFact, thread);
-						combinePrimeFactor(result, primeFact);
-						min = primeFactor(primeFact, thread);
-						fact2 = (BInteger) fact2.divide(fact1);
-						//System.out.println(fact2);
-						if (isProbablePrime(fact2, 100)) {
-							addPrimeFactor(result, fact2);
-							break;//finished
-						} else if (fact2.compareTo(ONE) == 0) {
-							break;//finished
-						}
-					} else {
-						//prime factor higher than max
-						factors.push(fact2);
-						break;
-					}
-				}
         return result;
     }
-
 
     /**
      * TraceOfanElement
@@ -892,7 +798,6 @@ public class Algorithm {
 
         return oneCount % 2;
     }
-
 
     /**
      * Repeated square-and-multiply algorithm for exponentiation
@@ -935,7 +840,6 @@ public class Algorithm {
         }
         return s;
     }
-
 
     /**
      * Repeated square-and-multiply algorithm for exponentiation
@@ -1017,7 +921,6 @@ public class Algorithm {
         if (m.compareTo(valueOf(100)) > 0 && (Thread.currentThread() instanceof FFaplInterpreter))
             ((FFaplInterpreter) (Thread.currentThread())).getLogger().displaySlowOperationWarning();
 
-
         x = new PolynomialRC(ONE, ONE, p, thread);
         //System.out.println("f = " + f);
         //System.out.println("x = " + x);
@@ -1070,7 +973,6 @@ public class Algorithm {
         m = new BInteger(f.degree(), thread);
         p = new BInteger(f.characteristic(), thread);
 
-
         //tmp1 = multiplyElements(primeFactors, thread);
         //tmp2 = squareAndMultiply(p, m, thread).subtract(BigInteger.ONE);
         //if(tmp1.compareTo(tmp2) != 0){
@@ -1098,8 +1000,6 @@ public class Algorithm {
         }
         //System.out.println("f = " + f);
 
-
-        //
         return true;
     }
 
@@ -1163,7 +1063,6 @@ public class Algorithm {
         boolean allPossiblePolynomialsIterated = false;
 
         while (!allPossiblePolynomialsIterated) {
-
             // [Step 2 - 7]
             if (f.isPrimitivePolynomial(factorsOfR, factorsOfPMinusOne, _thread)) {
                 // [Step 8]
@@ -1265,15 +1164,12 @@ public class Algorithm {
             // case 1: no factorization cache: create new, then add result to cache
             factorizationCache = new TreeMap<>();
             result = value.isProbablePrime(certainty);
-
         } else if ((factors = factorizationCache.get(value)) != null) {
             // case 2: factorization cache exists and factorization != null: check factorization
             return factors.size() == 1 && factors.get(value).equals(ONE);
-
         } else if (factorizationCache.containsKey(value)) {
             // case 3: factorization is null: check if there is a mapping
             return false;
-
         } else {
             // case 4: no mapping: check primality, then add result to cache
             result = value.isProbablePrime(certainty);
@@ -1285,7 +1181,6 @@ public class Algorithm {
             factors = new TreeMap<>();
             factors.put(value, ONE);
             factorizationCache.put(value, factors);
-
         } else {
             // value is not prime: factorization is unknown. thus, add null to cache as marker.
             factorizationCache.put(value, null);
@@ -1315,24 +1210,21 @@ public class Algorithm {
                 // for one and zero the factorization consists only of the number itself
                 addPrimeFactor(result, n);
                 return result;
-
             } else {
                 // for negative numbers, factorize the absolute value and add negative one
                 result = FactorInteger(n.negateR());
                 addPrimeFactor(result, new BInteger(valueOf(-1), thread));
             }
         } else {
-
             TreeMap<BigInteger, BigInteger> tmp;
             if (factorizationCache != null && ((tmp = factorizationCache.get(n)) != null)) {
-                return (TreeMap<BigInteger, BigInteger>) tmp.clone();
-
+                @SuppressWarnings("unchecked")
+                TreeMap<BigInteger, BigInteger> clone = (TreeMap<BigInteger, BigInteger>) tmp.clone();
+                return clone;
             } else if (isProbablePrime(n, 100)) {
                 addPrimeFactor(result, n);
                 return result;
-
             } else {
-
                 if (n.bitLength() > 35 && (Thread.currentThread() instanceof FFaplInterpreter))
                     ((FFaplInterpreter) (Thread.currentThread())).getLogger().displaySlowOperationWarning();
 
@@ -1471,7 +1363,6 @@ public class Algorithm {
                     }
                     n = n.divide(p);
                 }
-
             }
         }
         return result;
@@ -1503,7 +1394,6 @@ public class Algorithm {
             factor.put(tmp, ONE);
             f.setValue(f.value().getMonic());
         }
-
 
         i = new BInteger(ONE, thread);
         //F = f.clone();
@@ -1564,7 +1454,6 @@ public class Algorithm {
                 System.out.println("-" + factorTmp);
                 PowFactor(factorTmp, p);
                 factor.putAll(factorTmp);
-
             }
         }
 
@@ -1609,7 +1498,6 @@ public class Algorithm {
                 } else {
                     factor.put(key2, e);
                 }
-
             }
         }
         unit = f.clone();
@@ -1645,12 +1533,10 @@ public class Algorithm {
         MessageDigest _digest = null;
         BInteger hash;
 
-
         byte[] digestResult = null;
         try {
             _digest = MessageDigest.getInstance("SHA-256");
             _digest.update(inString.toString().getBytes(UTF_8));
-
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } finally {
@@ -1659,7 +1545,6 @@ public class Algorithm {
         // hash = new BInteger(new BigInteger(digestResult).abs(), null);
         hash = new BInteger(new BigInteger(1, digestResult), new Thread());
         return hash;
-
     }
 
     /**
@@ -1695,13 +1580,13 @@ public class Algorithm {
             wx.subtract(new Polynomial(ONE, ONE, thread));
             ai = f.clone();
             ai.setValue(gcd(f.value(), wx.value()));
-			
-			/*if(!ai.value().isMonic() && ai.value().degree().compareTo(BigInteger.ZERO) > 0){
-					//non Monic Polynomial
-					tmp = ai.clone();
-					tmp.setValue(new Polynomial(ai.value().leadingCoefficient(), BigInteger.ZERO, thread));
-					result.add(tmp);
-			}*/
+
+            //if (!ai.value().isMonic() && ai.value().degree().compareTo(BigInteger.ZERO) > 0) {
+            //    //non Monic Polynomial
+            //    tmp = ai.clone();
+            //    tmp.setValue(new Polynomial(ai.value().leadingCoefficient(), BigInteger.ZERO, thread));
+            //    result.add(tmp);
+            //}
             ai.setValue(ai.value().getMonic());
 
             //System.out.println("ai:" + ai);
@@ -1709,7 +1594,6 @@ public class Algorithm {
                 result.add(ai);
                 f.divide(ai);
                 w.mod(f);
-
             }
             i = i.add(ONE);
         }
@@ -1735,7 +1619,6 @@ public class Algorithm {
         return result;
     }
 
-
     /**
      * f = a^p, returns a in GF(p^m)
      *
@@ -1744,7 +1627,6 @@ public class Algorithm {
      * @throws FFaplAlgebraicException
      */
     private static GaloisField PRoot(GaloisField f) throws FFaplAlgebraicException {
-
         PolynomialRC ply = f.value();
         GaloisField proot = f.clone();
         BigInteger p = ply.characteristic();
@@ -1766,7 +1648,6 @@ public class Algorithm {
         proot.setValue(plyRes);
         return proot;
     }
-
 
     private static void PowFactor(TreeMap<GaloisField, BigInteger> table, BigInteger e) {
         GaloisField key;
@@ -1931,40 +1812,40 @@ public class Algorithm {
         return null;
     }
 
-
-    /**
-     * search by iteration over all possible primes (slow)
-     * @param n
-     * @return a prime factor of n
-     * @throws FFaplAlgebraicException
-
-    private static TreeMap<BigInteger, BigInteger> primeFactorInteger(BInteger n) throws FFaplAlgebraicException{
-    BInteger p, d;
-    Thread thread = n.getThread();
-    TreeMap<BigInteger, BigInteger> result = new TreeMap<BigInteger, BigInteger>();
-    if(isProbablePrime(n, 100)){
-    result.put(n, BigInteger.ONE);
-    return result;
-    }
-    p = new BInteger(BigInteger.valueOf(2), thread);
-    while(n.compareTo(BigInteger.ONE) > 0 && p.compareTo(n) <= 0){
-    isRunning(thread);
-    d = gcd(p, (BInteger)n);
-    if(d.compareTo(BigInteger.ONE) == 0){
-    p = (BInteger) p.nextProbablePrime();
-    }else{
-    while(d.compareTo(BigInteger.ONE) > 0){
-    addPrimeFactor(result, p);
-    n = (BInteger) n.divide(p);
-    d = gcd(p, (BInteger)n);
-    }
-    return result;
-    }
-
-    }
-    return null;
-    }
-     */
+//    /**
+//     * search by iteration over all possible primes (slow)
+//     * @param n
+//     * @return a prime factor of n
+//     * @throws FFaplAlgebraicException
+//     */
+//    private static TreeMap<BigInteger, BigInteger> primeFactorInteger(BInteger n) throws FFaplAlgebraicException {
+//        BInteger p, d;
+//        Thread thread = n.getThread();
+//        TreeMap<BigInteger, BigInteger> result = new TreeMap<BigInteger, BigInteger>();
+//        if (isProbablePrime(n, 100)) {
+//            result.put(n, BigInteger.ONE);
+//            return result;
+//        }
+//
+//        p = new BInteger(BigInteger.valueOf(2), thread);
+//        while (n.compareTo(BigInteger.ONE) > 0 && p.compareTo(n) <= 0) {
+//            isRunning(thread);
+//            d = gcd(p, (BInteger)n);
+//            if (d.compareTo(BigInteger.ONE) == 0) {
+//                p = (BInteger) p.nextProbablePrime();
+//            } else {
+//                while (d.compareTo(BigInteger.ONE) > 0) {
+//                    addPrimeFactor(result, p);
+//                    n = (BInteger) n.divide(p);
+//                    d = gcd(p, (BInteger)n);
+//                }
+//
+//                return result;
+//            }
+//        }
+//
+//        return null;
+//    }
 
     /**
      * search by iteration over all possible primes (slow), start with min
@@ -2000,8 +1881,8 @@ public class Algorithm {
                 }
                 return result;
             }
-
         }
+
         return null;
     }
 
@@ -2045,7 +1926,6 @@ public class Algorithm {
         return null;
     }
 
-
     /**
      * determines irreducible Polynomial recursively
      *
@@ -2088,7 +1968,6 @@ public class Algorithm {
         return null;
     }
 
-
     /**
      * throws an interrupt exception if not running
      *
@@ -2100,33 +1979,29 @@ public class Algorithm {
             if (thread.isInterrupted()) {
                 throw new FFaplAlgebraicException(null, IAlgebraicError.INTERRUPT);
             }
-
         }
     }
-	  
-	  /*/**
-	   * multiply elements of a Vector
-	   * @param vals
-	   * @param thread
-	   * @return multiplication of Elements;
-	   
-	  private static BInteger multiplyElements(Vector<BigInteger> vals, Thread thread){
-	
-			BInteger result;
-			if(vals.size() > 0){
-				result = new BInteger(BigInteger.ONE, thread);
-				for(Iterator<BigInteger> itr = vals.iterator(); itr.hasNext(); ){
-					result = (BInteger) result.multiply(itr.next());
-				}
-				
-			}else{
-				result = new BInteger(BigInteger.ZERO, thread);
-			}			
-			return result;
-		}
-	 * @throws FFaplAlgebraicException 
-*/
 
+//    /**
+//     * multiply elements of a Vector
+//     *
+//     * @param vals
+//     * @param thread
+//     * @return multiplication of Elements
+//     * @throws FFaplAlgebraicException
+//     */
+//    private static BInteger multiplyElements(Vector<BigInteger> vals, Thread thread) {
+//        BInteger result;
+//        if (vals.size() > 0) {
+//            result = new BInteger(BigInteger.ONE, thread);
+//            for (Iterator<BigInteger> itr = vals.iterator(); itr.hasNext(); ) {
+//                result = (BInteger) result.multiply(itr.next());
+//            }
+//        } else {
+//            result = new BInteger(BigInteger.ZERO, thread);
+//        }
+//        return result;
+//    }
 
     public static BigInteger log2(BigInteger a) {
         BigInteger x = new BigInteger("-1");
@@ -2139,7 +2014,6 @@ public class Algorithm {
 
         return x;
     }
-
 
     public static GaloisField tatePairing(EllipticCurve P, EllipticCurve Q) throws FFaplAlgebraicException {
         if (!Q.isGf()) {
@@ -2163,7 +2037,6 @@ public class Algorithm {
         return tatePairing(P, Q, order);
     }
 
-
     public static GaloisField tatePairing(EllipticCurve P, EllipticCurve Q, BigInteger orderOfP) throws FFaplAlgebraicException {
         if (!Q.isGf()) {
             throw new FFaplAlgebraicException(null, IAlgebraicError.EC_PAIRING_PARAMETER_NOT_VALID);
@@ -2174,7 +2047,6 @@ public class Algorithm {
             if (!P.equalEC(Q))
                 throw new FFaplAlgebraicException(null, IAlgebraicError.EC_PAIRING_PARAMETER_NOT_VALID);
         }
-
 
         if (P.getPAI() || Q.getPAI()) {
             if (P.getGF() == null) {
@@ -2188,7 +2060,6 @@ public class Algorithm {
             }
         }
 
-
         BigInteger order = orderOfP;
         GaloisField f1 = Q.getGF().clone();
         GaloisField f2 = Q.getGF().clone();
@@ -2201,7 +2072,6 @@ public class Algorithm {
         f2.setValue(new Polynomial(1, 0, null));
 
         int l = (int) Math.ceil(Math.log10(order.doubleValue() + 1) / Math.log10(2));
-
 
         for (int i = l - 2; i >= 0; i--) {
             lambda = T.getSlope(T.getX_gf(), T.getY_gf());
@@ -2217,7 +2087,6 @@ public class Algorithm {
                 if (!temp1.value().isZero())
                     f1 = temp1.clone();
                 //f2 bleibt gleich
-
             } else {
                 temp1.setValue(T.getX_gf()); //x3
                 temp1.subtract(Q.getX_gf()); //x3-x2
@@ -2232,7 +2101,6 @@ public class Algorithm {
 
                 if (!temp1.value().isZero())
                     f1 = temp1.clone();
-
 
                 temp1 = lambda.clone(); //l
                 temp1.add(Q.get_a1()); //l+a1
@@ -2251,10 +2119,8 @@ public class Algorithm {
                     f2 = temp1.clone();
             }
 
-
             T.add(T);
             if (order.testBit(i)) {
-
                 lambda.setValue(P.getY_gf());
                 lambda.subtract(T.getY_gf());
 
@@ -2275,7 +2141,6 @@ public class Algorithm {
                 } else {
                     lambda.divide(temp1);
 
-
                     temp1.setValue(T.getX_gf()); //x3
                     temp1.subtract(Q.getX_gf()); //x3-x2
                     temp1.multiply(lambda); // l(x3-x2)
@@ -2288,7 +2153,6 @@ public class Algorithm {
 
                     if (!temp1.value().isZero())
                         f1 = temp1.clone();
-
 
                     temp1 = lambda.clone(); //l
                     temp1.add(Q.get_a1()); //l+a1
@@ -2308,8 +2172,6 @@ public class Algorithm {
 
                 T.add(P);
             }
-
-
         }
 
         BigInteger exp = P.getGF().characteristic();
@@ -2320,9 +2182,7 @@ public class Algorithm {
         f1.divide(f2);
         f1.pow(exp);
 
-
         return f1;
     }
-
 
 }
