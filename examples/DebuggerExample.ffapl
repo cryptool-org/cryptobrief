@@ -1,0 +1,42 @@
+program debuggerDemo {
+	// Declaring constants
+	const p: Prime := getNextPrime(10^9);
+	const q: Prime := getNextPrime(p);
+	const n: Integer := p*q;
+
+    // Declare Functions
+	function fib(n: Integer) : Integer {
+		val : Integer;
+		// if else
+		if (n <= 1) {
+			val:= n;
+		} else {
+			val:= fib(n-1) + fib(n - 2);
+		}
+		return val;
+	}
+
+	// Declare Variables
+	a: Prime[][];
+	b: Z(3)[];
+	c, d: Integer;
+	X: RandomGenerator(n);
+	G: EC(Z(8831));
+
+	// Assigning Values to Variables
+	c:= 6;
+	d:= 3;
+	a:= {{2,5,7},{3,11,13}};
+	b:= {1,2,3,4,5,6,7,8};
+	G := << 4 , 11 >>;
+
+	// while loop
+	while (c < 100) {
+		c:= fib(c);
+	}
+
+	// predefined function
+	println(a);
+	println("result is " + c);
+
+}
