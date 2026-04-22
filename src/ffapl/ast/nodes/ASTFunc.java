@@ -59,7 +59,12 @@ public class ASTFunc extends FFaplNode {
 		_node7.setParent(this);
 		_node8.setParent(this);
 	}
-	
+
+
+	@Override
+	public int getLine() {
+		return _node1.getLine();
+	}
 
 	/* (non-Javadoc)
 	 * @see ffapl.ast.nodes.interfaces.INode#accept(ffapl.visitor.interfaces.IVoidVisitor)

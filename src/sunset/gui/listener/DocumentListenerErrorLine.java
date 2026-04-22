@@ -6,6 +6,7 @@ package sunset.gui.listener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import sunset.gui.debugger.FFaplDebugger;
 import sunset.gui.editor.FFaplCodeTextPane;
 
 
@@ -39,7 +40,9 @@ public class DocumentListenerErrorLine implements DocumentListener {
 	@Override
 	public void insertUpdate(DocumentEvent e) {
 		//_owner.setErrorLineColumn(-1, -1);
-		_owner.getLineHandler().resetHandler();
+		_owner.getLineHandler().resetWarningLines();
+
+		((FFaplDebugger) _owner.getDebugger()).documentChanged(e);
 	}
 
 	/* (non-Javadoc)
@@ -48,7 +51,11 @@ public class DocumentListenerErrorLine implements DocumentListener {
 	@Override
 	public void removeUpdate(DocumentEvent e) {
 		//_owner.setErrorLineColumn(-1, -1);
-		_owner.getLineHandler().resetHandler();
+		_owner.getLineHandler().resetWarningLines();
+		((FFaplDebugger) _owner.getDebugger()).documentChanged(e);
 	}
+
+
+
 
 }

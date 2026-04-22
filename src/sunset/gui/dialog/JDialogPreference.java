@@ -20,6 +20,7 @@ import sunset.gui.lib.FFaplMutableTreeNode;
 import sunset.gui.listener.ActionListenerCloseWindow;
 import sunset.gui.listener.ActionListenerPreferencesOk;
 import sunset.gui.listener.JTreeSelectionListenerPreferences;
+import sunset.gui.panel.JPanelDebugger;
 import sunset.gui.panel.JPanelInterpreter;
 import sunset.gui.panel.JPanelIsomorphismCalculation;
 import sunset.gui.panel.JPanelLanguage;
@@ -106,17 +107,24 @@ public class JDialogPreference extends FFaplJDialog {
 		
 		DefaultTreeModel model = (DefaultTreeModel) jTree_Preferences.getModel();
 		root = createTreeNode("preftree_preferences", "Preferences");
+		node = createTreeNode("preftree_debugger", "Debugger");
+		node.addComponent(new JPanelDebugger((FFaplJFrame) this.getOwner()));
+		root.insert(node, 0);
 		//node = createTreeNode("preftree_general", "General");
 		//root.insert(node, 0);
+
 		node = createTreeNode("preftree_language", "Language");
 		node.addComponent(new JPanelLanguage((FFaplJFrame) this.getOwner()));
 		root.insert(node, 0);
+
 		node = createTreeNode("preftree_interpreter", "Interpreter");
 		node.addComponent(new JPanelInterpreter((FFaplJFrame) this.getOwner()));
 		root.insert(node, 0);
+
 		node = createTreeNode("preftree_isomorphism_calculation", "Isomorphism Calculation");
 		node.addComponent(new JPanelIsomorphismCalculation());
 		root.insert(node, 0);
+
 		TreePath initPath = new TreePath(node.getPath());
 		model.setRoot(root);
 		jTree_Preferences.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);

@@ -45,6 +45,10 @@ public class FFaplNodeChoice implements INode {
    	 	_amount = amount;
    	 	_node.setParent(this);
     }
+
+	public int getLine(){
+		return _node.getLine();
+	}
     
     /**
      * returns the position of the choice

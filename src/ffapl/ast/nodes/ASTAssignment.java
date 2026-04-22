@@ -40,6 +40,11 @@ public class ASTAssignment extends FFaplNode {
 		_node4.setParent(this);
 	}
 
+	@Override
+	public int getLine(){
+		return _node1.getToken().line();
+	}
+
 	/* (non-Javadoc)
 	 * @see ffapl.ast.nodes.interfaces.INode#accept(ffapl.visitor.interfaces.IVoidVisitor)
 	 */

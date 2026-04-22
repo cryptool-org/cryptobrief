@@ -4,6 +4,7 @@
 package ffapl.lib;
 
 import ffapl.ast.nodes.interfaces.INode;
+import ffapl.lib.interfaces.ISymbol;
 import ffapl.lib.interfaces.IToken;
 import ffapl.types.Type;
 

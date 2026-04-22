@@ -11,6 +11,8 @@ import ffapl.java.interfaces.IJavaType;
 import ffapl.java.interfaces.IPseudoRandomGenerator;
 import ffapl.types.FFaplTypeCrossTable;
 
+import static sunset.gui.util.StringUtil.toScientific;
+
 /**
  * Pseudo Random Generator according Park Miller
  * @author Alexander Ortner
@@ -145,7 +147,14 @@ public class PRNG_Park_Miller implements IPseudoRandomGenerator {
 		}
 		return false;
 	}
-	
-	
+
+	@Override
+	public String toString() {
+		return "RNG_Placebo{" +
+				"seed=" + toScientific(_seed) +
+				", min=" + toScientific(_min) +
+				", max=" + toScientific(_max) +
+				'}';
+	}
 
 }

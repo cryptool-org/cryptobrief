@@ -2,10 +2,14 @@ package ffapl.lib.interfaces;
 
 import ffapl.java.classes.Array;
 import ffapl.java.exception.FFaplAlgebraicException;
+import ffapl.java.logging.FFaplLogger;
 import ffapl.types.Type;
 
 public interface IVm {
-	
+
+	public void setLogger(FFaplLogger _logger);
+	public FFaplLogger getLogger();
+
 	/**
 	 * Allocate space on the new procedure stack
 	 * @param type
@@ -58,7 +62,9 @@ public interface IVm {
 	 * @throws FFaplAlgebraicException
 	 */
 	public void loadValue(int offset, boolean global) throws FFaplAlgebraicException;
-	
+
+	public String getValue(int offset, boolean global) throws FFaplAlgebraicException;
+
 	/**
 	 * runtime effect: b = pop(); a = pop(); push(a[b]);
 	 * @throws FFaplAlgebraicException

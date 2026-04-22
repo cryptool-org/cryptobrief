@@ -4,8 +4,12 @@ import ffapl.exception.FFaplException;
 import ffapl.visitor.interfaces.*;
 
 public interface INode {
-	
-	/**
+
+    default int getLine() {
+        return -1;
+    }
+
+    /**
 	 * returns the Parent of the Node
 	 * @return
 	 */

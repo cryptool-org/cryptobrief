@@ -26,4 +26,6 @@ public interface IToken {
 	 * Return the source code column number where the token begins.
 	 */
 	public int column();
+
+	public int scope();
 }
