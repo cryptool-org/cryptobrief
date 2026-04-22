@@ -12,6 +12,8 @@ import ffapl.java.interfaces.IPseudoRandomGenerator;
 import ffapl.java.math.Algorithm;
 import ffapl.types.FFaplTypeCrossTable;
 
+import static sunset.gui.util.StringUtil.toScientific;
+
 /**
  * Build in PRNG
  * @author Alexander Ortner
@@ -108,4 +110,11 @@ public class PRNG_Standard implements IPseudoRandomGenerator {
 		return false;
 	}
 
+	@Override
+	public String toString() {
+		return "RNG_Placebo{" +
+				"seed=" + toScientific(_seed) +
+				", max=" + toScientific(_max) +
+				'}';
+	}
 }

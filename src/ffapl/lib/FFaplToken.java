@@ -14,12 +14,14 @@ public class FFaplToken implements IToken {
 		private int column;
 		private int line;
 		private int kind;
+		private int scope;
 		
-		public FFaplToken (String repr, int column, int line, int kind){
+		public FFaplToken (String repr, int column, int line, int kind, int scope){
 			this.representation = repr;
 			this.column = column;
 			this.line = line;
 			this.kind = kind;
+			this.scope = scope;
 		}
 		
 		public FFaplToken(ffapl.Token token) {
@@ -27,6 +29,7 @@ public class FFaplToken implements IToken {
 			this.column = token.beginColumn;
 			this.line = token.beginLine;
 			this.kind = token.kind;
+			this.scope = token.scope;
 		}
 
 		@Override
@@ -43,6 +46,9 @@ public class FFaplToken implements IToken {
 		public int line() {
 			return this.line;
 		}
+
+		@Override
+		public int scope() {return this.scope;}
 		
 		@Override
 		public String toString(){

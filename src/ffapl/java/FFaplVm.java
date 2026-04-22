@@ -106,6 +106,16 @@ public class FFaplVm implements IVm {
 						new IsomorphismCache()));
 	}
 
+    @Override
+	public void setLogger(FFaplLogger _logger) {
+		this._logger = _logger;
+	}
+
+	@Override
+	public FFaplLogger getLogger() {
+		return _logger;
+	}
+
 	@Override
 	public int allocStack(ISymbol symbol) throws FFaplAlgebraicException {
 		int result;
@@ -194,6 +204,13 @@ public class FFaplVm implements IVm {
 		}else{
 			this._expressionStack.push(val);
 		}
+	}
+
+	// for the debugger
+	@Override
+	public String getValue(int offset, boolean global){
+		loadValue(offset, global);
+		return popStack().toString();
 	}
 	
 	public void loadArrayElement() throws FFaplAlgebraicException{

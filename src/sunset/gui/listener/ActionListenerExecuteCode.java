@@ -15,9 +15,7 @@ import javax.swing.JTextPane;
 
 import sunset.gui.editor.FFaplCodeTextPane;
 import sunset.gui.interfaces.IFFaplLang;
-import sunset.gui.interfaces.IProperties;
 import sunset.gui.lib.ExecuteThread;
-import sunset.gui.logic.GUIPropertiesLogic;
 import sunset.gui.panel.JPanelCode;
 import sunset.gui.tabbedpane.JTabbedPaneCode;
 import sunset.gui.util.InputReaderUtil;
@@ -28,7 +26,8 @@ import ffapl.java.logging.FFaplLogger;
 import ffapl.java.util.FFaplReader;
 import ffapl.java.util.FFaplRuntimeProperties;
 import sunset.gui.logging.JTextPaneConsoleHandler;
-import sunset.gui.panel.JPanelTabTitle;
+
+import static sunset.gui.lib.ExecuteThread.setEnabled;
 
 /**
  * @author Alexander Ortner
@@ -38,9 +37,12 @@ import sunset.gui.panel.JPanelTabTitle;
 public class ActionListenerExecuteCode implements ActionListener {
 
 	private JTabbedPaneCode _tabbedPane_code;
-	private Thread _running;
 	private Vector<Component> _startComp;
 	private Vector<Component> _stopComp;
+	private Vector<Component> _stepOverComp;
+	private Vector<Component> _stepIntoComp;
+	private Vector<Component> _resumeComp;
+
 
 	private JTextPaneConsoleHandler consoleHandler;
 	/**
@@ -48,10 +50,13 @@ public class ActionListenerExecuteCode implements ActionListener {
 	 * @param startComp
 	 * @param stopComp
 	 */
-	public ActionListenerExecuteCode(JTabbedPaneCode tabbedPane_code, Vector<Component> startComp, Vector<Component> stopComp) {
+	public ActionListenerExecuteCode(JTabbedPaneCode tabbedPane_code, Vector<Component> startComp, Vector<Component> stopComp, Vector<Component> stepOverComp, Vector<Component> stepIntoComp, Vector<Component> resumeComp) {
 		_tabbedPane_code = tabbedPane_code;
 		_startComp = startComp;
 		_stopComp = stopComp;
+		_stepOverComp = stepOverComp;
+		_stepIntoComp = stepIntoComp;
+		_resumeComp = resumeComp;
 	}
 
 	@Override
@@ -65,20 +70,21 @@ public class ActionListenerExecuteCode implements ActionListener {
 		JTextPane textPane_console;
 		button = (Component) ev.getSource();
 		textPane = (FFaplCodeTextPane) _tabbedPane_code.currentCodePane();
+		FFaplInterpreter running = textPane.getInterpreter();
 		textPane_console = ((JPanelCode)_tabbedPane_code.currentCodePanel()).getConsole();
 		// reset Errors
-		textPane.getLineHandler().resetHandler();
+		textPane.getLineHandler().resetWarningLines();
 		textPane.repaint();
 
-		if (_running != null) {
-			if (!_running.isAlive()) {
-				_running = null;
+		if (running != null) {
+			if (!running.isAlive()) {
+				running = null;
 			} //else {
 				//System.out.println("Error in Thread");
 			//}
 		}
 
-		if (button.getName().equals(IFFaplLang.BUTTON_RUN)) {
+		if (button.getName().equals(IFFaplLang.BUTTON_RUN) || button.getName().equals(IFFaplLang.BUTTON_RUN_DEBUG)) {
 			logger = new FFaplLogger("FFaplLog");
 			consoleHandler = new JTextPaneConsoleHandler(textPane, textPane_console, LoggerUtil.getLoggerMode());
 			logger.addObserver(consoleHandler);
@@ -90,16 +96,20 @@ public class ActionListenerExecuteCode implements ActionListener {
 					IsomorphismCalculationUtil.getTimeLimitInSeconds());
 
 			// EXECUTE
-			if (textPane != null && _running == null) {
+			if (textPane != null && running == null) {
 				textPane_console.setText("");
 				Reader reader = new StringReader(textPane.getText());
 
 				try {
-					_running = new FFaplInterpreter(logger, properties, inputReader, reader);
-					executeThread = new ExecuteThread(_running, _startComp, _stopComp);
+					running = new FFaplInterpreter(logger, properties, inputReader, reader);
+					textPane.setInterpreter(running);
+					if (button.getName().equals(IFFaplLang.BUTTON_RUN_DEBUG)){
+						running.set_debug(true);
+						running.set_debugger(textPane.getDebugger());
+					}
+					executeThread = new ExecuteThread(running, _startComp, _stopComp, _stepOverComp, _stepIntoComp, _resumeComp, textPane.getDebugger());
 					executeThread.start();
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -114,17 +124,19 @@ public class ActionListenerExecuteCode implements ActionListener {
 	 * @return returns true if success, false if error occurred
 	 */
 	public boolean stopRunningThread() {
+		FFaplCodeTextPane textPane = (FFaplCodeTextPane) _tabbedPane_code.currentCodePane();
+		FFaplInterpreter running = textPane.getInterpreter();
 		// STOP
-		if (_running != null) {
-			_running.interrupt();
+		if (running != null) {
+			running.interrupt();
 			try {
-				_running.join();
+				running.join();
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return false;
 			}
-			_running = null;
+			textPane.setInterpreter(null);
 		}
 		return true;
 	}
@@ -133,11 +145,7 @@ public class ActionListenerExecuteCode implements ActionListener {
 	 * @return true if Execution Thread is running, false otherwise
 	 */
 	public boolean isRunning() {
-		if (_running != null) {
-			if (_running.isAlive()) {
-				return true;
-			}
-		}
-		return false;
+		FFaplInterpreter running = ((FFaplCodeTextPane) _tabbedPane_code.currentCodePane()).getInterpreter();
+		return running != null && running.isAlive();
 	}
 }

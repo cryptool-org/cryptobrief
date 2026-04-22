@@ -2,7 +2,9 @@ package sunset.gui.enums;
 
 public enum LineState {
 	ERROR(1),
-	WARNING(2);
+	WARNING(2),
+	BREAKPOINT(3),
+	ACTIVE_DEBUG(4);
 	
 	private Integer code;
 

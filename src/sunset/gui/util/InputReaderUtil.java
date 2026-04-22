@@ -21,6 +21,7 @@ public class InputReaderUtil extends FFaplReader {
         LinkedList<String> input = ActionListenerInputField.getInput();
         int tabIndex = ActionListenerInputField.getTabbedPane().getSelectedIndex();
 
+        FFaplJFrame.showConsolePanel();
         FFaplJFrame.getInputField().setEnabled(true);
         FFaplJFrame.getInputField().grabFocus();
 

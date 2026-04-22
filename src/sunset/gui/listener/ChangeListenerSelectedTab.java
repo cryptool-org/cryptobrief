@@ -138,6 +138,7 @@ public class ChangeListenerSelectedTab implements ChangeListener {
 			_lineNumber.setVisible(false);
 			_searchReplaceDialogOwner.setFileOpened(false);
 		}
+		tabbedPane.changedTab();
 	}
 
 	/**

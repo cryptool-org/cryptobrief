@@ -40,7 +40,7 @@ import ffapl.types.FFaplString;
 public class Print implements IPredefinedProcFunc {
 
 	
-	private FFaplLogger _logger;
+	//private FFaplLogger _logger;
 	private boolean _newLine;
 	private static int maxArrayDim = 4;
 	
@@ -50,7 +50,7 @@ public class Print implements IPredefinedProcFunc {
 	 * @param newLine
 	 */
 	public Print (FFaplLogger logger, boolean newLine){
-		_logger = logger;
+		//_logger = logger;
 		_newLine = newLine;
 	}
 	
@@ -90,7 +90,7 @@ public class Print implements IPredefinedProcFunc {
 	    if (_newLine){
 	    	msg = msg + "\n";
 	    }
-	    _logger.log(ILevel.RESULT, msg);
+	    interpreter.getLogger().log(ILevel.RESULT, msg);
 	}
 
 	

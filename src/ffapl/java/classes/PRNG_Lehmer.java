@@ -12,6 +12,8 @@ import ffapl.java.interfaces.IJavaType;
 import ffapl.java.interfaces.IPseudoRandomGenerator;
 import ffapl.types.FFaplTypeCrossTable;
 
+import static sunset.gui.util.StringUtil.toScientific;
+
 /**
  * Lehmer random number generator x_(i+1) = g*x_i mod p
  * restricted form
@@ -128,6 +130,14 @@ public class PRNG_Lehmer implements IPseudoRandomGenerator {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		return "RNG_Placebo{" +
+				"seed=" + toScientific(_seed.value()) +
+				", modulus=" + toScientific(modulus()) +
+				'}';
 	}
 
 }

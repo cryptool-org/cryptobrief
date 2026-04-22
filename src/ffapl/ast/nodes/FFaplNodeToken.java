@@ -26,10 +26,15 @@ public class FFaplNodeToken implements INode {
 	
 	/**
 	 * constructor
-	 * @param tk
+	 * @param token
 	 */
 	public FFaplNodeToken(Token token) {
 		_token = new FFaplToken(token);
+	}
+
+	@Override
+	public int getLine() {
+		return _token.line();
 	}
 
 	/* (non-Javadoc)

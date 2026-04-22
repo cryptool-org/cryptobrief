@@ -30,6 +30,10 @@ public class ASTStatement extends FFaplNode {
 		_node1.setParent(this);
 	}
 
+	public int getLine(){
+		return _node1.getLine();
+	}
+
 	/* (non-Javadoc)
 	 * @see ffapl.ast.nodes.interfaces.INode#accept(ffapl.visitor.interfaces.IVoidVisitor)
 	 */

@@ -2029,7 +2029,7 @@ static final long[] jjtoSpecial = {
 static final long[] jjtoMore = {
    0x0L, 0x470000L, 
 };
-    protected JavaCharStream  input_stream;
+    public JavaCharStream  input_stream;
 
     private final int[] jjrounds = new int[17];
     private final int[] jjstateSet = new int[2 * 17];

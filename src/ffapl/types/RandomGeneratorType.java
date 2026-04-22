@@ -17,5 +17,5 @@ public class RandomGeneratorType extends Type {
 	public Type clone() {
 		return null;
 	}
-	
+
 }

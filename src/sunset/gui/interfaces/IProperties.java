@@ -39,6 +39,9 @@ public class IProperties {
 	public final static String ISOMORPHISM_CALCULATION_TIME_LIMIT = "ISOCALC.TIMELIMIT";
 	public final static String ISOMORPHISM_CALCULATION_ROOT_FINDING_STRATEGY = "ISOCALC.ROOTFINDING";
 	public final static String SYSTEM = "SYSTEM";
+	public final static String GUI_BREAKPOINT_COLOR = "GUI.BREAKPOINT.COLOR";
+	public final static String GUI_ACTIVE_DEBUG_COLOR = "GUI.ACTIVEDEBUG.COLOR";
+	public final static String DEBUGGER_INTEGER_THRESHOLD = "DEBUGGER.INTEGER.THRESHOLD";
 
 	public static String getInstallPath() {
 		String installPath = "";

@@ -39,8 +39,8 @@ public class GUIPropertiesLogic {
 		return systemProperties.getProperty(key);
 	}
 	
-	public void setProperty(String key, String value){
-		properties.setProperty(key, value);
+	public Object setProperty(String key, String value){
+		return properties.setProperty(key, value);
 	}
 	
 	public Boolean getBooleanProperty(String key){

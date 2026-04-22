@@ -1,8 +1,9 @@
 /**
- * 
+ *
  */
 package ffapl.java.classes;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
@@ -12,124 +13,117 @@ import ffapl.java.interfaces.IJavaType;
 import ffapl.java.interfaces.ITrueRandomGenerator;
 import ffapl.types.FFaplTypeCrossTable;
 
+import static sunset.gui.util.StringUtil.toScientific;
+
 /**
  * @author Alexander Ortner
  * @version 1.0
- *
  */
 public class RNG_Placebo implements ITrueRandomGenerator {
 
-	
-	private BigInteger _min;
-	private BigInteger _max;
-	private Thread _thread;
-	
-	
-	/**
-	 * default constructor
-	 * @param thread
-	 */
-	public RNG_Placebo(Thread thread){
-		_min = BigInteger.ZERO;
-		_max = BigInteger.ONE.negate();//full range
-		_thread = thread;
-	}
-	
-	/**
-	 * 
-	 * @param max
-	 * @param thread
-	 * @throws FFaplAlgebraicException
-	 *         <WRONG_INPUT> if 0 >= abs(max)
-	 */
-	public RNG_Placebo(BigInteger max, Thread thread) throws FFaplAlgebraicException{
-		this(BigInteger.ZERO, max, thread);
-	}
-	
-	/**
-	 * 
-	 * @param min
-	 * @param max
-	 * @param thread
-	 * @throws FFaplAlgebraicException
-	 *         <WRONG_INPUT> if abs(min) >= abs(max)
-	 */
-	public RNG_Placebo(BigInteger min, BigInteger max, Thread thread) throws FFaplAlgebraicException{
-		_max = max;
-		_min = min;
-		_thread = thread;
-		if(_min.compareTo(BigInteger.ZERO) < 0){
-			Object[] arguments = {this.classInfo(), "min: " + _min}; 
-			throw new FFaplAlgebraicException(arguments, IAlgebraicError.VAL_LESS_ZERO);
-		}
-		if(_max.compareTo(BigInteger.ZERO) <= 0){
-			Object[] arguments = {this.classInfo(), "max: " + _max}; 
-			throw new FFaplAlgebraicException(arguments, IAlgebraicError.VAL_LESS_EQUAL_ZERO);
-		}
-		if(_min.compareTo(_max) >= 0 ){
-			Object[] arguments = {this.classInfo(), min + ">=" + max}; 
-			throw new FFaplAlgebraicException(arguments, IAlgebraicError.MIN_GREATER_EQUAL_MAX);
-		}
-	}
-	
-	/**
-	 * 
-	 * @param min
-	 * @param max
-	 * @param thread
-	 * @throws FFaplAlgebraicException
-	 *         <WRONG_INPUT> if abs(min) >= abs(max)
-	 */
-	public RNG_Placebo(long min, long max, Thread thread) throws FFaplAlgebraicException{
-		this(BigInteger.valueOf(min), BigInteger.valueOf(max), thread);
-	}
-	
-	/**
-	 * 
-	 * @param max
-	 * @param thread
-	 * @throws FFaplAlgebraicException
-	 *         <WRONG_INPUT> if 0 >= abs(max)
-	 */
-	public RNG_Placebo(long max, Thread thread) throws FFaplAlgebraicException{
-		this(BigInteger.ZERO, BigInteger.valueOf(max), thread);
-	}
-	
-	
 
-	/* (non-Javadoc)
-	 * @see ffapl.java.interfaces.ITrueRandomGenerator#next()
-	 */
-	@Override
-	public BigInteger next() throws FFaplAlgebraicException{
-		//SecureRandom rg = new SecureRandom(String.valueOf(System.currentTimeMillis()).getBytes());
-		SecureRandom rg = new SecureRandom();
-		BigInteger val = null;
-		BigInteger maxVal = _max.subtract(_min);
-		if(_max.equals(BigInteger.ONE.negate())){
-			val = BigInteger.valueOf(rg.nextLong());
-		}else{
-			val = new BigInteger(maxVal.bitLength(), rg);
-			val = val.mod(maxVal.add(BigInteger.ONE)).add(_min);
-		}
-		if(val.compareTo(BigInteger.ZERO) < 0){
-			val = val.negate();
-		}
-		return new BInteger(val, _thread);
-	}
+    private BigInteger _min;
+    private BigInteger _max;
+    private Thread _thread;
 
-	@Override
-	public int typeID() {
-		return IJavaType.RANDOMGENERATOR;
-	}
-	
-	@Override
-	public String classInfo() {
-		return FFaplTypeCrossTable.TYPE_Name[FFaplTypeCrossTable.FFAPLRANDOMG];
-	}
-	
-	@Override
-	public ITrueRandomGenerator clone(){
+
+    /**
+     * default constructor
+     *
+     * @param thread
+     */
+    public RNG_Placebo(Thread thread) {
+        _min = BigInteger.ZERO;
+        _max = BigInteger.ONE.negate();//full range
+        _thread = thread;
+    }
+
+    /**
+     * @param max
+     * @param thread
+     * @throws FFaplAlgebraicException <WRONG_INPUT> if 0 >= abs(max)
+     */
+    public RNG_Placebo(BigInteger max, Thread thread) throws FFaplAlgebraicException {
+        this(BigInteger.ZERO, max, thread);
+    }
+
+    /**
+     * @param min
+     * @param max
+     * @param thread
+     * @throws FFaplAlgebraicException <WRONG_INPUT> if abs(min) >= abs(max)
+     */
+    public RNG_Placebo(BigInteger min, BigInteger max, Thread thread) throws FFaplAlgebraicException {
+        _max = max;
+        _min = min;
+        _thread = thread;
+        if (_min.compareTo(BigInteger.ZERO) < 0) {
+            Object[] arguments = {this.classInfo(), "min: " + _min};
+            throw new FFaplAlgebraicException(arguments, IAlgebraicError.VAL_LESS_ZERO);
+        }
+        if (_max.compareTo(BigInteger.ZERO) <= 0) {
+            Object[] arguments = {this.classInfo(), "max: " + _max};
+            throw new FFaplAlgebraicException(arguments, IAlgebraicError.VAL_LESS_EQUAL_ZERO);
+        }
+        if (_min.compareTo(_max) >= 0) {
+            Object[] arguments = {this.classInfo(), min + ">=" + max};
+            throw new FFaplAlgebraicException(arguments, IAlgebraicError.MIN_GREATER_EQUAL_MAX);
+        }
+    }
+
+    /**
+     * @param min
+     * @param max
+     * @param thread
+     * @throws FFaplAlgebraicException <WRONG_INPUT> if abs(min) >= abs(max)
+     */
+    public RNG_Placebo(long min, long max, Thread thread) throws FFaplAlgebraicException {
+        this(BigInteger.valueOf(min), BigInteger.valueOf(max), thread);
+    }
+
+    /**
+     * @param max
+     * @param thread
+     * @throws FFaplAlgebraicException <WRONG_INPUT> if 0 >= abs(max)
+     */
+    public RNG_Placebo(long max, Thread thread) throws FFaplAlgebraicException {
+        this(BigInteger.ZERO, BigInteger.valueOf(max), thread);
+    }
+
+
+    /* (non-Javadoc)
+     * @see ffapl.java.interfaces.ITrueRandomGenerator#next()
+     */
+    @Override
+    public BigInteger next() throws FFaplAlgebraicException {
+        //SecureRandom rg = new SecureRandom(String.valueOf(System.currentTimeMillis()).getBytes());
+        SecureRandom rg = new SecureRandom();
+        BigInteger val = null;
+        BigInteger maxVal = _max.subtract(_min);
+        if (_max.equals(BigInteger.ONE.negate())) {
+            val = BigInteger.valueOf(rg.nextLong());
+        } else {
+            val = new BigInteger(maxVal.bitLength(), rg);
+            val = val.mod(maxVal.add(BigInteger.ONE)).add(_min);
+        }
+        if (val.compareTo(BigInteger.ZERO) < 0) {
+            val = val.negate();
+        }
+        return new BInteger(val, _thread);
+    }
+
+    @Override
+    public int typeID() {
+        return IJavaType.RANDOMGENERATOR;
+    }
+
+    @Override
+    public String classInfo() {
+        return FFaplTypeCrossTable.TYPE_Name[FFaplTypeCrossTable.FFAPLRANDOMG];
+    }
+
+    @Override
+    public ITrueRandomGenerator clone() {
 		/*if(_max.compareTo(BigInteger.ZERO) < 0){
 			return new TRNG_Placebo();
 		}
@@ -140,16 +134,24 @@ public class RNG_Placebo implements ITrueRandomGenerator {
 			e.printStackTrace();
 			return null;
 		}*/
-		//Only a copy
-		return this;
-	}
-	
-	@Override
-	public boolean equalType(Object type) {
-		if(type instanceof ITrueRandomGenerator){
-			return true;
-		}
-		return false;
-	}
+        //Only a copy
+        return this;
+    }
+
+    @Override
+    public boolean equalType(Object type) {
+        if (type instanceof ITrueRandomGenerator) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return "RNG_Placebo{" +
+                "min=" + toScientific(_min) +
+                ", max=" + toScientific(_max) +
+                '}';
+    }
 
 }
